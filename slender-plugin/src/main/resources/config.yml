@@ -1,0 +1,379 @@
+# ╔══════════════════════════════════════════════════════════════╗
+# ║              SlendermanPlugin — Configuration File              ║
+# ║                                                              ║
+# ║  Supported versions: Paper/Spigot 1.19 – 1.21.x             ║
+# ║  GitHub: https://github.com/virgenes/SlendermanPlugin          ║
+# ╚══════════════════════════════════════════════════════════════╝
+
+# ── General ────────────────────────────────────────────────────────────────
+General:
+  # Language for all player-facing messages.
+  # Available: en, es, fr, de, pt, zh
+  # Custom files can be placed in plugins/SlendermanPlugin/lang/<code>.yml
+  Language: en
+
+  # Prefix shown in console messages (not in-game messages).
+  Prefix: "&8[&cSlender&8] &r"
+
+  # Check for plugin updates on startup.
+  Update-Checker: true
+
+# ── Game Settings ───────────────────────────────────────────────────────────
+GameSettings:
+  # Number of pages survivors must collect to win.
+  Pages-To-Win: 8
+
+  # SlenderMan's maximum health (hearts × 2).
+  # Default: 40 = 20 hearts
+  SlenderMan-Health: 40
+
+  # Countdown (seconds) before the game starts after minimum players join.
+  Starting-Countdown: 30
+
+  # Countdown (seconds) after the game ends before returning to lobby.
+  Ending-Timer: 15
+
+  # Delay (ticks, 20 ticks = 1 second) before the arena resets to WAITING.
+  Restart-Delay-Ticks: 100
+
+  # ── Torch Settings ──────────────────────────────────────────────────────
+  Torch:
+    # Maximum number of torch uses per game session per survivor.
+    Max-Uses: 3
+
+    # Cooldown in seconds between torch uses.
+    Cooldown-Seconds: 5
+
+    # Duration (ticks) of Night Vision granted by a torch.
+    Night-Vision-Ticks: 100
+
+  # ── Atmosphere Effects ──────────────────────────────────────────────────
+  Atmosphere:
+    # Apply DARKNESS effect to survivors periodically.
+    # On servers below 1.19, BLINDNESS is used instead automatically.
+    Use-Darkness-Effect: true
+
+    # How often (seconds) to reapply the darkness effect.
+    Darkness-Reapply-Interval-Seconds: 3
+
+    # Duration (ticks) of each darkness application.
+    Darkness-Duration-Ticks: 80
+
+  # ── Terror Radius ───────────────────────────────────────────────────────
+  TerrorRadius:
+    # Enable proximity effects (music + nausea) near the SlenderMan.
+    Enabled: true
+
+    # Radius (blocks) at which scary ambient music plays.
+    Music-Radius: 7.00
+
+    # Radius (blocks) at which survivors get nausea.
+    # Must be <= Music-Radius
+    Nausea-Radius: 3.00
+
+    # Duration (ticks) of the nausea effect.
+    Nausea-Duration-Ticks: 60
+
+    # Amplifier of the nausea effect (0 = level 1, 1 = level 2).
+    Nausea-Amplifier: 1
+
+  # ── Disguise / Skins ────────────────────────────────────────────────────
+  Disguise:
+    # Enable the internal disguise system for the SlenderMan.
+    # When disabled, the SlenderMan appears as a normal player.
+    Enabled: true
+
+    # Default skin applied to the SlenderMan at game start.
+    # Options: ENDERMAN, WITHER, PHANTOM, RAVAGER, ELDER_GUARDIAN, WARDEN
+    # Note: PHANTOM requires 1.13+, RAVAGER requires 1.14+, WARDEN requires 1.19+
+    # If the skin is unavailable on your server version, ENDERMAN is used.
+    Default-Skin: ENDERMAN
+
+  # ── Starting Items ──────────────────────────────────────────────────────
+  Items:
+    # Material for the survivor's weapon.
+    # Must be a valid Bukkit Material name.
+    Survivor-Weapon: WOODEN_SWORD
+
+    # Material for the SlenderMan's weapon.
+    SlenderMan-Weapon: IRON_SWORD
+
+  # ── Party System ────────────────────────────────────────────────────────
+  Party:
+    # Enable the party system.
+    Enabled: true
+
+    # Maximum members per party (including the leader).
+    Max-Members: 4
+
+# ── Lobby Items ─────────────────────────────────────────────────────────────
+# Materials for items given to players in the lobby.
+# Must be valid Bukkit Material names.
+LobbyItems:
+  Arena-Selector: CHEST
+  Leave: RED_BED
+  My-Profile: PLAYER_HEAD
+  Play-Again: PAPER
+  Party-Menu: SLIME_BALL
+  Shop: GOLD_INGOT
+  Spectator-Settings: STICK
+  Spectator-Teleporter: COMPASS
+
+# ── Perk Settings ───────────────────────────────────────────────────────────
+Perks:
+  Runaway:
+    # Cooldown in seconds before the perk can be used again.
+    Cooldown-Seconds: 20
+    # Duration (ticks) of the Speed II effect.
+    Duration-Ticks: 100
+
+  BetterTogether:
+    Cooldown-Seconds: 25
+    # Radius (blocks) to search for nearby allies.
+    Radius-Blocks: 8.00
+
+  Archaeologist:
+    Cooldown-Seconds: 30
+    # Duration (ticks) of Night Vision granted.
+    Night-Vision-Ticks: 160
+
+# ── Database ────────────────────────────────────────────────────────────────
+Database:
+  # Storage type: YAML (file-based, no setup needed) or MYSQL
+  Type: YAML
+
+  # Auto-save interval in seconds (0 = disabled).
+  Auto-Save: 300
+
+  # MySQL settings (only used when Type: MYSQL)
+  Host: localhost
+  Port: 3306
+  Name: slender
+  User: root
+  Password: password
+
+# ── Economy System ───────────────────────────────────────────────────────────
+Economy:
+  # Enable economy integration
+  Enabled: true
+
+  # Starting coins for new players
+  Starting-Coins: 100.00
+
+  # Reward for winning a game
+  Win-Reward: 500.00
+
+  # Reward for finding a page
+  Page-Reward: 50.00
+
+  # Cost to join a game
+  Join-Cost: 10.00
+
+# ── Menu Configuration ───────────────────────────────────────────────────────
+Menus:
+  Main-Menu:
+    Title: "&6SlenderMan Menu"
+    Size: 27
+    Items:
+      Play:
+        Slot: 11
+        Material: DIAMOND_SWORD
+        Name: "&aPlay Game"
+        Lore:
+          - "&7Click to join a game"
+      Stats:
+        Slot: 13
+        Material: BOOK
+        Name: "&bStatistics"
+        Lore:
+          - "&7View your statistics"
+      Shop:
+        Slot: 15
+        Material: EMERALD
+        Name: "&eShop"
+        Lore:
+          - "&7Buy items and upgrades"
+      Profile:
+        Slot: 22
+        Material: PLAYER_HEAD
+        Name: "&dProfile"
+        Lore:
+          - "&7View your profile"
+      Party:
+        Slot: 20
+        Material: SLIME_BALL
+        Name: "&5Party"
+        Lore:
+          - "&7Manage your party"
+
+  Arena-Selection:
+    Title: "&6Select Arena"
+    Size: 54
+    Items-Per-Page: 45
+
+  Shop-Menu:
+    Title: "&6SlenderMan Shop"
+    Size: 54
+    Items-Per-Page: 45
+    Categories:
+      Weapons:
+        Slot: 10
+        Material: IRON_SWORD
+        Name: "&cWeapons"
+      Armor:
+        Slot: 12
+        Material: DIAMOND_CHESTPLATE
+        Name: "&bArmor"
+      Utilities:
+        Slot: 14
+        Material: TORCH
+        Name: "&eUtilities"
+      Perks:
+        Slot: 16
+        Material: ENCHANTED_BOOK
+        Name: "&dPerks"
+
+  Profile-Menu:
+    Title: "&6Player Profile"
+    Size: 36
+    Items:
+      Games-Played:
+        Slot: 10
+        Material: PAPER
+        Name: "&aGames Played"
+      Wins:
+        Slot: 11
+        Material: GOLD_INGOT
+        Name: "&6Wins"
+      Pages-Found:
+        Slot: 12
+        Material: BOOK
+        Name: "&ePages Found"
+      Coins:
+        Slot: 13
+        Material: EMERALD
+        Name: "&2Coins"
+      Level:
+        Slot: 14
+        Material: EXPERIENCE_BOTTLE
+        Name: "&dLevel"
+
+# ── Statistics ───────────────────────────────────────────────────────────────
+Statistics:
+  # Enable statistics tracking
+  Enabled: true
+
+  # Types of statistics to track
+  Tracked-Stats:
+    - "games_played"
+    - "games_won"
+    - "pages_found"
+    - "time_played"
+    - "deaths"
+    - "kills"
+    - "coins_earned"
+    - "distance_traveled"
+
+  # Leaderboard settings
+  Leaderboard:
+    Enabled: true
+    Update-Interval: 300
+    Max-Entries: 10
+
+# ── Performance ───────────────────────────────────────────────────────────
+Performance:
+  # Maximum entities per arena
+  Max-Entities-Per-Arena: 100
+
+  # Cleanup interval for inactive entities (seconds)
+  Entity-Cleanup-Interval: 60
+
+  # Maximum memory usage threshold (MB)
+  Memory-Threshold: 512
+
+  # Enable performance monitoring
+  Monitoring-Enabled: true
+
+# ── Security ───────────────────────────────────────────────────────────────
+Security:
+  # Anti-cheat measures
+  Anti-Cheat:
+    Enabled: true
+    Max-Actions-Per-Second: 10
+    Ban-On-Violation: true
+
+  # Chat filter
+  Chat-Filter:
+    Enabled: true
+    Blocked-Words:
+      - "hack"
+      - "cheat"
+      - "exploit"
+
+# ── Localization ───────────────────────────────────────────────────────────
+Localization:
+  # Auto-detect player language
+  Auto-Detect: true
+
+  # Fallback language if detection fails
+  Fallback-Language: "en"
+
+  # Available languages
+  Available:
+    - "en"
+    - "es"
+    - "fr"
+    - "de"
+    - "pt"
+    - "zh"
+
+# ── Notifications ───────────────────────────────────────────────────────────
+Notifications:
+  # Enable notifications
+  Enabled: true
+
+  # Types of notifications
+  Types:
+    Game-Start: true
+    Game-End: true
+    Page-Found: true
+    Player-Join: true
+    Player-Leave: true
+    Level-Up: true
+    Achievement: true
+
+  # Notification sound
+  Sound: "ENTITY_EXPERIENCE_ORB_PICKUP"
+
+# ── Debug Settings ─────────────────────────────────────────────────────────
+Debug:
+  # Enable debug mode
+  Enabled: false
+
+  # Log level (FINE, INFO, WARNING, SEVERE)
+  Log-Level: "INFO"
+
+  # Save debug logs to file
+  Save-To-File: false
+
+# ── Advanced Settings ─────────────────────────────────────────────────────
+Advanced:
+  # Multi-world support
+  Multi-World:
+    Enabled: true
+    Allowed-Worlds:
+      - "world"
+      - "world_nether"
+      - "world_the_end"
+
+  # Plugin compatibility
+  Compatibility:
+    PlaceholderAPI: true
+    Vault: true
+    WorldEdit: true
+    WorldGuard: true
+
+  # Custom game modes
+  Custom-Modes:
+    Enabled: false
+    Modes: []

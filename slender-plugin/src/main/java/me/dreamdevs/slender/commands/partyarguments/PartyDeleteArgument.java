@@ -8,6 +8,9 @@ import me.dreamdevs.slender.game.Party;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class PartyDeleteArgument implements ArgumentCommand {
 
     @Override
@@ -37,9 +40,7 @@ public class PartyDeleteArgument implements ArgumentCommand {
             return true;
         }
 
-        party.getMembers().forEach(member -> {
-            party.getMembers().remove(member);
-
+        new ArrayList<>(party.getMembersMap().keySet()).forEach(member -> {
             member.getOfflinePlayer().getPlayer().sendMessage(Langauge.PARTY_REMOVED_INFO.toString());
         });
 

@@ -5,15 +5,19 @@ import me.dreamdevs.slender.api.Setting;
 import me.dreamdevs.slender.api.Statistic;
 import me.dreamdevs.slender.api.database.IDatabase;
 import me.dreamdevs.slender.api.game.Role;
+import me.dreamdevs.slender.api.game.perks.Perk;
 import me.dreamdevs.slender.api.game.perks.PerkInfo;
 import me.dreamdevs.slender.api.utils.Util;
 import me.dreamdevs.slender.database.data.GamePlayer;
+import me.dreamdevs.slender.disguise.SlenderDisguise;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class DatabaseYAML implements IDatabase {
@@ -34,6 +38,7 @@ public class DatabaseYAML implements IDatabase {
 	@Override
 	public void saveStatistics() {
 		SlenderMain.getInstance().getPlayerManager().getPlayers().forEach(gamePlayer -> {
+			if (gamePlayer.getPlayer() == null) return;
 			File playerFile = new File(dataDirectory, gamePlayer.getPlayer().getUniqueId()+".yml");
 			Util.createFile(playerFile);
 			YamlConfiguration playerData = YamlConfiguration.loadConfiguration(playerFile);
@@ -51,8 +56,12 @@ public class DatabaseYAML implements IDatabase {
 			playerData.set("PlayerSettings.AutoArenaJoin", gamePlayer.getSetting(Setting.AUTO_JOIN_MODE));
 			playerData.set("PlayerSettings.ShowJoinArenaMessage", gamePlayer.getSetting(Setting.SHOW_ARENA_JOIN_MESSAGE));
 			playerData.set("PlayerSettings.MessagesType", gamePlayer.getSetting(Setting.MESSAGE_TYPE));
-			playerData.set("PlayerPerks.EquippedSurvivorPerk", gamePlayer.getPerk(Role.SURVIVOR).getClass().getAnnotation(PerkInfo.class).name());
-			playerData.set("PlayerPerks.EquippedSlenderManPerk", gamePlayer.getPerk(Role.SLENDER).getClass().getAnnotation(PerkInfo.class).name());
+			Perk survivorPerk = gamePlayer.getPerk(Role.SURVIVOR);
+			Perk slenderPerk = gamePlayer.getPerk(Role.SLENDER);
+			playerData.set("PlayerPerks.EquippedSurvivorPerk", survivorPerk != null ? survivorPerk.getClass().getAnnotation(PerkInfo.class).name() : "RUNAWAY");
+			playerData.set("PlayerPerks.EquippedSlenderManPerk", slenderPerk != null ? slenderPerk.getClass().getAnnotation(PerkInfo.class).name() : "ENDERMAN");
+			playerData.set("PlayerSkins.Owned", gamePlayer.getOwnedSkins().stream().map(SlenderDisguise::name).collect(Collectors.toList()));
+			playerData.set("PlayerSkins.Equipped", gamePlayer.getEquippedSkin().name());
 			try {
 				playerData.save(playerFile);
 			} catch (Exception e) {}
@@ -68,7 +77,7 @@ public class DatabaseYAML implements IDatabase {
 		}
 
 		Stream.of(files).map(YamlConfiguration::loadConfiguration).forEach(configuration -> {
-			UUID uuid = UUID.fromString(Objects.requireNonNull(configuration.getString("PlayerInfo.Uuid")));
+			UUID uuid = UUID.fromString(Objects.requireNonNull(configuration.getString("PlayerInfo.UUID")));
 
 			GamePlayer gamePlayer = new GamePlayer(Bukkit.getOfflinePlayer(uuid));
 			gamePlayer.setStatistic(Statistic.COINS, configuration.getInt("Statistics.Coins",0));
@@ -85,6 +94,25 @@ public class DatabaseYAML implements IDatabase {
 
 			gamePlayer.setPerk(Role.SURVIVOR, SlenderMain.getInstance().getPerkManager().getPerk(configuration.getString("PlayerPerks.EquippedSurvivorPerk","RUNAWAY")));
 			gamePlayer.setPerk(Role.SLENDER, SlenderMain.getInstance().getPerkManager().getPerk(configuration.getString("PlayerPerks.EquippedSlenderManPerk","")));
+
+			List<String> ownedSkins = configuration.getStringList("PlayerSkins.Owned");
+			if (ownedSkins.isEmpty()) {
+				gamePlayer.getOwnedSkins().add(SlenderDisguise.ENDERMAN);
+			} else {
+				for (String skinName : ownedSkins) {
+					try {
+						SlenderDisguise skin = SlenderDisguise.valueOf(skinName.toUpperCase());
+						gamePlayer.getOwnedSkins().add(skin);
+					} catch (IllegalArgumentException ignored) {}
+				}
+			}
+			String equippedName = configuration.getString("PlayerSkins.Equipped", "ENDERMAN");
+			try {
+				SlenderDisguise equipped = SlenderDisguise.valueOf(equippedName.toUpperCase());
+				if (gamePlayer.ownsSkin(equipped)) {
+					gamePlayer.equipSkin(equipped);
+				}
+			} catch (IllegalArgumentException ignored) {}
 
 			SlenderMain.getInstance().getPlayerManager().getPlayers().add(gamePlayer);
 		});

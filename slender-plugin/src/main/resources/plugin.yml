@@ -1,17 +1,33 @@
-name: ${project.name}
-version: ${project.version}
+name: SlendermanPlugin
+version: '2.0.0'
 main: me.dreamdevs.slender.SlenderMain
-author: DreamDevs
-api-version: 1.13
-
-softdepend:
-  - ProtocolLib
-  - LibsDisguises
+author: virgenes
+api-version: '1.16'
+description: Professional horror minigame with multiple game modes
 
 commands:
-  stopitslender:
-    aliases: [slender, slenderman, sis]
-    description: Main StopItSlender command
+  sis:
+    aliases: [slender, slenderman, slendermanplugin]
+    description: Main Slender command
+    usage: /sis <subcommand>
   party:
     aliases: [slenderparty]
-    description: Party StopItSlender command
+    description: Party system command
+    usage: /party <subcommand>
+  sisadmin:
+    description: Admin commands for Slender
+    usage: /sisadmin <subcommand>
+    permission: slender.admin
+
+permissions:
+  slender.*:
+    description: All Slender permissions
+    children:
+      slender.admin: true
+      slender.play: true
+  slender.admin:
+    description: Admin permissions
+    default: op
+  slender.play:
+    description: Play permissions
+    default: true

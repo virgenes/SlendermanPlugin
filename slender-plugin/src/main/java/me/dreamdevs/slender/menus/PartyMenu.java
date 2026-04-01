@@ -30,7 +30,7 @@ public class PartyMenu extends ItemMenu {
 			setItem(4, new PartyButton(gamePlayer, PartyButton.Action.NOTHING, party, Langauge.MENU_PARTY_INFO_ITEM_NAME.toString(),
 						new ItemStack(Material.BOOK), Langauge.MENU_PARTY_INFO_ITEM_LORE.toString()
 								.replace("%LEADER%", party.getPartyLeader().getPlayer().getName())
-								.replace("%MEMBERS_COUNT%", String.valueOf(party.getMembers().size()))
+								.replace("%MEMBERS_COUNT%", String.valueOf(party.getMembersMap().size()))
 								.replace("%STATUS%", (boolean) party.getPartySetting(PartySettings.OPEN_PARTY) ? Langauge.MENU_PARTY_PUBLIC.toString() : Langauge.MENU_PARTY_PRIVATE.toString())));
 
 			if (!party.getPartyLeader().equals(gamePlayer.getPlayer())) {

@@ -2,11 +2,10 @@ package me.dreamdevs.slender.managers;
 
 import lombok.Getter;
 import me.dreamdevs.slender.SlenderMain;
-import me.dreamdevs.slender.api.SlenderApi;
 import me.dreamdevs.slender.api.Statistic;
 import me.dreamdevs.slender.database.data.GamePlayer;
+import me.dreamdevs.slender.disguise.DisguiseManager;
 import me.dreamdevs.slender.game.CustomItem;
-import me.libraryaddict.disguise.DisguiseAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.OfflinePlayer;
@@ -39,7 +38,7 @@ public class PlayerManager {
     public void loadLobby(@NotNull Player player) {
         player.getInventory().setItem(0, CustomItem.ARENA_SELECTOR.toItemStack());
         player.getInventory().setItem(3, CustomItem.PARTY_MENU.toItemStack());
-        player.getInventory().setItem(5, CustomItem.PERKS.toItemStack());
+        player.getInventory().setItem(5, CustomItem.SHOP.toItemStack());
 
         ItemStack itemStack = CustomItem.MY_PROFILE.toItemStack();
         SkullMeta skullMeta = (SkullMeta) itemStack.getItemMeta();
@@ -62,7 +61,7 @@ public class PlayerManager {
         player.setExp(0);
         player.setGlowing(false);
         player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
-        player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
+        player.getAttribute(Attribute.MAX_HEALTH).setBaseValue(20);
         player.setHealth(20);
         player.getActivePotionEffects().stream().map(PotionEffect::getType).forEach(player::removePotionEffect);
 
@@ -76,9 +75,7 @@ public class PlayerManager {
             }
         });
 
-        if (SlenderApi.isLibsDisguisedEnabled) {
-            DisguiseAPI.undisguiseToAll(player);
-        }
+        DisguiseManager.undisguise(player);
     }
 
 }

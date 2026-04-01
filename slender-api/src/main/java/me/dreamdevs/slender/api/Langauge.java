@@ -197,7 +197,34 @@ public enum Langauge {
 	MENU_ADMIN_MENU_FORCE_START_GAME_ITEM("Menu.Admin.Force-Start-Game-Item","&aForce Start"),
 	MENU_ADMIN_MENU_FORCE_RESTART_GAME_ITEM("Menu.Admin.Force-Restart-Game-Item","&aForce Restart"),
 	MENU_ADMIN_MENU_FORCE_STOP_GAME_ITEM("Menu.Admin.Force-Stop-Game-Item","&aForce Stop"),
-	MENU_ADMIN_MENU_FORCE_SET_LOBBY_ITEM("Menu.Admin.Force-Set-Lobby-Game-Item","&aSet Lobby");
+	COMPASS_NO_SURVIVORS("ArenaAnnouncements.Compass-No-Survivors","&cNo survivors available to track."),
+
+	MENU_ADMIN_MENU_FORCE_SET_LOBBY_ITEM("Menu.Admin.Force-Set-Lobby-Game-Item","&aSet Lobby"),
+
+	// Slender Shop
+	SHOP_TITLE("Shop.Title","&4&lSlender Shop"),
+	SHOP_SKIN_LOCKED("Shop.Skin-Locked","&cLocked &7- &6%COST% coins"),
+	SHOP_SKIN_OWNED("Shop.Skin-Owned","&aOwned"),
+	SHOP_SKIN_EQUIPPED("Shop.Skin-Equipped","&b&lEquipped"),
+	SHOP_NOT_ENOUGH_COINS("Shop.Not-Enough-Coins","&cNot enough coins! You need &6%COST% &ccoins."),
+	SHOP_SKIN_PURCHASED("Shop.Skin-Purchased","&aSkin &e%SKIN% &apurchased!"),
+	SHOP_SKIN_EQUIPPED_MSG("Shop.Skin-Equipped-Msg","&aSkin &e%SKIN% &aequipped!"),
+	ITEMS_SLENDER_SHOP_DISPLAY_NAME("Items.Slender-Shop.DisplayName","&4Slender Shop &7(Right-click)"),
+	ITEMS_SLENDER_SHOP_DISPLAY_LORE("Items.Slender-Shop.DisplayLore","\n&eRight-click to open &4Slender Shop&e."),
+	ITEMS_SHOP_DISPLAY_NAME("Items.Shop.DisplayName","&6Shop &7(Right-click)"),
+	ITEMS_SHOP_DISPLAY_LORE("Items.Shop.DisplayLore","\n&eRight-click to open the &6Shop&e."),
+	SHOP_SURVIVOR_SECTION("Shop.Survivor-Section","&aSurvivor Perks"),
+	SHOP_SLENDER_SECTION("Shop.Slender-Section","&4Slender Skins"),
+
+	// Torch messages
+	TORCH_NO_USES("Torch.No-Uses","&cYou have no torches left!"),
+	TORCH_COOLDOWN("Torch.Cooldown","&cTorch on cooldown! &7(%TIME%s)"),
+	TORCH_USED("Torch.Used","&eTorch used. &7Remaining: &6%CURRENT%/%MAX%"),
+
+	// Page pickup title
+	ARENA_PAGE_PICKUP_TITLE("ArenaAnnouncements.Page-Pickup-Title","&6Page %CURRENT%/8");
+
+	// Torch messages
 
 	private static YamlConfiguration configuration;
 	private final @Getter String defaultMessage;
@@ -208,13 +235,18 @@ public enum Langauge {
 		this.defaultMessage = defaultMessage;
 	}
 
-	public static void setConfiguration(File file) {
-		configuration = YamlConfiguration.loadConfiguration(file);
+	public static void setConfiguration(YamlConfiguration configuration) {
+		Langauge.configuration = configuration;
 	}
 
 	@Override
 	public String toString() {
-		return ColourUtil.colorize(configuration.getString(getPath()));
+		if (configuration == null) return ColourUtil.colorize(defaultMessage);
+		Object value = configuration.get(path);
+		if (value instanceof String) {
+			return ColourUtil.colorize((String) value);
+		}
+		return ColourUtil.colorize(defaultMessage);
 	}
 
 }

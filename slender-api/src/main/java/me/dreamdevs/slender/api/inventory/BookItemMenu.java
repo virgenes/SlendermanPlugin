@@ -90,7 +90,15 @@ public class BookItemMenu {
 
 		counter.set(0);
 
-		realPagesNumber.forEach(bookPage -> getItemsFromPage(bookPage.getPageNumber()).forEach(numerableMenuItem -> bookPage.setItem(counter.getAndIncrement(), numerableMenuItem)));
+		realPagesNumber.forEach(bookPage -> {
+			counter.set(0);
+			getItemsFromPage(bookPage.getPageNumber()).forEach(numerableMenuItem -> {
+				int slot = counter.getAndIncrement();
+				if (slot < bookPage.getSize().getSize() - 9) { // leave last row for navigation
+					bookPage.setItem(slot, numerableMenuItem);
+				}
+			});
+		});
 	}
 
 	public void setOptionItems(MenuItem[] newOptionsItem) {

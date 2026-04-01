@@ -21,6 +21,9 @@ public class Party implements IParty {
     public Party() {
         this.members = new HashMap<>();
         this.partySettings = new HashMap<>();
+        this.partySettings.put(PartySettings.OPEN_PARTY, false);
+        this.partySettings.put(PartySettings.CHAT_PARTY, false);
+        this.partySettings.put(PartySettings.MAX_PLAYERS, 4);
     }
 
     public void sendMessage(String message) {

@@ -9,7 +9,6 @@ import me.dreamdevs.slender.api.SlenderApi;
 import me.dreamdevs.slender.api.events.ItemClickEvent;
 import me.dreamdevs.slender.api.inventory.buttons.MenuItem;
 import me.dreamdevs.slender.api.inventory.handlers.ItemMenuListener;
-import me.dreamdevs.slender.api.utils.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -121,13 +120,10 @@ public class ItemMenu {
 	public void onInventoryClick(InventoryClickEvent event) {
 		if (event.getClick() == ClickType.LEFT || event.getClick() == ClickType.RIGHT || event.getClick() == ClickType.SHIFT_LEFT || event.getClick() == ClickType.SHIFT_RIGHT) {
 			int slot = event.getRawSlot();
-			Util.sendPluginMessage("Passed 1");
 			if (slot >= 0 && slot < size.getSize() && items[slot] != null) {
-				Util.sendPluginMessage("Passed 2");
 				Player player = (Player) event.getWhoClicked();
 				ItemClickEvent itemClickEvent = new ItemClickEvent(player, event.getCurrentItem(), event.getClick());
 				items[slot].onItemClick(itemClickEvent);
-				Util.sendPluginMessage("Passed 3");
 				if (itemClickEvent.willUpdate()) {
 					update(player);
 				} else {

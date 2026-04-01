@@ -3,6 +3,7 @@ package me.dreamdevs.slender.commands.partyarguments;
 import me.dreamdevs.slender.SlenderMain;
 import me.dreamdevs.slender.api.Langauge;
 import me.dreamdevs.slender.api.commands.ArgumentCommand;
+import me.dreamdevs.slender.api.game.party.PartyRole;
 import me.dreamdevs.slender.database.data.GamePlayer;
 import me.dreamdevs.slender.game.Party;
 import org.bukkit.command.CommandSender;
@@ -17,11 +18,6 @@ public class PartyLeaveArgument implements ArgumentCommand {
             return true;
         }
 
-        if(args.length > 1) {
-            commandSender.sendMessage(Langauge.ARENA_TOO_MANY_ARGUMENTS.toString());
-            return true;
-        }
-
         Player player = (Player) commandSender;
         GamePlayer gamePlayer = SlenderMain.getInstance().getPlayerManager().getPlayer(player);
 
@@ -31,19 +27,23 @@ public class PartyLeaveArgument implements ArgumentCommand {
             return true;
         }
 
-        if(!party.getPartyLeader().equals(gamePlayer.getPlayer())) {
-            player.sendMessage(Langauge.PARTY_PLAYER_NOT_LEADER.toString());
-            return true;
+        PartyRole role = party.getMembersMap().get(gamePlayer);
+        if (role == PartyRole.LEADER) {
+            party.getMembersMap().keySet().forEach(member -> {
+                Player p = member.getOfflinePlayer().getPlayer();
+                if (p != null) p.sendMessage(Langauge.PARTY_REMOVED_INFO.toString());
+            });
+            SlenderMain.getInstance().getPartyManager().getParties().remove(party);
+        } else {
+            SlenderMain.getInstance().getPartyManager().leaveParty(player, party);
         }
-
-        SlenderMain.getInstance().getPartyManager().leaveParty(player, party);
 
         return true;
     }
 
     @Override
     public String getHelpText() {
-        return "&e/party leave - leave from party as member";
+        return "&e/party leave - leave the party";
     }
 
     @Override

@@ -1,0 +1,224 @@
+# SlendermanPlugin — English language file
+# Edit any value to customize messages shown to players.
+
+ArenaAnnouncements:
+  Player-Join: "&e%PLAYER% joined this arena &7(&b%CURRENT%/%MAXIMUM%&7)"
+  Player-Quit: "&e%PLAYER% left the arena &7(&b%CURRENT%/%MAXIMUM%&7)"
+  Survivor-Killed-By-SlenderMan: "&e%PLAYER% was killed by SlenderMan!"
+  SlenderMan-Killed-By-Survivor: "&eSlenderMan was killed — be careful, he's back!"
+  SlenderMan-Left: "&eSlenderMan left the game!"
+  Survivor-Left: "&e%PLAYER% left the game!"
+  Collected-Pages: "&6Collected pages: &e%CURRENT%&6/&e8"
+  Join-Game-Info: "&a&l================================================\n&r\n                    &f&lStop It Slender\n&r\n    &e&lFind all 8 pages or die by SlenderMan!\n    &e&lUse your torches to light the way!\n&r\n&a&l================================================"
+  Started-Info: "&eThe game has begun! Find or kill them all!"
+  Stop-Starting: "&cNot enough players to start..."
+  Starting-Info: "&eGame starting in 30 seconds!"
+  Page-Spawned-Info: "&eA page has spawned somewhere in the dark!"
+  Spectator-Mode: "&eYou are now a spectator."
+  Page-Pickup-Title: "&6Page %CURRENT%/8"
+  Arena-Title: "&c&lStop It Slender!"
+  Waiting-Subtitle: "&7Waiting for players..."
+  Starting-Subtitle: "&aStarting in &e%TIME% &aseconds..."
+  Started-Subtitle: "&4Good Luck!"
+  Win-Survivors-Subtitle: "&aSurvivors won!"
+  Win-SlenderMan-Subtitle: "&cSlenderMan won!"
+  Dead-Title: "&c&lYou died!"
+  Dead-Subtitle: "&eYou are now a spectator."
+  Boss-Bar:
+    Waiting-Title: "&c&lStop It Slender"
+    Ending-Title: "&cReturning to lobby in &e%TIME%s"
+  Boss-Bar-Running-Title: "&cTime left: &e%TIME%s"
+  No-Slots: "&cThis game is full!"
+  No-Available-Arenas: "&cNo arenas available right now."
+  No-Permission: "&cYou don't have permission to do that."
+  No-Argument: "&cUnknown argument."
+  No-Arena: "&cNo arena found with that ID."
+  No-Player: "&cPlayer not found."
+  Too-Many-Arguments: "&cToo many arguments."
+  Arena-Still-Running: "&cThat arena is still running."
+  Player-In-Game: "&cYou are already in a game."
+  Compass-No-Survivors: "&cNo survivors available to track."
+  Status:
+    Waiting: "&7Waiting..."
+    Starting: "&aStarting"
+    Running: "&bRunning"
+    Ending: "&cEnding"
+    Restarting: "&cRestarting"
+  Objectives:
+    Page-Name: "&6Page %NUMBER%"
+    Survivor-Team: "&bSurvivors"
+    SlenderMan-Team: "&cSlenderMan"
+
+LobbyAnnouncements:
+  Click-Here: "&eClick here!"
+  Arena-Starting-Announcement: "&a&l================================================\n&r\n                    &f&lStop It Slender\n&r\n&b&lArena &f&l%ARENA% &b&lis starting in 30 seconds!\n&r\n&a&l================================================"
+
+Level:
+  Player-Exp-Reward: "&a+%AMOUNT% EXP"
+  Player-Level-Up: "&a&l================================================\n&r\n                    &f&lStop It Slender\n&r\n                        &3&lLevel Up!\n   &7Keep playing to get better!\n      &7Your level: &b%LEVEL%\n&r\n&a&l================================================"
+
+Items:
+  Arena-Selector:
+    DisplayName: "&aArena Selector &7(Right-click)"
+    DisplayLore: "\n&eRight-click to open the &aArena Selector&e."
+  Leave:
+    DisplayName: "&cLeave &7(Right-click)"
+    DisplayLore: "\n&eRight-click to leave the arena."
+  My-Profile:
+    DisplayName: "&bMy Profile &7(Right-click)"
+    DisplayLore: "\n&eRight-click to open &bMy Profile&e."
+  Play-Again:
+    DisplayName: "&bPlay Again &7(Right-click)"
+    DisplayLore: "\n&eRight-click to &bPlay Again&e."
+  Party-Menu:
+    DisplayName: "&bParty Menu &7(Right-click)"
+    DisplayLore: "\n&eRight-click to open the &bParty Menu&e."
+  Perks:
+    DisplayName: "&dPerks &7(Right-click)"
+    DisplayLore: "\n&eRight-click to open &dPerks&e."
+  Spectator-Settings:
+    DisplayName: "&bSpectator Settings &7(Right-click)"
+    DisplayLore: "\n&eRight-click to open &bSpectator Settings&e."
+  Spectator-Teleport:
+    DisplayName: "&aTeleporter &7(Right-click)"
+    DisplayLore: "\n&eRight-click to open the &aTeleporter&e."
+  Spectator-Teleport-DisplayLore: "\n&eRight-click to open the &aTeleporter&e."
+  SlenderMan-Sword:
+    DisplayName: "&cSlenderMan's Sword"
+    DisplayLore: "\n&4Kill them all!"
+  SlenderMan-Compass:
+    DisplayName: "&cSlenderMan's Compass"
+    DisplayLore: "\n&4Track the survivors!"
+  Survivor-Sword:
+    DisplayName: "&7Survivor's Sword"
+    DisplayLore: "\n&7Protect yourself and your friends!"
+  Slender-Shop:
+    DisplayName: "&4Slender Shop &7(Right-click)"
+    DisplayLore: "\n&eRight-click to open the &4Slender Shop&e."
+  Shop:
+    DisplayName: "&6Shop &7(Right-click)"
+    DisplayLore: "\n&eRight-click to open the &6Shop&e."
+
+Admin:
+  Only-Player-Command: "&cOnly players can use this command."
+  Set-Lobby-Successfully: "&aLobby location set!"
+  Set-SlenderMan-Spawn-Successfully: "&aSlenderMan spawn set!"
+  Set-Survivors-Spawn-Successfully: "&aSurvivor spawn added!"
+  Set-Pages-Spawn-Successfully: "&aPage spawn added!"
+  Saved-Arena-Settings-Successfully: "&aArena settings saved!"
+  Force-Start-Arena-Successfully: "&aGame force-started!"
+  Force-Start-Arena-Unsuccessfully: "&cCould not force-start the game."
+  Force-Stop-Arena-Successfully: "&aGame force-stopped!"
+  Force-Stop-Arena-Unsuccessfully: "&cCould not force-stop the game."
+  Force-Restart-Arena-Successfully: "&aGame force-restarted!"
+
+Party:
+  Created-Info: "&aParty created!"
+  Removed-Info: "&cParty disbanded."
+  Player-Not-In-Party: "&cYou are not in a party."
+  Player-Not-Leader: "&cYou are not the party leader."
+  No-Player: "&cThat player is not in your party."
+  Kicked-Player: "&b%PLAYER% was kicked by %LEADER%."
+  No-Public-Party: "&cNo public parties available."
+  Player-Is-Already-In-Party: "&cYou are already in a party."
+  Player-Joined: "&e%PLAYER% joined the party!"
+  Player-Left: "&e%PLAYER% left the party."
+  Changed-Status: "&b%LEADER% changed party status to: %STATUS%"
+  Not-Pending-Request: "&cYou have no pending party invite."
+  Invited-Player: "&aYou invited &e%TARGET% &ato your party!"
+  Request-Message: "&7You have a party invite! &e(Click to accept)"
+  Too-Many-Players: "&cYour party is too large for this arena."
+
+Perks:
+  Perk-Selected: "&aEquipped &e%PERK_NAME% &afor &e%TEAM%&a."
+
+Menu:
+  Status-On: "&aOn"
+  Status-Off: "&cOff"
+  Back-Item-Name: "&cBack"
+  Arena-Selector:
+    Title: "&8» Select Arena"
+    Item-Name: "&aArena: &b%MAP_NAME%"
+    Item-Lore: "&r\n&7» Players: &b%CURRENT_PLAYERS%&7/&a%MAX_PLAYERS%\n&7» Status: %ARENA_STATUS%\n&r\n&eClick to join."
+  My-Profile:
+    Title: "My Profile"
+    Settings:
+      Title: "Settings"
+      Auto-Join-Mode-Item-Name: "&bAuto Join Mode"
+      Auto-Join-Mode-Item-Lore: "\n&7Automatically join another arena\n&7when your current game ends.\n&7\n&7Status: %STATUS%"
+      Show-Arena-Join-Message-Item-Name: "&bShow Join Message"
+      Show-Arena-Join-Message-Item-Lore: "\n&7Show the game info message\n&7when joining an arena.\n&7\n&7Status: %STATUS%"
+      Messages-Type-Item-Name: "&bMessage Type"
+      Messages-Type-Item-Lore: "\n&7Choose which chat messages\n&7you receive.\n&7\n&7Type: %TYPE%"
+    Stats-Item-Name: "&bYour Stats"
+    Stats-Item-Lore: "&7Wins: &b%WINS%\n&r\n&7Level: &b%LEVEL%\n&7EXP: &b%EXP%\n&r\n&7Pages Collected: &b%COLLECTED_PAGES%\n&r\n&7Survivors Killed: &b%KILLED_SURVIVORS%\n&7SlenderMen Killed: &b%KILLED_SLENDERMEN%\n&7Total Kills: &b%TOTAL_KILLS%"
+    Settings-Item-Name: "&bSettings"
+    Settings-Item-Lore: "\n&7Click to change your settings."
+  Perks:
+    Title: "Choose Perk"
+    Survivor-Perks: "&aSelect Survivor Perk"
+    SlenderMan-Perks: "&cSelect SlenderMan Perk"
+  Party:
+    Title: "&3&lParty"
+    Public: "&aPublic"
+    Private: "&cPrivate"
+    Create-Item-Name: "&bCreate Party"
+    Create-Item-Lore: "\n&7Click to create a party!"
+    Delete-Item-Name: "&bDisband Party"
+    Delete-Item-Lore: "\n&7Click to disband the party."
+    Change-Status-Item-Name: "&aChange Status"
+    Change-Status-Item-Lore: "\n&7Toggle party open/closed."
+    Find-Party-Item-Name: "&aFind Party"
+    Find-Party-Item-Lore: "\n&7Browse public parties."
+    Info-Item-Name: "&bParty Info"
+    Info-Item-Lore: "&7Leader: &b%LEADER%\n&7Members: %MEMBERS_COUNT%\n&7Status: %STATUS%"
+  Spectator-Teleporter:
+    Title: "Teleporter"
+  Spectator-Settings:
+    Title: "Spectator Settings"
+    No-Speed: "&cNo Speed"
+    Speed: "&aSpeed"
+  Levels:
+    Title: "Levels"
+    Level-Item-Name: "&eLevel %NUMBER%"
+  Editor:
+    Title: "Map Editor"
+    Minimum-Players-Item-Name: "&bMin Players: %AMOUNT%"
+    Minimum-Players-Item-Lore: "\n&7Left-click: +1\n&7Right-click: -1"
+    Maximum-Players-Item-Name: "&bMax Players: %AMOUNT%"
+    Maximum-Players-Item-Lore: "\n&7Left-click: +1\n&7Right-click: -1"
+    Set-SlenderMan-Spawn-Item-Name: "&bSet SlenderMan Spawn"
+    Set-SlenderMan-Spawn-Item-Lore: "\n&7Click to set the SlenderMan spawn."
+    Game-Time-Item-Name: "&bGame Time: %AMOUNT%s"
+    Game-Time-Item-Lore: "\n&7Left-click: +1\n&7Right-click: -1"
+    Add-Survivor-Spawn-Item-Name: "&bAdd Survivor Spawn"
+    Add-Survivor-Spawn-Item-Lore: "\n&7Click to add a survivor spawn."
+    Add-Pages-Spawn-Item-Name: "&bAdd Page Spawn"
+    Add-Pages-Spawn-Item-Lore: "\n&7Click to add a page spawn."
+    Save-Settings-Item-Name: "&bSave Settings"
+    Save-Settings-Item-Lore: "\n&7Click to save."
+  Admin:
+    Title: "Admin Menu"
+    Force-Start-Game-Item: "&aForce Start"
+    Force-Restart-Game-Item: "&aForce Restart"
+    Force-Stop-Game-Item: "&cForce Stop"
+    Force-Set-Lobby-Game-Item: "&aSet Lobby"
+
+Shop:
+  Title: "&4&lSlender Shop"
+  Skin-Locked: "&cLocked &7— &6%COST% coins"
+  Skin-Owned: "&aOwned"
+  Skin-Equipped: "&b&lEquipped ✔"
+  Not-Enough-Coins: "&cNot enough coins! Need &6%COST%&c."
+  Skin-Purchased: "&aSkin &e%SKIN% &apurchased!"
+  Skin-Equipped-Msg: "&aSkin &e%SKIN% &aequipped!"
+  Survivor-Section: "&aSurvivor Perks"
+  Slender-Section: "&4Slender Skins"
+
+Torch:
+  No-Uses: "&cYou have no torches left!"
+  Cooldown: "&cTorch on cooldown! &7(%TIME%s)"
+  Used: "&eTorch used. &7Remaining: &6%CURRENT%/%MAX%"
+
+Errors:
+  No-Page-Locations: "&c[SlenderMan] Error: No page spawn locations configured for arena %ARENA%."

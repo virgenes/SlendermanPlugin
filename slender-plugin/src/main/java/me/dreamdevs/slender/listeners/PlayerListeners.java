@@ -4,6 +4,7 @@ import me.dreamdevs.slender.SlenderMain;
 import me.dreamdevs.slender.api.Langauge;
 import me.dreamdevs.slender.api.Setting;
 import me.dreamdevs.slender.api.events.ItemClickEvent;
+import me.dreamdevs.slender.api.game.ArenaState;
 import me.dreamdevs.slender.api.game.Role;
 import me.dreamdevs.slender.api.inventory.ItemMenu;
 import me.dreamdevs.slender.api.inventory.buttons.MenuItem;
@@ -58,10 +59,13 @@ public class PlayerListeners implements Listener {
 
             if(arena.getPlayers().get(gamePlayer.getPlayer()) == Role.SLENDER) {
                 arena.sendMessage(Langauge.ARENA_SLENDER_MAN_LEFT.toString());
-                arena.restart();
+                arena.getPlayers().remove(gamePlayer.getPlayer());
+                if(arena.getArenaState() == ArenaState.RUNNING || arena.getArenaState() == ArenaState.STARTING) {
+                    arena.restart();
+                }
+            } else {
+                arena.getPlayers().remove(gamePlayer.getPlayer());
             }
-
-            arena.getPlayers().remove(gamePlayer.getPlayer());
         }
 
         SlenderMain.getInstance().getPlayerManager().getPlayers().remove(gamePlayer);

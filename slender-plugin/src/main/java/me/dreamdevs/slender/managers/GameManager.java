@@ -54,19 +54,19 @@ public class GameManager {
                 return;
             }
 
-            if(SlenderMain.getInstance().getPartyManager().isInParty(gamePlayer)) {
+            if(SlenderMain.getInstance().getPartyManager() != null && SlenderMain.getInstance().getPartyManager().isInParty(gamePlayer)) {
                 if(!SlenderMain.getInstance().getPartyManager().getParty(gamePlayer).getPartyLeader().equals(gamePlayer.getPlayer())) {
                     player.sendMessage(Langauge.PARTY_PLAYER_NOT_LEADER.toString());
                     return;
                 }
 
                 Party party = SlenderMain.getInstance().getPartyManager().getParty(gamePlayer);
-                if(arena.getMaxPlayers()-arena.getPlayers().size() < party.getMembers().size()) {
+                if(arena.getMaxPlayers()-arena.getPlayers().size() < party.getMembersMap().size()) {
                     player.sendMessage(Langauge.PARTY_TOO_MANY_PLAYERS.toString());
                     return;
                 }
 
-                party.getMembers().forEach(member -> {
+                party.getMembersMap().keySet().forEach(member -> {
                     GamePlayer gameMember = (GamePlayer) member;
                     gameMember.getPlayer().teleport(arena.getSlenderManSpawnLocation());
                     gameMember.clearInventory();
@@ -98,6 +98,7 @@ public class GameManager {
                         arena.setTimer(30);
                     }
                 });
+                return;
             }
 
             player.teleport(arena.getSlenderManSpawnLocation());
@@ -144,7 +145,7 @@ public class GameManager {
             return;
         }
 
-        if (SlenderMain.getInstance().getPartyManager().isInParty(gamePlayer) && SlenderMain.getInstance().getPartyManager().getParty(gamePlayer).getPartyLeader().equals(gamePlayer.getPlayer())) {
+        if (SlenderMain.getInstance().getPartyManager() != null && SlenderMain.getInstance().getPartyManager().isInParty(gamePlayer) && SlenderMain.getInstance().getPartyManager().getParty(gamePlayer).getPartyLeader().equals(gamePlayer.getPlayer())) {
             Party party = SlenderMain.getInstance().getPartyManager().getParty(gamePlayer);
             party.getMembers().stream().map(GamePlayer.class::cast).forEach(this::forceRemovePlayerFromGame);
         }

@@ -11,7 +11,7 @@ public class ArenaCreateArgument implements ArgumentCommand {
 
     @Override
     public boolean execute(CommandSender commandSender, String[] args) {
-        if(args[1] == null) {
+        if(args.length < 2 || args[1] == null || args[1].isEmpty()) {
             commandSender.sendMessage(Langauge.ARENA_NO_ARENA.toString());
             return true;
         }
@@ -20,6 +20,7 @@ public class ArenaCreateArgument implements ArgumentCommand {
         arena.setMinPlayers(2);
         arena.setMaxPlayers(10);
         arena.setSlenderManSpawnLocation(null);
+        arena.startGame();
         SlenderMain.getInstance().getGameManager().getArenas().add(arena);
         commandSender.sendMessage(ColourUtil.colorize("&aYou created new arena with ID: "+arena.getId()+"!"));
         return true;

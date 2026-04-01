@@ -43,7 +43,7 @@ public class PartyManager {
             gamePlayer.getPlayer().sendMessage(Langauge.PARTY_PLAYER_NOT_IN_PARTY.toString());
             return;
         }
-        party.getMembers().remove(gamePlayer);
+        party.getMembersMap().remove(gamePlayer);
         party.sendMessage(Langauge.PARTY_PLAYER_LEFT_PARTY.toString().replace("%PLAYER%", player.getName()));
     }
 

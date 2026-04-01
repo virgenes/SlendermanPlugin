@@ -25,6 +25,7 @@ public class CommandHandler implements TabExecutor {
         registerCommand("createarena", ArenaCreateArgument.class);
         registerCommand("editarena", ArenaEditArgument.class);
         registerCommand("deletearena", ArenaDeleteArgument.class);
+        registerCommand("start", ArenaStartArgument.class);
         registerCommand("join", ArenaJoinArgument.class);
         registerCommand("leave", ArenaLeaveArgument.class);
         Objects.requireNonNull(plugin.getCommand("stopitslender")).setExecutor(this);

@@ -7,22 +7,32 @@ import me.dreamdevs.slender.api.database.IGamePlayer;
 import me.dreamdevs.slender.api.game.IArena;
 import me.dreamdevs.slender.api.game.Role;
 import me.dreamdevs.slender.api.game.perks.Perk;
+import me.dreamdevs.slender.disguise.SlenderDisguise;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class GamePlayer implements IGamePlayer {
 
 	private final OfflinePlayer player;
 	private final Map<Statistic, Integer> statistics;
 	private final Map<Setting, Object> settings;
+	private final Map<Role, Perk> perks;
+	private final Set<SlenderDisguise> ownedSkins;
+	private SlenderDisguise equippedSkin;
 
 	public GamePlayer(OfflinePlayer player) {
 		this.player = player;
 		this.statistics = new HashMap<>();
 		this.settings = new HashMap<>();
+		this.perks = new HashMap<>();
+		this.ownedSkins = new HashSet<>();
+		this.equippedSkin = SlenderDisguise.ENDERMAN;
+		ownedSkins.add(SlenderDisguise.ENDERMAN);
 	}
 
 	@Override
@@ -52,12 +62,12 @@ public class GamePlayer implements IGamePlayer {
 
 	@Override
 	public void setPerk(Role role, Perk perk) {
-
+		this.perks.put(role, perk);
 	}
 
 	@Override
 	public Perk getPerk(Role role) {
-		return null;
+		return perks.get(role);
 	}
 
 	@Override
@@ -81,5 +91,27 @@ public class GamePlayer implements IGamePlayer {
 		getPlayer().getInventory().clear();
 		getPlayer().getInventory().setArmorContents(null);
 		getPlayer().getInventory().setExtraContents(null);
+	}
+
+	public Set<SlenderDisguise> getOwnedSkins() {
+		return ownedSkins;
+	}
+
+	public boolean ownsSkin(SlenderDisguise skin) {
+		return ownedSkins.contains(skin);
+	}
+
+	public void purchaseSkin(SlenderDisguise skin) {
+		ownedSkins.add(skin);
+	}
+
+	public SlenderDisguise getEquippedSkin() {
+		return equippedSkin != null ? equippedSkin : SlenderDisguise.ENDERMAN;
+	}
+
+	public void equipSkin(SlenderDisguise skin) {
+		if (ownedSkins.contains(skin)) {
+			this.equippedSkin = skin;
+		}
 	}
 }

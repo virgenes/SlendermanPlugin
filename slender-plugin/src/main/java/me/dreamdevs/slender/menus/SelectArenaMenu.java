@@ -3,26 +3,29 @@ package me.dreamdevs.slender.menus;
 import me.dreamdevs.slender.SlenderMain;
 import me.dreamdevs.slender.api.Langauge;
 import me.dreamdevs.slender.api.events.ItemClickEvent;
-import me.dreamdevs.slender.api.inventory.BookItemMenu;
+import me.dreamdevs.slender.api.game.ArenaState;
+import me.dreamdevs.slender.api.inventory.ItemMenu;
 import me.dreamdevs.slender.api.inventory.buttons.MenuItem;
 import me.dreamdevs.slender.api.utils.ColourUtil;
 import me.dreamdevs.slender.game.Arena;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class SelectArenaMenu extends BookItemMenu {
+public class SelectArenaMenu extends ItemMenu {
 
 	public SelectArenaMenu() {
-		super(Langauge.MENU_ARENA_SELECTOR_TITLE.toString(), buildIcons(), false, false);
-	}
+		super(Langauge.MENU_ARENA_SELECTOR_TITLE.toString(), Size.THREE_LINE);
 
-	private static List<MenuItem> buildIcons() {
-		return SlenderMain.getInstance().getGameManager().getArenas().stream()
-				.map(SelectArenaItem::new)
-				.collect(Collectors.toList());
+		List<Arena> arenas = SlenderMain.getInstance().getGameManager().getArenas();
+		int slot = 10;
+		for (Arena arena : arenas) {
+			setItem(slot, new SelectArenaItem(arena));
+			slot++;
+			if (slot == 17) slot = 19;
+		}
 	}
 
 	private static class SelectArenaItem extends MenuItem {
@@ -30,13 +33,29 @@ public class SelectArenaMenu extends BookItemMenu {
 		private final Arena arena;
 
 		public SelectArenaItem(Arena arena) {
-			super(Langauge.MENU_ARENA_SELECT_ARENA_ITEM_NAME.toString().replace("%MAP_NAME%", arena.getId()),
+			super(ColourUtil.colorize("&aArena: &b" + arena.getId()),
 					new ItemStack(Material.GRASS_BLOCK),
-					ColourUtil.colouredArrayLore(Langauge.MENU_ARENA_SELECT_ARENA_ITEM_LORE.toString()
-							.replace("%CURRENT_PLAYERS%", String.valueOf(arena.getPlayers().size()))
-							.replace("%MAX_PLAYERS%", String.valueOf(arena.getMaxPlayers()))
-							.replace("%ARENA_STATUS%", arena.getArenaState().name())));
+					buildLore(arena).toArray(String[]::new));
 			this.arena = arena;
+		}
+
+		private static java.util.List<String> buildLore(Arena arena) {
+			String status;
+			switch (arena.getArenaState()) {
+				case WAITING: status = Langauge.ARENA_STATUS_WAITING.toString(); break;
+				case STARTING: status = Langauge.ARENA_STATUS_STARTING.toString(); break;
+				case RUNNING: status = Langauge.ARENA_STATUS_RUNNING.toString(); break;
+				case ENDING: status = Langauge.ARENA_STATUS_ENDING.toString(); break;
+				case RESTARTING: status = Langauge.ARENA_STATUS_RESTARTING.toString(); break;
+				default: status = "Unknown"; break;
+			}
+			return ColourUtil.colouredLore(java.util.Arrays.asList(
+					"",
+					"&7Players: &b" + arena.getPlayers().size() + "&7/&a" + arena.getMaxPlayers(),
+					"&7Status: " + status,
+					"",
+					"&eClick to join this arena"
+			));
 		}
 
 		@Override

@@ -3,40 +3,35 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>StopItSlender</artifactId>
-        <groupId>me.DreamDevs.GitHub</groupId>
-        <version>1.4.0</version>
+        <artifactId>SlendermanPlugin</artifactId>
+        <groupId>me.virgenes.GitHub</groupId>
+        <version>1.5.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>slender-plugin</artifactId>
 
     <!-- Information used in plugin.yml -->
-    <name>StopItSlender</name>
-    <version>1.4.0</version>
+    <name>SlendermanPlugin</name>
+    <version>1.5.0</version>
 
     <build>
         <finalName>${name}-${version}</finalName>
     </build>
 
     <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.release>17</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
+            <groupId>io.papermc.paper</groupId>
+            <artifactId>paper-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>LibsDisguises</groupId>
-            <artifactId>LibsDisguises</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>
@@ -45,10 +40,21 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>me.DreamDevs.GitHub</groupId>
+            <groupId>me.virgenes.GitHub</groupId>
             <artifactId>slender-api</artifactId>
-            <version>1.4.0</version>
+            <version>1.5.0</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.comphenix.protocol</groupId>
+            <artifactId>ProtocolLib</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>me.clip</groupId>
+            <artifactId>placeholderapi</artifactId>
+            <version>2.11.6</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

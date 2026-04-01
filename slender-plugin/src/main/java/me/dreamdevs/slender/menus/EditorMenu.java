@@ -77,25 +77,25 @@ public class EditorMenu extends ItemMenu {
 					arena.setMaxPlayers(event.getClicktype().isLeftClick() ? arena.getMaxPlayers()+1 : arena.getMaxPlayers()-1);
 					new EditorMenu(arena).open(event.getPlayer());
 					break;
-				case PAGES_SPAWN:
-					arena.getPagesLocations().add(event.getPlayer().getLocation());
-					event.getPlayer().sendMessage(Langauge.ADMIN_SET_PAGES_SPAWN_SUCCESSFULLY.toString());
-					new EditorMenu(arena);
-					break;
-				case GAME_TIME:
-					arena.setGameTime(event.getClicktype().isLeftClick() ? arena.getGameTime()+1 : arena.getGameTime()-1);
-					new EditorMenu(arena);
-					break;
-				case SURVIVORS_SPAWN:
-					arena.getSurvivorsLocations().add(event.getPlayer().getLocation());
-					event.getPlayer().sendMessage(Langauge.ADMIN_SET_SURVIVORS_SPAWN_SUCCESSFULLY.toString());
-					new EditorMenu(arena);
-					break;
-				case SLENDERMAN_SPAWN:
-					arena.setSlenderManSpawnLocation(event.getPlayer().getLocation());
-					event.getPlayer().sendMessage(Langauge.ADMIN_SET_SLENDERMAN_SPAWN_SUCCESSFULLY.toString());
-					new EditorMenu(arena);
-					break;
+			case PAGES_SPAWN:
+				arena.getPagesLocations().add(event.getPlayer().getLocation());
+				event.getPlayer().sendMessage(Langauge.ADMIN_SET_PAGES_SPAWN_SUCCESSFULLY.toString());
+				new EditorMenu(arena).open(event.getPlayer());
+				break;
+			case GAME_TIME:
+				arena.setGameTime(event.getClicktype().isLeftClick() ? arena.getGameTime()+1 : arena.getGameTime()-1);
+				new EditorMenu(arena).open(event.getPlayer());
+				break;
+			case SURVIVORS_SPAWN:
+				arena.getSurvivorsLocations().add(event.getPlayer().getLocation());
+				event.getPlayer().sendMessage(Langauge.ADMIN_SET_SURVIVORS_SPAWN_SUCCESSFULLY.toString());
+				new EditorMenu(arena).open(event.getPlayer());
+				break;
+			case SLENDERMAN_SPAWN:
+				arena.setSlenderManSpawnLocation(event.getPlayer().getLocation());
+				event.getPlayer().sendMessage(Langauge.ADMIN_SET_SLENDERMAN_SPAWN_SUCCESSFULLY.toString());
+				new EditorMenu(arena).open(event.getPlayer());
+				break;
 				case SAVE:
 					SlenderMain.getInstance().getGameManager().saveGame(arena);
 					event.getPlayer().sendMessage(Langauge.ADMIN_SAVED_ARENA_SETTINGS_SUCCESSFULLY.toString());
