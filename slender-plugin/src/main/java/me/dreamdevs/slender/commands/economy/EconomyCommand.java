@@ -13,7 +13,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class EconomyCommand implements CommandExecutor, TabCompleter {
 
@@ -266,7 +265,7 @@ public class EconomyCommand implements CommandExecutor, TabCompleter {
     }
 
     private void sendHelp(CommandSender sender) {
-        sender.sendMessage(ColourUtil.colorize("&6&l=== Stop It Slender Economy ==="));
+        sender.sendMessage(ColourUtil.colorize("&6&l=== SlendermanPlugin Economy ==="));
         sender.sendMessage(ColourUtil.colorize("&e/sis balance &7- Check your balance"));
         sender.sendMessage(ColourUtil.colorize("&e/sis balancetop &7- Top 10 richest players"));
         sender.sendMessage(ColourUtil.colorize("&e/sis pay <player> <amount> &7- Send coins"));

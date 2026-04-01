@@ -47,8 +47,12 @@ public class Util {
         return location.getBlockX()+":"+location.getBlockY()+":"+location.getBlockZ()+":"+location.getWorld().getName();
     }
 
+    public static String color(String message) {
+        return ColourUtil.colorize(message);
+    }
+
     public static void sendPluginMessage(String message) {
-        Bukkit.getConsoleSender().sendMessage(ColourUtil.colorize(message));
+        Bukkit.getConsoleSender().sendMessage(color(message));
     }
 
     public static int getRandomNumber(int bound) {

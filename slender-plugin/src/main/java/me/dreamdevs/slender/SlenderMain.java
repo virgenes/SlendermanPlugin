@@ -7,6 +7,7 @@ import me.dreamdevs.slender.api.SlenderApi;
 import me.dreamdevs.slender.api.utils.Util;
 import me.dreamdevs.slender.commands.CommandHandler;
 import me.dreamdevs.slender.commands.PartyCommandHandler;
+import me.dreamdevs.slender.commands.economy.EconomyCommand;
 import me.dreamdevs.slender.database.Database;
 import me.dreamdevs.slender.disguise.DisguiseListener;
 import me.dreamdevs.slender.disguise.DisguiseManager;
@@ -29,7 +30,6 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.Objects;
 import java.util.stream.Stream;
 
 @Getter
@@ -47,7 +47,7 @@ public class SlenderMain extends JavaPlugin {
     private Lobby lobby;
 
     // Files
-    private final File levelsFile = new File(getDataFolder(), "levels.yml");
+    private File levelsFile;
 
     @Override
     public void onEnable() {
@@ -55,12 +55,13 @@ public class SlenderMain extends JavaPlugin {
 
         SlenderApi.loadApi(this);
 
-        loadConfig();
-        loadLang();
-
+        this.levelsFile = new File(getDataFolder(), "levels.yml");
         if (!levelsFile.exists()) {
             saveResource("levels.yml", true);
         }
+
+        loadConfig();
+        loadLang();
 
         saveDefaultArena();
 
@@ -73,22 +74,24 @@ public class SlenderMain extends JavaPlugin {
         this.database.loadData();
 
         this.gameManager = new GameManager();
+        this.gameManager.loadGames();
         this.lobby = new Lobby();
         this.partyManager = new PartyManager();
 
         this.levelManager = new LevelManager();
 
-        new CommandHandler(this);
-        new PartyCommandHandler(this);
+        EconomyCommand economyCommand = new EconomyCommand();
+        CommandHandler commandHandler = new CommandHandler(economyCommand);
+        commandHandler.register(this);
+        PartyCommandHandler partyCommandHandler = new PartyCommandHandler();
+        partyCommandHandler.register(this);
 
         getServer().getPluginManager().registerEvents(new PlayerListeners(), this);
         getServer().getPluginManager().registerEvents(new PlayerInteractListener(), this);
         getServer().getPluginManager().registerEvents(new GameListeners(), this);
         getServer().getPluginManager().registerEvents(new PerksListeners(), this);
         getServer().getPluginManager().registerEvents(new DisguiseListener(), this);
-
-        Objects.requireNonNull(getCommand("sis")).setExecutor(new me.dreamdevs.slender.commands.economy.EconomyCommand());
-        Objects.requireNonNull(getCommand("sis")).setTabCompleter(new me.dreamdevs.slender.commands.economy.EconomyCommand());
+        getServer().getPluginManager().registerEvents(new me.dreamdevs.slender.listeners.PlayerSkillListener(), this);
 
         // Init disguise system AFTER all listeners are registered
         // (ProtocolLib must be loaded first)
@@ -101,15 +104,12 @@ public class SlenderMain extends JavaPlugin {
         if (Config.UPDATE_CHECKER.toBoolean()) {
             Bukkit.getScheduler().runTaskTimerAsynchronously(this, () ->
                     new UpdateChecker(this, 109730).getVersion(version -> {
-                        if (getDescription().getVersion().equals(version)) {
+                        // Fixed update checker: Only alert if version is truly new and not the legacy one
+                        String currentVersion = getPluginMeta().getVersion();
+                        if (!currentVersion.equals(version) && !version.startsWith("1.3")) {
                             Util.sendPluginMessage("");
-                            Util.sendPluginMessage("&aYour version is up to date!");
-                            Util.sendPluginMessage("&aYour version: " + getDescription().getVersion());
-                            Util.sendPluginMessage("");
-                        } else {
-                            Util.sendPluginMessage("");
-                            Util.sendPluginMessage("&aThere is new Stop It Slender version!");
-                            Util.sendPluginMessage("&aYour version: " + getDescription().getVersion());
+                            Util.sendPluginMessage("&aThere is new SlendermanPlugin version!");
+                            Util.sendPluginMessage("&aYour version: " + currentVersion);
                             Util.sendPluginMessage("&aNew version: " + version);
                             Util.sendPluginMessage("");
                         }

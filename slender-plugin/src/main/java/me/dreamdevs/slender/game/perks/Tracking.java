@@ -5,8 +5,10 @@ import me.dreamdevs.slender.api.game.Role;
 import me.dreamdevs.slender.api.game.perks.Perk;
 import me.dreamdevs.slender.api.game.perks.PerkInfo;
 import me.dreamdevs.slender.api.utils.ColourUtil;
-import me.dreamdevs.slender.database.data.GamePlayer;
 import me.dreamdevs.slender.game.Arena;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -14,7 +16,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @PerkInfo(name = "Tracking", icon = Material.COMPASS, role = Role.SURVIVOR)
 public class Tracking implements Perk {
@@ -55,7 +56,10 @@ public class Tracking implements Perk {
                         direction.setY(playerLoc.getY() + 1);
 
                         player.getWorld().spawnParticle(Particle.HAPPY_VILLAGER, direction, 10, 0.3, 0.3, 0.3, 0);
-                        player.sendActionBar(ColourUtil.colorize("&a&lTracking &7- Page nearby!"));
+                        player.sendActionBar(Component.text()
+                                .append(Component.text("Tracking ", NamedTextColor.GREEN, TextDecoration.BOLD))
+                                .append(Component.text("- Page nearby!", NamedTextColor.GRAY))
+                                .build());
                     }
                 }, 0L, 600L);
 

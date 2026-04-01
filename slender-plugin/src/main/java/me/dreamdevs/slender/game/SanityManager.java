@@ -1,13 +1,15 @@
 package me.dreamdevs.slender.game;
 
 import me.dreamdevs.slender.SlenderMain;
-import me.dreamdevs.slender.api.Config;
 import me.dreamdevs.slender.api.game.Role;
 import me.dreamdevs.slender.api.game.perks.Perk;
 import me.dreamdevs.slender.database.data.GamePlayer;
 import me.dreamdevs.slender.game.perks.Resilience;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.title.Title;
+import net.kyori.adventure.util.Ticks;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -106,11 +108,9 @@ public class SanityManager {
                 if (stealth != null) {
                     double noise = stealth.getNoise(player);
                     if (noise > 5.0) {
-                        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                                new TextComponent(net.md_5.bungee.api.ChatColor.RED + "⚠ You're making too much noise..."));
+                        player.sendActionBar(Component.text("⚠ You're making too much noise...", NamedTextColor.RED));
                     } else if (noise > 2.0) {
-                        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                                new TextComponent(net.md_5.bungee.api.ChatColor.YELLOW + "You're being heard..."));
+                        player.sendActionBar(Component.text("You're being heard...", NamedTextColor.YELLOW));
                     }
                 }
             }
@@ -129,16 +129,16 @@ public class SanityManager {
         // Color based on danger level
         if (sanity > 70) {
             bar.setColor(BarColor.WHITE);
-            bar.setTitle(net.md_5.bungee.api.ChatColor.WHITE + "Sanity: " + (int) sanity + "%");
+            bar.setTitle("Sanity: " + (int) sanity + "%");
         } else if (sanity > 40) {
             bar.setColor(BarColor.YELLOW);
-            bar.setTitle(net.md_5.bungee.api.ChatColor.YELLOW + "Sanity: " + (int) sanity + "%");
+            bar.setTitle("Sanity: " + (int) sanity + "%");
         } else if (sanity > 15) {
             bar.setColor(BarColor.RED);
-            bar.setTitle(net.md_5.bungee.api.ChatColor.RED + "⚠ Sanity: " + (int) sanity + "%");
+            bar.setTitle("⚠ Sanity: " + (int) sanity + "%");
         } else {
             bar.setColor(BarColor.RED);
-            bar.setTitle(net.md_5.bungee.api.ChatColor.DARK_RED + "☠ CRITICAL: " + (int) sanity + "%");
+            bar.setTitle("☠ CRITICAL: " + (int) sanity + "%");
         }
     }
 
@@ -146,7 +146,13 @@ public class SanityManager {
         player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 400, 1));
         player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 200, 0));
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_HURT, 1f, 0.5f);
-        player.sendTitle("§c§lPANIC ATTACK", "§7You can't control your fear...", 10, 60, 20);
+        
+        Title title = Title.title(
+                Component.text("PANIC ATTACK", NamedTextColor.RED, TextDecoration.BOLD),
+                Component.text("You can't control your fear...", NamedTextColor.GRAY),
+                Title.Times.times(Ticks.duration(10), Ticks.duration(60), Ticks.duration(20))
+        );
+        player.showTitle(title);
     }
 
     private void applySanityEffects(Player player, double sanity) {

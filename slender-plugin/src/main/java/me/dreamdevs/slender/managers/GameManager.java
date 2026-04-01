@@ -14,10 +14,9 @@ import me.dreamdevs.slender.database.data.GamePlayer;
 import me.dreamdevs.slender.game.Arena;
 import me.dreamdevs.slender.game.CustomItem;
 import me.dreamdevs.slender.game.Party;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -35,6 +34,9 @@ public class GameManager {
 
     public GameManager() {
         this.arenas = new ArrayList<>();
+    }
+
+    public void loadGames() {
         File file = new File(SlenderMain.getInstance().getDataFolder(), "arenas");
         if(!file.exists() || !file.isDirectory())
             file.mkdirs();
@@ -66,12 +68,12 @@ public class GameManager {
                     return;
                 }
 
-                party.getMembersMap().keySet().forEach(member -> {
-                    GamePlayer gameMember = (GamePlayer) member;
+                party.getMembersMap().keySet().forEach(gameMember -> {
                     gameMember.getPlayer().teleport(arena.getSlenderManSpawnLocation());
                     gameMember.clearInventory();
                     gameMember.getPlayer().setScoreboard(arena.getScoreboard());
                     gameMember.getPlayer().getInventory().setItem(8, CustomItem.LEAVE.toItemStack());
+                    gameMember.getPlayer().getInventory().setItem(7, CustomItem.FORCED_START.toItemStack());
                     arena.getPlayers().put(gameMember.getPlayer(), Role.NONE);
                     arena.getBossBar().addPlayer(gameMember.getPlayer());
 
@@ -85,11 +87,11 @@ public class GameManager {
                         playerGame.showPlayer(SlenderMain.getInstance(), gameMember.getPlayer());
                     });
 
-                    if ((boolean) member.getSetting(Setting.SHOW_ARENA_JOIN_MESSAGE)) {
+                    if ((boolean) gameMember.getSetting(Setting.SHOW_ARENA_JOIN_MESSAGE)) {
                         gameMember.getPlayer().sendMessage(Langauge.ARENA_JOIN_GAME_INFO.toString());
                     }
 
-                    SlenderJoinArenaEvent slenderJoinArenaEvent = new SlenderJoinArenaEvent(member, arena);
+                    SlenderJoinArenaEvent slenderJoinArenaEvent = new SlenderJoinArenaEvent(gameMember, arena);
                     Bukkit.getPluginManager().callEvent(slenderJoinArenaEvent);
 
                     if(arena.getPlayers().size() >= arena.getMinPlayers()) {
@@ -105,6 +107,7 @@ public class GameManager {
             gamePlayer.clearInventory();
             player.setScoreboard(arena.getScoreboard());
             player.getInventory().setItem(8, CustomItem.LEAVE.toItemStack());
+            player.getInventory().setItem(7, CustomItem.FORCED_START.toItemStack());
             arena.getPlayers().put(player, Role.NONE);
             arena.getBossBar().addPlayer(player);
 
@@ -254,13 +257,11 @@ public class GameManager {
     }
 
     private void sendArenaAnnouncement(Arena arena, String message, String hoverMessage, List<Player> players) {
-        TextComponent textComponent = new TextComponent(ColourUtil.colorize(message));
-        ComponentBuilder componentBuilder = new ComponentBuilder(ColourUtil.colorize(hoverMessage));
+        Component component = ColourUtil.colorizeToComponent(message)
+                .hoverEvent(HoverEvent.showText(ColourUtil.colorizeToComponent(hoverMessage)))
+                .clickEvent(ClickEvent.runCommand("/slender join " + arena.getId()));
 
-        textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, componentBuilder.create()));
-        textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/stopitslender join "+arena.getId()));
-
-        players.forEach(player -> player.spigot().sendMessage(textComponent));
+        players.forEach(player -> player.sendMessage(component));
     }
 
 }

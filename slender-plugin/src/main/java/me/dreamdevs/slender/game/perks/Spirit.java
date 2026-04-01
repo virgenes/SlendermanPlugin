@@ -4,6 +4,11 @@ import me.dreamdevs.slender.api.game.Role;
 import me.dreamdevs.slender.api.game.perks.Perk;
 import me.dreamdevs.slender.api.game.perks.PerkInfo;
 import me.dreamdevs.slender.api.utils.ColourUtil;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.title.Title;
+import net.kyori.adventure.util.Ticks;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -36,7 +41,12 @@ public class Spirit implements Perk {
         for (Player ally : allies) {
             if (ally != null && ally.isOnline()) {
                 ally.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 300, 0));
-                ally.sendTitle(ColourUtil.colorize("&a&lSpirit's Blessing"), ColourUtil.colorize("&7" + deadPlayer.getName() + "&7 watches over you"), 10, 40, 10);
+                Title title = Title.title(
+                        Component.text("Spirit's Blessing", NamedTextColor.GREEN, TextDecoration.BOLD),
+                        Component.text(deadPlayer.getName() + " watches over you", NamedTextColor.GRAY),
+                        Title.Times.times(Ticks.duration(10), Ticks.duration(40), Ticks.duration(10))
+                );
+                ally.showTitle(title);
                 ally.playSound(ally.getLocation(), org.bukkit.Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
             }
         }

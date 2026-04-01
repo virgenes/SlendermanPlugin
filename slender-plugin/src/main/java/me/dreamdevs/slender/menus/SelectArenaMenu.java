@@ -3,12 +3,10 @@ package me.dreamdevs.slender.menus;
 import me.dreamdevs.slender.SlenderMain;
 import me.dreamdevs.slender.api.Langauge;
 import me.dreamdevs.slender.api.events.ItemClickEvent;
-import me.dreamdevs.slender.api.game.ArenaState;
 import me.dreamdevs.slender.api.inventory.ItemMenu;
 import me.dreamdevs.slender.api.inventory.buttons.MenuItem;
 import me.dreamdevs.slender.api.utils.ColourUtil;
 import me.dreamdevs.slender.game.Arena;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 

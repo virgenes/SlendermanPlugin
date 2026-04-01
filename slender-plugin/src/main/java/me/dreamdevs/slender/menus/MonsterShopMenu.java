@@ -1,7 +1,6 @@
 package me.dreamdevs.slender.menus;
 
 import me.dreamdevs.slender.SlenderMain;
-import me.dreamdevs.slender.api.Langauge;
 import me.dreamdevs.slender.api.Statistic;
 import me.dreamdevs.slender.api.events.ItemClickEvent;
 import me.dreamdevs.slender.api.game.Role;
@@ -64,23 +63,91 @@ public class MonsterShopMenu extends ItemMenu {
     private static class MonsterPerkItem extends MenuItem {
 
         private final Perk perk;
+        private final String perkName;
 
         public MonsterPerkItem(GamePlayer gamePlayer, Perk perk, PerkInfo info) {
-            super(ColourUtil.colorize("&c" + info.name()), new ItemStack(info.icon()),
-                    ColourUtil.colouredLore(perk.getLore()).toArray(new String[0]));
+            super(ColourUtil.colorize("&c" + info.name()), new ItemStack(info.icon()));
             this.perk = perk;
+            this.perkName = info.name();
+        }
+
+        @Override
+        public ItemStack getFinalIcon(org.bukkit.entity.Player player) {
+            GamePlayer gp = SlenderMain.getInstance().getPlayerManager().getPlayer(player);
+            ItemStack item = super.getIcon().clone();
+            org.bukkit.inventory.meta.ItemMeta meta = item.getItemMeta();
+            java.util.List<net.kyori.adventure.text.Component> lore = new java.util.ArrayList<>();
+
+            // Header
+            lore.add(net.kyori.adventure.text.Component.text(""));
+
+            // Original Lore
+            for (String line : perk.getLore()) {
+                lore.add(ColourUtil.colorizeToComponent(line));
+            }
+
+            lore.add(net.kyori.adventure.text.Component.text(""));
+
+            if (gp != null) {
+                if (gp.getPerk(Role.SLENDER) != null && gp.getPerk(Role.SLENDER).getClass().equals(perk.getClass())) {
+                    lore.add(ColourUtil.colorizeToComponent("&b&l[EQUIPPED]"));
+                } else if (gp.ownsPerk(perkName)) {
+                    lore.add(ColourUtil.colorizeToComponent("&a&l[OWNED]"));
+                    lore.add(ColourUtil.colorizeToComponent("&7Click to select"));
+                } else {
+                    int price = getPrice(perkName);
+                    lore.add(ColourUtil.colorizeToComponent("&6Price: " + price + " coins"));
+                    lore.add(ColourUtil.colorizeToComponent("&7Click to purchase"));
+                }
+            }
+
+            meta.lore(lore);
+            item.setItemMeta(meta);
+            return item;
+        }
+
+        private int getPrice(String name) {
+            try {
+                me.dreamdevs.slender.api.Config config = me.dreamdevs.slender.api.Config.valueOf("PRICE_" + name.toUpperCase().replace(" ", "_"));
+                return config.toInt();
+            } catch (Exception e) {
+                return 1000; // Default price
+            }
         }
 
         @Override
         public void onItemClick(ItemClickEvent event) {
-            event.setWillClose(true);
-            GamePlayer gp = SlenderMain.getInstance().getPlayerManager().getPlayer(event.getPlayer());
-            if (gp != null) {
-                gp.setPerk(Role.SLENDER, perk);
+            Player player = event.getPlayer();
+            GamePlayer gp = SlenderMain.getInstance().getPlayerManager().getPlayer(player);
+            if (gp == null) return;
+
+            if (gp.getPerk(Role.SLENDER) != null && gp.getPerk(Role.SLENDER).getClass().equals(perk.getClass())) {
+                player.sendMessage(ColourUtil.colorize("&cThis perk is already equipped!"));
+                return;
             }
-            event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
-            event.getPlayer().sendMessage(ColourUtil.colorize("&aSelected perk: &c" +
-                    perk.getClass().getAnnotation(PerkInfo.class).name()));
+
+            if (gp.ownsPerk(perkName)) {
+                // Select
+                gp.setPerk(Role.SLENDER, perk);
+                player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
+                player.sendMessage(ColourUtil.colorize("&aSelected perk: &c" + perkName));
+                event.setWillUpdate(true);
+            } else {
+                // Purchase
+                int price = getPrice(perkName);
+                int balance = gp.getStatistic(me.dreamdevs.slender.api.Statistic.COINS);
+
+                if (balance >= price) {
+                    gp.setStatistic(me.dreamdevs.slender.api.Statistic.COINS, balance - price);
+                    gp.unlockPerk(perkName);
+                    player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
+                    player.sendMessage(ColourUtil.colorize("&aYou purchased the perk &e" + perkName + " &afor &6" + price + " coins&a!"));
+                    event.setWillUpdate(true);
+                } else {
+                    player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1f, 1f);
+                    player.sendMessage(ColourUtil.colorize("&cYou don't have enough coins! Only (" + balance + "/" + price + ")"));
+                }
+            }
         }
     }
 

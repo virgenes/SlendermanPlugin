@@ -35,7 +35,7 @@ public class PerkManager {
 		registerPerk(PagesBelongings.class);
 	}
 
-	public void registerPerk(Class<? extends Perk> perkClass) {
+	public final void registerPerk(Class<? extends Perk> perkClass) {
 		try {
 			PerkInfo info = perkClass.getAnnotation(PerkInfo.class);
 			Perk perk = perkClass.getConstructor().newInstance();

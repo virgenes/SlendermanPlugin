@@ -7,8 +7,8 @@ description: Professional horror minigame with multiple game modes
 
 commands:
   sis:
-    aliases: [slender, slenderman, slendermanplugin]
-    description: Main Slender command
+    aliases: [slender, slenderman, slendermanplugin, stopitslender, game]
+    description: Main SlendermanPlugin command (Game & Economy)
     usage: /sis <subcommand>
   party:
     aliases: [slenderparty]

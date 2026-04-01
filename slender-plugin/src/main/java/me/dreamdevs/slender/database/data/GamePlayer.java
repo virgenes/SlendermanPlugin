@@ -22,7 +22,9 @@ public class GamePlayer implements IGamePlayer {
 	private final Map<Statistic, Integer> statistics;
 	private final Map<Setting, Object> settings;
 	private final Map<Role, Perk> perks;
+	private final Set<String> ownedPerks;
 	private final Set<SlenderDisguise> ownedSkins;
+	private final Map<me.dreamdevs.slender.api.game.Skill, Integer> skills;
 	private SlenderDisguise equippedSkin;
 
 	public GamePlayer(OfflinePlayer player) {
@@ -30,9 +32,36 @@ public class GamePlayer implements IGamePlayer {
 		this.statistics = new HashMap<>();
 		this.settings = new HashMap<>();
 		this.perks = new HashMap<>();
+		this.ownedPerks = new HashSet<>();
 		this.ownedSkins = new HashSet<>();
+		this.skills = new HashMap<>();
 		this.equippedSkin = SlenderDisguise.ENDERMAN;
 		ownedSkins.add(SlenderDisguise.ENDERMAN);
+	}
+
+	@Override
+	public int getSkillLevel(me.dreamdevs.slender.api.game.Skill skill) {
+		return skills.getOrDefault(skill, 0);
+	}
+
+	@Override
+	public void setSkillLevel(me.dreamdevs.slender.api.game.Skill skill, int level) {
+		this.skills.put(skill, level);
+	}
+
+	@Override
+	public void unlockPerk(String perkName) {
+		this.ownedPerks.add(perkName);
+	}
+
+	@Override
+	public boolean ownsPerk(String perkName) {
+		return ownedPerks.contains(perkName);
+	}
+
+	@Override
+	public Set<String> getOwnedPerks() {
+		return ownedPerks;
 	}
 
 	@Override

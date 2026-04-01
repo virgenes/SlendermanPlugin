@@ -15,10 +15,6 @@
     <name>SlendermanPlugin</name>
     <version>1.5.0</version>
 
-    <build>
-        <finalName>${name}-${version}</finalName>
-    </build>
-
     <properties>
         <maven.compiler.release>17</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -36,7 +32,7 @@
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-            <version>22.0.0</version>
+            <version>24.1.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

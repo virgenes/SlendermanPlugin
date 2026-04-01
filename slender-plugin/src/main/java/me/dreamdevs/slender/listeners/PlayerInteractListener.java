@@ -13,6 +13,10 @@ import me.dreamdevs.slender.game.Arena;
 import me.dreamdevs.slender.game.CustomItem;
 import me.dreamdevs.slender.game.perks.*;
 import me.dreamdevs.slender.menus.*;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -58,20 +62,23 @@ public class PlayerInteractListener implements Listener {
 
         ItemStack itemStack = event.getItem();
         ItemMeta meta = itemStack.getItemMeta();
-        String displayName = meta.hasDisplayName() ? meta.getDisplayName() : "";
-        List<String> lore = meta.hasLore() ? meta.getLore() : new ArrayList<>();
+        Component displayName = meta.displayName();
+        List<Component> lore = meta.lore() != null ? meta.lore() : new ArrayList<>();
         Player player = event.getPlayer();
         GamePlayer gamePlayer = SlenderMain.getInstance().getPlayerManager().getPlayer(player);
 
+        // Plain text for name-based checks if needed
+        String plainName = displayName != null ? PlainTextComponentSerializer.plainText().serialize(displayName) : "";
+
         // === LOBBY ITEMS ===
-        if (displayName.equals(CustomItem.ARENA_SELECTOR.getDisplayName()) && lore.equals(CustomItem.ARENA_SELECTOR.getLore())) {
+        if (Objects.equals(displayName, CustomItem.ARENA_SELECTOR.getDisplayName()) && Objects.equals(lore, CustomItem.ARENA_SELECTOR.getLore())) {
             event.setCancelled(true);
             player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, (float) Math.random());
             new SelectArenaMenu().open(player);
             return;
         }
 
-        if (displayName.equals(CustomItem.LEAVE.getDisplayName()) && lore.equals(CustomItem.LEAVE.getLore())) {
+        if (Objects.equals(displayName, CustomItem.LEAVE.getDisplayName()) && Objects.equals(lore, CustomItem.LEAVE.getLore())) {
             event.setCancelled(true);
             if (gamePlayer == null || gamePlayer.getArena() == null) return;
             Arena arena = (Arena) gamePlayer.getArena();
@@ -79,14 +86,14 @@ public class PlayerInteractListener implements Listener {
             return;
         }
 
-        if (displayName.equals(CustomItem.MY_PROFILE.getDisplayName()) && lore.equals(CustomItem.MY_PROFILE.getLore())) {
+        if (Objects.equals(displayName, CustomItem.MY_PROFILE.getDisplayName()) && Objects.equals(lore, CustomItem.MY_PROFILE.getLore())) {
             event.setCancelled(true);
             player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, (float) Math.random());
             new MyProfileMenu(player).open(player);
             return;
         }
 
-        if (displayName.equals(CustomItem.PLAY_AGAIN.getDisplayName()) && lore.equals(CustomItem.PLAY_AGAIN.getLore())) {
+        if (Objects.equals(displayName, CustomItem.PLAY_AGAIN.getDisplayName()) && Objects.equals(lore, CustomItem.PLAY_AGAIN.getLore())) {
             event.setCancelled(true);
             if (gamePlayer == null || gamePlayer.getArena() == null) return;
             Arena arena = (Arena) gamePlayer.getArena();
@@ -95,7 +102,7 @@ public class PlayerInteractListener implements Listener {
                             || rArena.getArenaState() == ArenaState.STARTING)
                             && !rArena.getPlayers().containsKey(player)).findFirst().orElse(null);
             if (randomArena == null) {
-                player.sendMessage(Langauge.ARENA_NO_AVAILABLE_ARENAS.toString());
+                player.sendMessage(ColourUtil.colorizeToComponent(Langauge.ARENA_NO_AVAILABLE_ARENAS.toString()));
                 return;
             }
             SlenderMain.getInstance().getGameManager().leaveGame(gamePlayer.getPlayer(), arena);
@@ -103,28 +110,28 @@ public class PlayerInteractListener implements Listener {
             return;
         }
 
-        if (displayName.equals(CustomItem.SPECTATOR_SETTINGS.getDisplayName())) {
+        if (Objects.equals(displayName, CustomItem.SPECTATOR_SETTINGS.getDisplayName())) {
             event.setCancelled(true);
             player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, (float) Math.random());
             new SpectatorSettingsMenu().open(player);
             return;
         }
 
-        if (displayName.equals(CustomItem.PARTY_MENU.getDisplayName())) {
+        if (Objects.equals(displayName, CustomItem.PARTY_MENU.getDisplayName())) {
             event.setCancelled(true);
             player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, (float) Math.random());
             new PartyMenu(gamePlayer).open(player);
             return;
         }
 
-        if (displayName.equals(CustomItem.PERKS.getDisplayName())) {
+        if (Objects.equals(displayName, CustomItem.PERKS.getDisplayName())) {
             event.setCancelled(true);
             player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, (float) Math.random());
             new PerkMenu().open(player);
             return;
         }
 
-        if (displayName.equals(CustomItem.SPECTATOR_TELEPORTER.getDisplayName())) {
+        if (Objects.equals(displayName, CustomItem.SPECTATOR_TELEPORTER.getDisplayName())) {
             event.setCancelled(true);
             player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, (float) Math.random());
             if (gamePlayer != null && gamePlayer.getArena() != null) {
@@ -133,12 +140,43 @@ public class PlayerInteractListener implements Listener {
             return;
         }
 
-        if (displayName.equals(CustomItem.SHOP.getDisplayName()) && lore.equals(CustomItem.SHOP.getLore())) {
+        if (Objects.equals(displayName, CustomItem.SHOP.getDisplayName()) && Objects.equals(lore, CustomItem.SHOP.getLore())) {
             event.setCancelled(true);
             player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, (float) Math.random());
             if (gamePlayer != null) {
                 new ShopMenu(gamePlayer).open(player);
             }
+            return;
+        }
+
+        if (Objects.equals(displayName, CustomItem.FORCED_START.getDisplayName())) {
+            event.setCancelled(true);
+            if (gamePlayer == null || gamePlayer.getArena() == null) return;
+            Arena arenaObj = (Arena) gamePlayer.getArena();
+            if (arenaObj.getArenaState() != ArenaState.WAITING && arenaObj.getArenaState() != ArenaState.STARTING) {
+                player.sendMessage(Component.text("La partida ya ha comenzado.", NamedTextColor.RED));
+                return;
+            }
+            if (arenaObj.getPlayers().size() < arenaObj.getMinPlayers()) {
+                player.sendMessage(Component.text()
+                        .append(Component.text("Se necesitan al menos ", NamedTextColor.RED))
+                        .append(Component.text(arenaObj.getMinPlayers(), NamedTextColor.YELLOW))
+                        .append(Component.text(" jugadores para iniciar.", NamedTextColor.RED))
+                        .build());
+                return;
+            }
+            if (arenaObj.getTimer() <= 5 && arenaObj.getArenaState() == ArenaState.STARTING) {
+                player.sendMessage(Component.text("La partida ya está por iniciar.", NamedTextColor.RED));
+                return;
+            }
+            
+            arenaObj.setArenaState(ArenaState.STARTING);
+            arenaObj.setTimer(5);
+            arenaObj.sendMessage(Component.text()
+                    .append(Component.text(player.getName(), NamedTextColor.GOLD, TextDecoration.BOLD))
+                    .append(Component.text(" ha forzado el inicio de la partida. Empezamos en 5 segundos!", NamedTextColor.YELLOW))
+                    .build());
+            player.getInventory().remove(itemStack);
             return;
         }
 
@@ -148,7 +186,7 @@ public class PlayerInteractListener implements Listener {
         if (arena == null) return;
 
         // === SURVIVOR LANTERN ===
-        if (itemStack.getType() == Material.LANTERN && displayName.contains("Lantern")) {
+        if (itemStack.getType() == Material.LANTERN && plainName.contains("Lantern")) {
             event.setCancelled(true);
             Role role = arena.getPlayers().get(player);
             if (role != Role.SURVIVOR) return;
@@ -157,7 +195,7 @@ public class PlayerInteractListener implements Listener {
             int uses = lanternUses.getOrDefault(uuid, MAX_LANTERN_USES);
 
             if (uses <= 0) {
-                player.sendMessage(ColourUtil.colorize("&cYour lantern has no fuel left!"));
+                player.sendMessage(Component.text("Your lantern has no fuel left!", NamedTextColor.RED));
                 player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1f, 0.3f);
                 return;
             }
@@ -167,11 +205,11 @@ public class PlayerInteractListener implements Listener {
 
             // Update item lore
             ItemMeta lMeta = itemStack.getItemMeta();
-            lMeta.setLore(ColourUtil.colouredLore(Arrays.asList("&7Right-click to illuminate", "&7Uses: " + uses + "/" + MAX_LANTERN_USES)));
+            lMeta.lore(ColourUtil.colouredLoreToComponents(Arrays.asList("&7Right-click to illuminate", "&7Uses: " + uses + "/" + MAX_LANTERN_USES)));
             itemStack.setItemMeta(lMeta);
 
             // Remove darkness temporarily (10 seconds of clear vision)
-            player.removePotionEffect(PotionEffectType.BLINDNESS);
+            player.removePotionEffect(PotionEffectType.DARKNESS);
             player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 200, 1));
 
             // Light up area with particles
@@ -179,20 +217,23 @@ public class PlayerInteractListener implements Listener {
             player.getWorld().spawnParticle(Particle.FLAME, loc.clone().add(0, 1.5, 0), 30, 2, 1, 2, 0.01);
             player.getWorld().spawnParticle(Particle.GLOW_SQUID_INK, loc.clone().add(0, 1.5, 0), 20, 3, 1, 3, 0.02);
             player.playSound(player.getLocation(), Sound.BLOCK_LANTERN_PLACE, 1f, 1f);
-            player.sendMessage(ColourUtil.colorize("&e&lLantern activated! &7(" + uses + " uses remaining)"));
+            player.sendMessage(Component.text()
+                    .append(Component.text("Lantern activated! ", NamedTextColor.YELLOW, TextDecoration.BOLD))
+                    .append(Component.text("(" + uses + " uses remaining)", NamedTextColor.GRAY))
+                    .build());
 
             // Restore darkness after 10 seconds
             Bukkit.getScheduler().runTaskLater(SlenderMain.getInstance(), () -> {
                 if (player.isOnline() && arena.getPlayers().get(player) == Role.SURVIVOR) {
                     player.removePotionEffect(PotionEffectType.NIGHT_VISION);
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Integer.MAX_VALUE, 1));
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.DARKNESS, Integer.MAX_VALUE, 4));
                 }
             }, 200L);
             return;
         }
 
         // === SLENDERMAN RADAR ===
-        if (itemStack.getType() == Material.CLOCK && displayName.contains("Radar")) {
+        if (itemStack.getType() == Material.CLOCK && plainName.contains("Radar")) {
             event.setCancelled(true);
             Role role = arena.getPlayers().get(player);
             if (role != Role.SLENDER) return;
@@ -203,7 +244,10 @@ public class PlayerInteractListener implements Listener {
 
             if (now - lastUse < RADAR_COOLDOWN_MS) {
                 long remaining = (RADAR_COOLDOWN_MS - (now - lastUse)) / 1000L;
-                player.sendMessage(ColourUtil.colorize("&cRadar on cooldown! &7(" + remaining + "s remaining)"));
+                player.sendMessage(Component.text()
+                        .append(Component.text("Radar on cooldown! ", NamedTextColor.RED))
+                        .append(Component.text("(" + remaining + "s remaining)", NamedTextColor.GRAY))
+                        .build());
                 player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1f, 0.3f);
                 return;
             }
@@ -211,7 +255,10 @@ public class PlayerInteractListener implements Listener {
             radarCooldowns.put(uuid, now);
 
             // Show all survivors on radar for 10 seconds
-            player.sendMessage(ColourUtil.colorize("&c&lRADAR ACTIVE &7- Scanning for survivors..."));
+            player.sendMessage(Component.text()
+                    .append(Component.text("RADAR ACTIVE ", NamedTextColor.RED, TextDecoration.BOLD))
+                    .append(Component.text("- Scanning for survivors...", NamedTextColor.GRAY))
+                    .build());
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 1f, 1f);
 
             // Show particles at survivor locations for 10 seconds
@@ -230,39 +277,24 @@ public class PlayerInteractListener implements Listener {
 
             // Stop radar after 10 seconds
             Bukkit.getScheduler().runTaskLater(SlenderMain.getInstance(), () -> {
-                player.sendMessage(ColourUtil.colorize("&cRadar scan complete."));
+                player.sendMessage(Component.text("Radar scan complete.", NamedTextColor.RED));
                 player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, 1f, 0.5f);
             }, 200L);
             return;
         }
 
-        // === SURVIVOR PERK ABILITY ITEM ===
-        if (itemStack.getType() == Material.BLAZE_POWDER && displayName.contains("Perk")) {
+        // === PERK ABILITY ITEM ===
+        if (lore.stream().anyMatch(c -> PlainTextComponentSerializer.plainText().serialize(c).contains("Your perk ability"))) {
             event.setCancelled(true);
             Role role = arena.getPlayers().get(player);
-            if (role != Role.SURVIVOR) return;
+            if (role == null || role == Role.NONE) return;
 
-            Perk perk = gamePlayer.getPerk(Role.SURVIVOR);
+            Perk perk = gamePlayer.getPerk(role);
             if (perk == null) {
-                player.sendMessage(ColourUtil.colorize("&cNo perk equipped!"));
+                player.sendMessage(Component.text("No perk equipped!", NamedTextColor.RED));
                 return;
             }
-            activatePerkAbility(player, gamePlayer, perk, Role.SURVIVOR);
-            return;
-        }
-
-        // === SLENDERMAN PERK ABILITY ITEM ===
-        if (itemStack.getType() == Material.BLAZE_ROD && displayName.contains("Perk")) {
-            event.setCancelled(true);
-            Role role = arena.getPlayers().get(player);
-            if (role != Role.SLENDER) return;
-
-            Perk perk = gamePlayer.getPerk(Role.SLENDER);
-            if (perk == null) {
-                player.sendMessage(ColourUtil.colorize("&cNo perk equipped!"));
-                return;
-            }
-            activatePerkAbility(player, gamePlayer, perk, Role.SLENDER);
+            activatePerkAbility(player, gamePlayer, perk, role);
             return;
         }
     }

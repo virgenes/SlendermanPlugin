@@ -1,6 +1,5 @@
 package me.dreamdevs.slender.game.perks;
 
-import me.dreamdevs.slender.SlenderMain;
 import me.dreamdevs.slender.api.Config;
 import me.dreamdevs.slender.api.game.Role;
 import me.dreamdevs.slender.api.game.perks.Perk;

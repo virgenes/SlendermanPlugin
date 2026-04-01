@@ -1,30 +1,40 @@
 package me.dreamdevs.slender.api.utils;
 
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class ColourUtil {
 
+    private static final LegacyComponentSerializer LEGACY_SERIALIZER = LegacyComponentSerializer.builder()
+            .character('&')
+            .hexCharacter('#')
+            .extractUrls()
+            .hexColors()
+            .build();
+
     public static String colorize(String string) {
-        if(string == null) return null;
-        // Convert literal \n to actual newlines
-        string = string.replace("\\n", "\n");
-        Pattern pattern = Pattern.compile("#[a-fA-F0-9]{6}");
-        for (Matcher matcher = pattern.matcher(string); matcher.find(); matcher = pattern.matcher(string)) {
-            String color = string.substring(matcher.start(), matcher.end());
-            string = string.replace(color, ChatColor.of(color) + "");
-        }
-        string = ChatColor.translateAlternateColorCodes('&', string);
-        return string;
+        if (string == null) return null;
+        return LegacyComponentSerializer.legacySection().serialize(colorizeToComponent(string));
+    }
+
+    public static Component colorizeToComponent(String string) {
+        if (string == null) return Component.empty();
+        return LEGACY_SERIALIZER.deserialize(string.replace("\\n", "\n"));
+    }
+
+    public static List<Component> colouredLoreToComponents(List<String> lore) {
+        return Optional.ofNullable(lore)
+                .map(strings -> strings.stream()
+                        .map(ColourUtil::colorizeToComponent)
+                        .collect(Collectors.toList()))
+                .orElse(new ArrayList<>());
     }
 
     public static List<String> colouredLore(String... lore) {
-        return Optional.ofNullable(lore).map(ColourUtil::colouredLore).orElse(new ArrayList<>());
+        return Optional.ofNullable(lore).map(l -> colouredLore(Arrays.asList(l))).orElse(new ArrayList<>());
     }
 
     public static List<String> colouredLore(List<String> lore) {
@@ -33,14 +43,11 @@ public class ColourUtil {
 
     public static List<String> colouredLore(String lore) {
         List<String> list = new ArrayList<>();
+        if (lore == null) return list;
         String[] strings = lore.split("\n");
-        for(String s : strings)
+        for (String s : strings)
             list.add(colorize(s));
         return list;
-    }
-
-    public static String[] colouredArrayLore(String lore) {
-        return Stream.of(lore.split("\n")).map(ColourUtil::colorize).toArray(String[]::new);
     }
 
 }

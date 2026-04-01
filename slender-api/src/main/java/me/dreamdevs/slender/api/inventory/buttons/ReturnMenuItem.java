@@ -2,7 +2,6 @@ package me.dreamdevs.slender.api.inventory.buttons;
 
 import me.dreamdevs.slender.api.events.ItemClickEvent;
 import me.dreamdevs.slender.api.inventory.ItemMenu;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -11,7 +10,7 @@ public class ReturnMenuItem extends MenuItem {
 	private ItemMenu returnMenu;
 
 	public ReturnMenuItem(ItemMenu returnMenu) {
-		super(ChatColor.RED+"<- Return Page", new ItemStack(Material.ARROW));
+		super("&c<- Return Page", new ItemStack(Material.ARROW));
 		this.returnMenu = returnMenu;
 	}
 

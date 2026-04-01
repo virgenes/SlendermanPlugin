@@ -15,12 +15,12 @@ public class SlenderApi {
 	public static void loadApi(JavaPlugin plugin) {
 		SlenderApi.plugin = plugin;
 
-		Util.sendPluginMessage("&aLoading Stop It Slender API...");
+		Util.sendPluginMessage("&aLoading SlendermanPlugin API...");
 
 		ItemMenuListener.getInstance().register(plugin);
 
 		Util.sendPluginMessage("&aInternal disguise system active.");
-		Util.sendPluginMessage("&aSuccessfully registered Stop It Slender API!");
+		Util.sendPluginMessage("&aSuccessfully registered SlendermanPlugin API!");
 	}
 
 }

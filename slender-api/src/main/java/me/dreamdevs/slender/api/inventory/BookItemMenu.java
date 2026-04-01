@@ -30,7 +30,7 @@ public class BookItemMenu {
 		this.mainPage = new BookItemMenu.BookPage(title + (showPage ? " | Page 1" : ""), fitSize ? ItemMenu.Size.fit(icons.size()) : ItemMenu.Size.SIX_LINE, 0);
 
 		icons.forEach(menuItem -> {
-			if (counter.getAndIncrement() == getMainPage().getSize().getSize()-9) {
+			if (counter.getAndIncrement() == mainPage.getSize().getSize()-9) {
 				counter.set(0);
 				page.incrementAndGet();
 			}

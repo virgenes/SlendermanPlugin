@@ -18,7 +18,7 @@
 | 🧠 **Sanity** | Visual bar, panic effects, hallucinations, darkness drain |
 | ⚔️ **Perks** | 9 survivor perks + 3 Slenderman perks, equippable in-game |
 | 🎭 **Disguises** | 6 Slenderman skins (Enderman, Wither, Phantom, Ravager, Elder Guardian, Warden) |
-| 📊 **Progression** | XP, levels, ranks (Initiate → Legend), persistent stats |
+| 📊 **Progression** | Complete Evolution system: XP, Levels, Skills, and Achievements |
 | 💰 **Economy** | Built-in coin system, balance commands, shop |
 | 🌍 **Multi-arena** | Unlimited simultaneous arenas with independent config |
 | 🔌 **Integrations** | PlaceholderAPI, ProtocolLib, ViaVersion compatible |
@@ -124,15 +124,24 @@ Survivors have 0–100 sanity. It drains when:
 | 25–49 | Nausea, slowness, blindness pulses |
 | 0–24 | **PANIC** — severe effects, vulnerability |
 
-### Ranks
-| Level | Rank |
+### Evolution System (Leveling)
+Players earn EXP by playing games, collecting pages, killing survivors, or killing Slenderman. 
+As they level up, they unlock new levels with specific coin rewards configured in `levels.yml`.
+
+### Skills System
+Players can use their earned coins to upgrade permanent passive skills up to Level 5:
+| Skill | Effect |
 |---|---|
-| 0–4 | Initiate |
-| 5–9 | Adventurer |
-| 10–19 | Survivor |
-| 20–29 | Expert |
-| 30–49 | Master |
-| 50+ | **Legend** |
+| **Walk Speed** | Increases base movement speed by +5% per level |
+| **Stamina** | Increases sprint duration |
+| **Resistance** | Reduces damage taken by monsters by -5% per level |
+| **Coin Booster** | Increases coins earned per match |
+
+### Achievements
+Players have a dedicated tracker to unlock lifetime achievements based on total stats:
+- **Scholar I-III**: Collect 8, 40, and 200 total pages
+- **Hunter I-III**: Kill 5, 25, and 100 survivors as Slenderman
+- **Survivor I-III**: Win 1, 10, and 50 matches as Survivor
 
 ### Survivor Perks
 | Perk | Effect |

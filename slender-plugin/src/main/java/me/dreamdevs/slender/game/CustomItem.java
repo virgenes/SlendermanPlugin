@@ -1,9 +1,9 @@
 package me.dreamdevs.slender.game;
 
 import lombok.Getter;
-import me.dreamdevs.slender.SlenderMain;
 import me.dreamdevs.slender.api.Langauge;
 import me.dreamdevs.slender.api.utils.ColourUtil;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -61,23 +61,26 @@ public enum CustomItem {
             ColourUtil.colouredLore(Arrays.asList("&7Right-click to scan for survivors", "&7Cooldown: %COOLDOWN%s"))),
 
     SLENDERMAN_PERK_ITEM(Material.BLAZE_ROD, "&4Perk Ability",
-            ColourUtil.colouredLore(Arrays.asList("&7Right-click to activate", "&7Your equipped perk")));
+            ColourUtil.colouredLore(Arrays.asList("&7Right-click to activate", "&7Your equipped perk"))),
 
-    private final String displayName;
+    FORCED_START(Material.GOLD_INGOT, "&6&lForzar Inicio",
+            ColourUtil.colouredLore(Arrays.asList("&7Haz click para iniciar la partida", "&7inmediatamente (Requiere mínimo de jugadores)")));
+
+    private final Component displayName;
     private final Material material;
-    private final List<String> lore;
+    private final List<Component> lore;
 
     CustomItem(Material material, String displayName, List<String> lore) {
         this.material = material;
-        this.displayName = ColourUtil.colorize(displayName);
-        this.lore = lore;
+        this.displayName = ColourUtil.colorizeToComponent(displayName);
+        this.lore = ColourUtil.colouredLoreToComponents(lore);
     }
 
     public ItemStack toItemStack() {
         ItemStack itemStack = new ItemStack(material);
         ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.setDisplayName(displayName);
-        itemMeta.setLore(lore);
+        itemMeta.displayName(displayName);
+        itemMeta.lore(lore);
         itemMeta.setUnbreakable(true);
         itemStack.setItemMeta(itemMeta);
         return itemStack;

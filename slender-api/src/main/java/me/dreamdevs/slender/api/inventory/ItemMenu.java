@@ -9,6 +9,8 @@ import me.dreamdevs.slender.api.SlenderApi;
 import me.dreamdevs.slender.api.events.ItemClickEvent;
 import me.dreamdevs.slender.api.inventory.buttons.MenuItem;
 import me.dreamdevs.slender.api.inventory.handlers.ItemMenuListener;
+import me.dreamdevs.slender.api.utils.ColourUtil;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -20,7 +22,7 @@ import org.bukkit.inventory.Inventory;
  */
 public class ItemMenu {
 
-	private @Getter String name;
+	private @Getter Component name;
 	private @Getter Size size;
 	private @Getter MenuItem[] items;
 	private @Getter @Setter ItemMenu parent;
@@ -28,7 +30,7 @@ public class ItemMenu {
 	private @Getter Inventory inventory;
 
 	public ItemMenu(String name, Size size, ItemMenu parent) {
-		this.name = name;
+		this.name = ColourUtil.colorizeToComponent(name);
 		this.size = size;
 		this.items = new MenuItem[size.getSize()];
 		this.parent = parent;
@@ -50,17 +52,17 @@ public class ItemMenu {
 		return parent != null;
 	}
 
-	public ItemMenu setItem(int position, MenuItem menuItem) {
+	public final ItemMenu setItem(int position, MenuItem menuItem) {
 		items[position] = menuItem;
 		return this;
 	}
 
-	public ItemMenu clearItem(int position) {
+	public final ItemMenu clearItem(int position) {
 		items[position] = null;
 		return this;
 	}
 
-	public ItemMenu clearAllItems() {
+	public final ItemMenu clearAllItems() {
 		Arrays.fill(items, null);
 		return this;
 	}
@@ -87,9 +89,9 @@ public class ItemMenu {
 			ItemMenuListener.getInstance().register(SlenderApi.plugin);
 		}
 		inventory = Bukkit.createInventory(new ItemMenuHolder(this,
-						Bukkit.createInventory(player, size.getSize())),
+						Bukkit.createInventory(null, size.getSize())),
 				size.getSize(), name);
-		apply(inventory);
+		apply(inventory, player);
 		player.openInventory(inventory);
 	}
 
@@ -99,16 +101,16 @@ public class ItemMenu {
 			if (inventory.getHolder() instanceof ItemMenuHolder
 					&& ((ItemMenuHolder) inventory.getHolder()).getMenu()
 					.equals(this)) {
-				apply(inventory);
+				apply(inventory, player);
 				player.updateInventory();
 			}
 		}
 	}
 
-	private void apply(Inventory inventory) {
+	private void apply(Inventory inventory, Player player) {
 		for (int i = 0; i < items.length; i++) {
 			if (items[i] != null) {
-				inventory.setItem(i, items[i].getFinalIcon());
+				inventory.setItem(i, items[i].getFinalIcon(player));
 			}
 		}
 	}

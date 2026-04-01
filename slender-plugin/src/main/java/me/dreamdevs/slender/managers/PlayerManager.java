@@ -57,7 +57,7 @@ public class PlayerManager {
         player.setGameMode(GameMode.ADVENTURE);
         player.setFlying(false);
         player.setFoodLevel(20);
-        player.setBedSpawnLocation(null);
+        player.setRespawnLocation(null, true);
         player.setExp(0);
         player.setGlowing(false);
         player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
@@ -76,6 +76,10 @@ public class PlayerManager {
         });
 
         DisguiseManager.undisguise(player);
+        loadLobby(player);
+        
+        // Reapply walk speed multiplier
+        me.dreamdevs.slender.listeners.PlayerSkillListener.applyWalkSpeed(player);
     }
 
 }

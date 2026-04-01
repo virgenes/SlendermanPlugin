@@ -18,7 +18,7 @@ public class PartyCommandHandler implements TabExecutor {
 
     private final @Getter HashMap<String, Class<? extends ArgumentCommand>> arguments;
 
-    public PartyCommandHandler(SlenderMain plugin) {
+    public PartyCommandHandler() {
         this.arguments = new HashMap<>();
         registerCommand("create", PartyCreateArgument.class);
         registerCommand("delete", PartyDeleteArgument.class);
@@ -26,6 +26,9 @@ public class PartyCommandHandler implements TabExecutor {
         registerCommand("kick", PartyKickMemberArgument.class);
         registerCommand("accept", PartyAcceptInviteArgument.class);
         registerCommand("leave", PartyLeaveArgument.class);
+    }
+
+    public void register(SlenderMain plugin) {
         Objects.requireNonNull(plugin.getCommand("party")).setExecutor(this);
         Objects.requireNonNull(plugin.getCommand("party")).setTabCompleter(this);
     }
@@ -47,7 +50,7 @@ public class PartyCommandHandler implements TabExecutor {
                 }
                 return true;
             } else {
-                commandSender.sendMessage(ColourUtil.colorize("&aHelp for Stop It Slender Party:"));
+                commandSender.sendMessage(ColourUtil.colorize("&aHelp for SlendermanPlugin Party:"));
                 for(Class<? extends ArgumentCommand> argumentCommand : arguments.values()) {
                     commandSender.sendMessage(ColourUtil.colorize(argumentCommand.getConstructor().newInstance().getHelpText()));
                 }
@@ -69,7 +72,7 @@ public class PartyCommandHandler implements TabExecutor {
         } else return Collections.emptyList();
     }
 
-    public void registerCommand(String command, Class<? extends ArgumentCommand> clazz) {
+    private void registerCommand(String command, Class<? extends ArgumentCommand> clazz) {
         arguments.put(command, clazz);
     }
 

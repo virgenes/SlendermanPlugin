@@ -16,6 +16,11 @@ import me.dreamdevs.slender.game.Arena;
 import me.dreamdevs.slender.game.CustomItem;
 import me.dreamdevs.slender.game.perks.PrayerSpeed;
 import me.dreamdevs.slender.game.perks.Spirit;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.title.Title;
+import net.kyori.adventure.util.Ticks;
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
@@ -80,7 +85,7 @@ public class GameListeners implements Listener {
 
     @EventHandler
     public void deathPlayer(PlayerDeathEvent event) {
-        event.setDeathMessage(null);
+        event.deathMessage(null);
         event.setDroppedExp(0);
         event.setNewTotalExp(0);
         event.setNewLevel(0);
@@ -126,7 +131,7 @@ public class GameListeners implements Listener {
             Bukkit.getScheduler().runTaskLater(SlenderMain.getInstance(), () -> {
                 gamePlayer.getPlayer().spigot().respawn();
                 gamePlayer.getPlayer().setGlowing(false);
-                gamePlayer.getPlayer().sendMessage(Langauge.ARENA_SPECTATOR_MODE.toString());
+                gamePlayer.getPlayer().sendMessage(ColourUtil.colorizeToComponent(Langauge.ARENA_SPECTATOR_MODE.toString()));
             }, 4L);
 
         }
@@ -167,7 +172,13 @@ public class GameListeners implements Listener {
             gamePlayer.getPlayer().getInventory().setItem(8, CustomItem.LEAVE.toItemStack());
             gamePlayer.getPlayer().setAllowFlight(true);
             gamePlayer.getPlayer().setFlying(true);
-            gamePlayer.getPlayer().sendTitle(Langauge.ARENA_DEAD_TITLE.toString(), Langauge.ARENA_DEAD_SUBTITLE.toString(), 10, 30, 10);
+            
+            Title title = Title.title(
+                    ColourUtil.colorizeToComponent(Langauge.ARENA_DEAD_TITLE.toString()),
+                    ColourUtil.colorizeToComponent(Langauge.ARENA_DEAD_SUBTITLE.toString()),
+                    Title.Times.times(Ticks.duration(10), Ticks.duration(30), Ticks.duration(10))
+            );
+            gamePlayer.getPlayer().showTitle(title);
         } else if(role == Role.SLENDER) {
             event.setRespawnLocation(gamePlayer.getArena().getSlenderManSpawnLocation());
             Player p = event.getPlayer();
@@ -203,7 +214,10 @@ public class GameListeners implements Listener {
         // PrayerSpeed perk: faster collection
         Perk perk = gamePlayer.getPerk(Role.SURVIVOR);
         if (perk instanceof PrayerSpeed) {
-            player.sendActionBar(ColourUtil.colorize("&6&lPrayer Speed &7- Collection boosted!"));
+            player.sendActionBar(Component.text()
+                    .append(Component.text("Prayer Speed ", NamedTextColor.GOLD, TextDecoration.BOLD))
+                    .append(Component.text("- Collection boosted!", NamedTextColor.GRAY))
+                    .build());
         }
 
         SlenderSurvivorPickupPageEvent slenderSurvivorPickupPageEvent = new SlenderSurvivorPickupPageEvent(gamePlayer, arena, arena.getCollectedPages());

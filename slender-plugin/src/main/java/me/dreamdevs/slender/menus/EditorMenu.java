@@ -15,12 +15,12 @@ public class EditorMenu extends ItemMenu {
 		super(Langauge.MENU_EDITOR_TITLE.toString(), Size.THREE_LINE);
 
 		setItem(10, new SetSetting(arena, SetSetting.ArenaSetting.MINIMUM_PLAYERS,
-				Langauge.MENU_EDITOR_MINIMUM_PLAYERS_ITEM_NAME.toString(),
+				Langauge.MENU_EDITOR_MINIMUM_PLAYERS_ITEM_NAME.toString().replace("%AMOUNT%", String.valueOf(arena.getMinPlayers())),
 				new ItemStack(Material.REDSTONE),
 				Langauge.MENU_EDITOR_MINIMUM_PLAYERS_ITEM_LORE.toString().replace("%AMOUNT%", String.valueOf(arena.getMinPlayers()))));
 
 		setItem(11, new SetSetting(arena, SetSetting.ArenaSetting.MAXIMUM_PLAYERS,
-				Langauge.MENU_EDITOR_MAXIMUM_PLAYERS_ITEM_NAME.toString(),
+				Langauge.MENU_EDITOR_MAXIMUM_PLAYERS_ITEM_NAME.toString().replace("%AMOUNT%", String.valueOf(arena.getMaxPlayers())),
 				new ItemStack(Material.LAPIS_LAZULI),
 				Langauge.MENU_EDITOR_MAXIMUM_PLAYERS_ITEM_LORE.toString().replace("%AMOUNT%", String.valueOf(arena.getMaxPlayers()))));
 
@@ -40,9 +40,9 @@ public class EditorMenu extends ItemMenu {
 				Langauge.MENU_EDITOR_ADD_PAGES_SPAWN_ITEM_LORE.toString()));
 
 		setItem(15, new SetSetting(arena, SetSetting.ArenaSetting.GAME_TIME,
-				Langauge.MENU_EDITOR_GAME_TIME_ITEM_NAME.toString(),
+				Langauge.MENU_EDITOR_GAME_TIME_ITEM_NAME.toString().replace("%AMOUNT%", String.valueOf(arena.getGameTime())),
 				new ItemStack(Material.CLOCK),
-				Langauge.MENU_EDITOR_GAME_TIME_ITEM_LORE.toString()));
+				Langauge.MENU_EDITOR_GAME_TIME_ITEM_LORE.toString().replace("%AMOUNT%", String.valueOf(arena.getGameTime()))));
 
 		setItem(16, new SetSetting(arena, SetSetting.ArenaSetting.SAVE,
 				Langauge.MENU_EDITOR_SAVE_SETTINGS_ITEM_NAME.toString(),

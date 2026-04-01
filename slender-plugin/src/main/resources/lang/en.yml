@@ -9,14 +9,14 @@ ArenaAnnouncements:
   SlenderMan-Left: "&eSlenderMan left the game!"
   Survivor-Left: "&e%PLAYER% left the game!"
   Collected-Pages: "&6Collected pages: &e%CURRENT%&6/&e8"
-  Join-Game-Info: "&a&l================================================\n&r\n                    &f&lStop It Slender\n&r\n    &e&lFind all 8 pages or die by SlenderMan!\n    &e&lUse your torches to light the way!\n&r\n&a&l================================================"
+  Join-Game-Info: "&a&l================================================\n&r\n                    &f&lSlendermanPlugin\n&r\n    &e&lFind all 8 pages or die by SlenderMan!\n    &e&lUse your torches to light the way!\n&r\n&a&l================================================"
   Started-Info: "&eThe game has begun! Find or kill them all!"
   Stop-Starting: "&cNot enough players to start..."
   Starting-Info: "&eGame starting in 30 seconds!"
   Page-Spawned-Info: "&eA page has spawned somewhere in the dark!"
   Spectator-Mode: "&eYou are now a spectator."
   Page-Pickup-Title: "&6Page %CURRENT%/8"
-  Arena-Title: "&c&lStop It Slender!"
+  Arena-Title: "&c&lSlendermanPlugin!"
   Waiting-Subtitle: "&7Waiting for players..."
   Starting-Subtitle: "&aStarting in &e%TIME% &aseconds..."
   Started-Subtitle: "&4Good Luck!"
@@ -25,7 +25,7 @@ ArenaAnnouncements:
   Dead-Title: "&c&lYou died!"
   Dead-Subtitle: "&eYou are now a spectator."
   Boss-Bar:
-    Waiting-Title: "&c&lStop It Slender"
+    Waiting-Title: "&c&lSlendermanPlugin"
     Ending-Title: "&cReturning to lobby in &e%TIME%s"
   Boss-Bar-Running-Title: "&cTime left: &e%TIME%s"
   No-Slots: "&cThis game is full!"
@@ -51,11 +51,11 @@ ArenaAnnouncements:
 
 LobbyAnnouncements:
   Click-Here: "&eClick here!"
-  Arena-Starting-Announcement: "&a&l================================================\n&r\n                    &f&lStop It Slender\n&r\n&b&lArena &f&l%ARENA% &b&lis starting in 30 seconds!\n&r\n&a&l================================================"
+  Arena-Starting-Announcement: "&a&l================================================\n&r\n                    &f&lSlendermanPlugin\n&r\n&b&lArena &f&l%ARENA% &b&lis starting in 30 seconds!\n&r\n&a&l================================================"
 
 Level:
   Player-Exp-Reward: "&a+%AMOUNT% EXP"
-  Player-Level-Up: "&a&l================================================\n&r\n                    &f&lStop It Slender\n&r\n                        &3&lLevel Up!\n   &7Keep playing to get better!\n      &7Your level: &b%LEVEL%\n&r\n&a&l================================================"
+  Player-Level-Up: "&a&l================================================\n&r\n                    &f&lSlendermanPlugin\n&r\n                        &3&lLevel Up!\n   &7Keep playing to get better!\n      &7Your level: &b%LEVEL%\n&r\n&a&l================================================"
 
 Items:
   Arena-Selector:

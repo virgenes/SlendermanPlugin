@@ -78,7 +78,22 @@ public enum Config {
     PERK_BETTER_TOGETHER_COOLDOWN("Perks.BetterTogether.Cooldown-Seconds", 25),
     PERK_BETTER_TOGETHER_RADIUS("Perks.BetterTogether.Radius-Blocks", 8),
     PERK_ARCHAEOLOGIST_COOLDOWN("Perks.Archaeologist.Cooldown-Seconds", 30),
-    PERK_ARCHAEOLOGIST_NIGHT_VISION_TICKS("Perks.Archaeologist.Night-Vision-Ticks", 160);
+    PERK_ARCHAEOLOGIST_NIGHT_VISION_TICKS("Perks.Archaeologist.Night-Vision-Ticks", 160),
+
+    // ── Perk prices ──────────────────────────────────────────────────────
+    PRICE_RUNAWAY("Prices.Perks.Runaway", 500),
+    PRICE_BETTER_TOGETHER("Prices.Perks.BetterTogether", 750),
+    PRICE_ARCHAEOLOGIST("Prices.Perks.Archaeologist", 1000),
+    PRICE_RESILIENCE("Prices.Perks.Resilience", 600),
+    PRICE_TRACKING("Prices.Perks.Tracking", 800),
+    PRICE_ECHO("Prices.Perks.Echo", 400),
+    PRICE_SPIRIT("Prices.Perks.Spirit", 1200),
+    PRICE_PRAYER_SPEED("Prices.Perks.PrayerSpeed", 900),
+    PRICE_KILLER_INSTINCT("Prices.Perks.KillerInstinct", 1500),
+    PRICE_ENDLESS_AGONY("Prices.Perks.EndlessAgony", 1300),
+    PRICE_DARK_ABYSS("Prices.Perks.DarkAbyss", 1100),
+    PRICE_FROM_THE_DARK("Prices.Perks.FromTheDark", 1400),
+    PRICE_PAGES_BELONGINGS("Prices.Perks.PagesBelongings", 1600);
 
     // ─────────────────────────────────────────────────────────────────────
 

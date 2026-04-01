@@ -60,8 +60,14 @@ public class DatabaseYAML implements IDatabase {
 			Perk slenderPerk = gamePlayer.getPerk(Role.SLENDER);
 			playerData.set("PlayerPerks.EquippedSurvivorPerk", survivorPerk != null ? survivorPerk.getClass().getAnnotation(PerkInfo.class).name() : "RUNAWAY");
 			playerData.set("PlayerPerks.EquippedSlenderManPerk", slenderPerk != null ? slenderPerk.getClass().getAnnotation(PerkInfo.class).name() : "ENDERMAN");
+			playerData.set("PlayerPerks.Owned", new java.util.ArrayList<>(gamePlayer.getOwnedPerks()));
 			playerData.set("PlayerSkins.Owned", gamePlayer.getOwnedSkins().stream().map(SlenderDisguise::name).collect(Collectors.toList()));
 			playerData.set("PlayerSkins.Equipped", gamePlayer.getEquippedSkin().name());
+
+			for (me.dreamdevs.slender.api.game.Skill skill : me.dreamdevs.slender.api.game.Skill.values()) {
+				playerData.set("PlayerSkills." + skill.name(), gamePlayer.getSkillLevel(skill));
+			}
+
 			try {
 				playerData.save(playerFile);
 			} catch (Exception e) {}
@@ -92,8 +98,11 @@ public class DatabaseYAML implements IDatabase {
 			gamePlayer.setSetting(Setting.SHOW_ARENA_JOIN_MESSAGE, configuration.getBoolean("PlayerSettings.ShowJoinArenaMessage",true));
 			gamePlayer.setSetting(Setting.MESSAGE_TYPE, configuration.getString("PlayerSettings.MessagesType","all"));
 
-			gamePlayer.setPerk(Role.SURVIVOR, SlenderMain.getInstance().getPerkManager().getPerk(configuration.getString("PlayerPerks.EquippedSurvivorPerk","RUNAWAY")));
+			gamePlayer.setPerk(Role.SURVIVOR, SlenderMain.getInstance().getPerkManager().getPerk(configuration.getString("PlayerPerks.EquippedSurvivorPerk","")));
 			gamePlayer.setPerk(Role.SLENDER, SlenderMain.getInstance().getPerkManager().getPerk(configuration.getString("PlayerPerks.EquippedSlenderManPerk","")));
+
+			List<String> ownedPerks = configuration.getStringList("PlayerPerks.Owned");
+			ownedPerks.forEach(gamePlayer::unlockPerk);
 
 			List<String> ownedSkins = configuration.getStringList("PlayerSkins.Owned");
 			if (ownedSkins.isEmpty()) {
@@ -113,6 +122,10 @@ public class DatabaseYAML implements IDatabase {
 					gamePlayer.equipSkin(equipped);
 				}
 			} catch (IllegalArgumentException ignored) {}
+
+			for (me.dreamdevs.slender.api.game.Skill skill : me.dreamdevs.slender.api.game.Skill.values()) {
+				gamePlayer.setSkillLevel(skill, configuration.getInt("PlayerSkills." + skill.name(), 0));
+			}
 
 			SlenderMain.getInstance().getPlayerManager().getPlayers().add(gamePlayer);
 		});

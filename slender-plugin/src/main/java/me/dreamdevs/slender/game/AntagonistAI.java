@@ -3,8 +3,13 @@ package me.dreamdevs.slender.game;
 import me.dreamdevs.slender.SlenderMain;
 import me.dreamdevs.slender.api.Config;
 import me.dreamdevs.slender.api.game.Role;
-import me.dreamdevs.slender.database.data.GamePlayer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.title.Title;
+import net.kyori.adventure.util.Ticks;
 import org.bukkit.*;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -23,21 +28,26 @@ import java.util.concurrent.ThreadLocalRandom;
 public class AntagonistAI {
 
     public enum Phase {
-        OBSERVER("&7Observer", 0.0, 0.33),
-        STALKER("&eStalker", 0.33, 0.66),
-        HUNTER("&cHunter", 0.66, 1.0);
+        OBSERVER("Observer", NamedTextColor.GRAY, 0.0, 0.33),
+        STALKER("Stalker", NamedTextColor.YELLOW, 0.33, 0.66),
+        HUNTER("Hunter", NamedTextColor.RED, 0.66, 1.1); // Use 1.1 to avoid edge case at 1.0
 
-        private final String displayName;
+        private final String name;
+        private final NamedTextColor color;
         private final double minPercent;
         private final double maxPercent;
 
-        Phase(String displayName, double minPercent, double maxPercent) {
-            this.displayName = displayName;
+        Phase(String name, NamedTextColor color, double minPercent, double maxPercent) {
+            this.name = name;
+            this.color = color;
             this.minPercent = minPercent;
             this.maxPercent = maxPercent;
         }
 
-        public String getDisplayName() { return displayName; }
+        public Component getDisplayName() {
+            return Component.text(name, color);
+        }
+
         public double getMinPercent() { return minPercent; }
         public double getMaxPercent() { return maxPercent; }
 
@@ -80,7 +90,10 @@ public class AntagonistAI {
             if (newPhase != currentPhase) {
                 currentPhase = newPhase;
                 updatePhaseBonuses();
-                arena.sendMessage(ChatColor.GOLD + "[SlenderMan] Phase changed to " + currentPhase.getDisplayName());
+                arena.sendMessage(Component.text()
+                        .append(Component.text("[SlenderMan] Phase changed to ", NamedTextColor.GOLD))
+                        .append(currentPhase.getDisplayName())
+                        .build());
             }
 
             // Apply phase-specific behaviors
@@ -241,7 +254,11 @@ public class AntagonistAI {
         victim.playSound(victim.getLocation(), Sound.ENTITY_ENDERMAN_SCREAM, 2f, 0.5f);
 
         // Title
-        victim.sendTitle("§c§lJUMPSCARE", "§7The SlenderMan got you...", 5, 40, 10);
+        victim.showTitle(Title.title(
+                Component.text("JUMPSCARE", NamedTextColor.RED, TextDecoration.BOLD),
+                Component.text("The SlenderMan got you...", NamedTextColor.GRAY),
+                Title.Times.times(Ticks.duration(5), Ticks.duration(40), Ticks.duration(10))
+        ));
 
         // Kill after delay
         Bukkit.getScheduler().runTaskLater(SlenderMain.getInstance(), () -> {
@@ -272,9 +289,12 @@ public class AntagonistAI {
                     nearest.getLocation().getDirection().multiply(-5).setY(0));
             behind.setY(nearest.getLocation().getY());
 
-            // Teleport with particle effect
+            // Safely teleport with particle effect and sound
+            // Reset velocity and fall distance to prevent "moved too quickly" warnings
+            slender.setVelocity(new org.bukkit.util.Vector(0, 0, 0));
+            slender.setFallDistance(0);
             slender.getWorld().spawnParticle(Particle.PORTAL, slender.getLocation(), 30, 0.5, 1, 0.5, 0);
-            slender.teleport(behind);
+            slender.teleport(behind, PlayerTeleportEvent.TeleportCause.PLUGIN);
             slender.getWorld().spawnParticle(Particle.PORTAL, behind, 30, 0.5, 1, 0.5, 0);
             slender.playSound(slender.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f);
         }

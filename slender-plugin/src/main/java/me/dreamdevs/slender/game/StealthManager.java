@@ -3,8 +3,8 @@ package me.dreamdevs.slender.game;
 import me.dreamdevs.slender.SlenderMain;
 import me.dreamdevs.slender.api.game.Role;
 import me.dreamdevs.slender.database.data.GamePlayer;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -92,8 +92,7 @@ public class StealthManager implements Listener {
         double current = noiseLevels.getOrDefault(uuid, 0.0);
         noiseLevels.put(uuid, Math.max(0.0, current - 2.0));
 
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                new TextComponent(net.md_5.bungee.api.ChatColor.GREEN + "Sneaking - You are silent"));
+        player.sendActionBar(Component.text("Sneaking - You are silent", NamedTextColor.GREEN));
     }
 
     public void addNoise(UUID uuid, double amount) {
@@ -111,13 +110,11 @@ public class StealthManager implements Listener {
 
         double noise = noiseLevels.getOrDefault(uuid, 0.0);
         if (noise > 5.0) {
-            player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                    new TextComponent(net.md_5.bungee.api.ChatColor.RED + "⚠ You're making too much noise..."));
+            player.sendActionBar(Component.text("⚠ You're making too much noise...", NamedTextColor.RED));
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 0.3f, 0.3f);
             lastWarningTime.put(uuid, now);
         } else if (noise > 2.0) {
-            player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                    new TextComponent(net.md_5.bungee.api.ChatColor.YELLOW + "You're being heard..."));
+            player.sendActionBar(Component.text("You're being heard...", NamedTextColor.YELLOW));
             lastWarningTime.put(uuid, now);
         }
     }

@@ -1,5 +1,7 @@
 package me.dreamdevs.slender.game;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -39,7 +41,7 @@ public class LanternManager {
         ItemStack lantern = new ItemStack(Material.LANTERN);
         ItemMeta meta = lantern.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName("§6Lantern");
+            meta.displayName(Component.text("Lantern", NamedTextColor.GOLD));
             lantern.setItemMeta(meta);
         }
         player.getInventory().setItem(slot, lantern);

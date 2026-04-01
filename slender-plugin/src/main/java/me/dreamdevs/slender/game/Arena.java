@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import me.dreamdevs.slender.SlenderMain;
 import me.dreamdevs.slender.api.*;
-import me.dreamdevs.slender.api.Statistic;
 import me.dreamdevs.slender.api.events.SlenderGameEndEvent;
 import me.dreamdevs.slender.api.events.SlenderGameStartEvent;
 import me.dreamdevs.slender.api.game.ArenaState;
@@ -12,12 +11,11 @@ import me.dreamdevs.slender.api.game.IArena;
 import me.dreamdevs.slender.api.game.Role;
 import me.dreamdevs.slender.api.utils.ColourUtil;
 import me.dreamdevs.slender.api.utils.Util;
-import me.dreamdevs.slender.compat.VersionCompat;
 import me.dreamdevs.slender.database.data.GamePlayer;
 import me.dreamdevs.slender.disguise.DisguiseManager;
 import me.dreamdevs.slender.disguise.SlenderDisguise;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.kyori.adventure.title.Title;
+import net.kyori.adventure.util.Ticks;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
@@ -25,12 +23,14 @@ import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.*;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
@@ -86,7 +86,7 @@ public class Arena extends BukkitRunnable implements IArena {
         this.slenderMan = null;
 
         this.scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
-        this.scoreboard.registerNewObjective(id, "dummy", id);
+        this.scoreboard.registerNewObjective(id, Criteria.DUMMY, ColourUtil.colorizeToComponent(id));
 
         this.scoreboard.registerNewTeam("survivors");
         this.scoreboard.registerNewTeam("slenderman");
@@ -185,37 +185,41 @@ public class Arena extends BukkitRunnable implements IArena {
         tempList.forEach(player -> players.put(player, Role.SURVIVOR));
         players.put(slenderMan, Role.SLENDER);
 
-        this.scoreboard.getTeam("slenderman").addPlayer(slenderMan);
-        slenderMan.getInventory().clear();
-        slenderMan.getInventory().setItem(0, CustomItem.SLENDERMAN_WEAPON.toItemStack());
-        slenderMan.getInventory().setItem(1, CustomItem.SLENDERMAN_RADAR.toItemStack());
-        GamePlayer gameSlenderMan = SlenderMain.getInstance().getPlayerManager().getPlayer(slenderMan);
+        final Player finalSlenderMan = this.slenderMan;
+        this.scoreboard.getTeam("slenderman").addPlayer(finalSlenderMan);
+        finalSlenderMan.getInventory().clear();
+        finalSlenderMan.getInventory().setItem(0, CustomItem.SLENDERMAN_WEAPON.toItemStack());
+        finalSlenderMan.getInventory().setItem(1, CustomItem.SLENDERMAN_RADAR.toItemStack());
+        GamePlayer gameSlenderMan = SlenderMain.getInstance().getPlayerManager().getPlayer(finalSlenderMan);
+        
         // Perk ability item
         Perk slenderPerk = gameSlenderMan.getPerk(Role.SLENDER);
         if (slenderPerk != null) {
             PerkInfo sInfo = slenderPerk.getClass().getAnnotation(PerkInfo.class);
             ItemStack perkItem = new ItemStack(sInfo.icon());
             ItemMeta sMeta = perkItem.getItemMeta();
-            sMeta.setDisplayName(ColourUtil.colorize("&4&l" + sInfo.name()));
-            sMeta.setLore(ColourUtil.colouredLore(Arrays.asList("&7Right-click to activate", "&7Your perk ability")));
+            sMeta.displayName(ColourUtil.colorizeToComponent("&4&l" + sInfo.name()));
+            sMeta.lore(ColourUtil.colouredLoreToComponents(Arrays.asList("&7Right-click to activate", "&7Your perk ability")));
             sMeta.setUnbreakable(true);
             perkItem.setItemMeta(sMeta);
-            slenderMan.getInventory().setItem(2, perkItem);
+            finalSlenderMan.getInventory().setItem(2, perkItem);
         }
 
         // Darkness effect for all survivors - total blindness
         tempList.forEach(player -> {
-            player.teleport(survivorsLocations.get(Util.getRandomNumber(survivorsLocations.size())));
+            player.setVelocity(new org.bukkit.util.Vector(0, 0, 0));
+            player.setFallDistance(0);
+            player.teleport(survivorsLocations.get(Util.getRandomNumber(survivorsLocations.size())), PlayerTeleportEvent.TeleportCause.PLUGIN);
             this.scoreboard.getTeam("survivors").addPlayer(player);
-            // Total darkness: high level blindness, no night vision
-            player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Integer.MAX_VALUE, 4));
+            // Total darkness: darkness effect
+            player.addPotionEffect(new PotionEffect(PotionEffectType.DARKNESS, Integer.MAX_VALUE, 4));
             player.getInventory().clear();
             player.getInventory().setItem(0, CustomItem.SURVIVOR_WEAPON.toItemStack());
             // Lantern with 5 uses
             ItemStack lantern = new ItemStack(Material.LANTERN);
             ItemMeta lMeta = lantern.getItemMeta();
-            lMeta.setDisplayName(ColourUtil.colorize("&e&lSurvivor Lantern"));
-            lMeta.setLore(ColourUtil.colouredLore(Arrays.asList("&7Right-click to illuminate", "&7Uses: 5/5")));
+            lMeta.displayName(ColourUtil.colorizeToComponent("&e&lSurvivor Lantern"));
+            lMeta.lore(ColourUtil.colouredLoreToComponents(Arrays.asList("&7Right-click to illuminate", "&7Uses: 5/5")));
             lMeta.setUnbreakable(true);
             lantern.setItemMeta(lMeta);
             player.getInventory().setItem(1, lantern);
@@ -226,155 +230,103 @@ public class Arena extends BukkitRunnable implements IArena {
                 PerkInfo pInfo = survivorPerk.getClass().getAnnotation(PerkInfo.class);
                 ItemStack perkItem = new ItemStack(pInfo.icon());
                 ItemMeta pMeta = perkItem.getItemMeta();
-                pMeta.setDisplayName(ColourUtil.colorize("&6&l" + pInfo.name()));
-                pMeta.setLore(ColourUtil.colouredLore(Arrays.asList("&7Right-click to activate", "&7Your perk ability")));
+                pMeta.displayName(ColourUtil.colorizeToComponent("&6&l" + pInfo.name()));
+                pMeta.lore(ColourUtil.colouredLoreToComponents(Arrays.asList("&7Right-click to activate", "&7Your perk ability")));
                 pMeta.setUnbreakable(true);
                 perkItem.setItemMeta(pMeta);
                 player.getInventory().setItem(2, perkItem);
             }
         });
 
-        slenderMan.teleport(slenderManSpawnLocation);
-        slenderMan.getAttribute(Attribute.MAX_HEALTH).setBaseValue(Config.SLENDERMAN_HEALTH.toInt());
-        slenderMan.setHealth(Config.SLENDERMAN_HEALTH.toInt());
-        slenderMan.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, Integer.MAX_VALUE));
+        finalSlenderMan.setVelocity(new org.bukkit.util.Vector(0, 0, 0));
+        finalSlenderMan.setFallDistance(0);
+        finalSlenderMan.teleport(slenderManSpawnLocation, PlayerTeleportEvent.TeleportCause.PLUGIN);
+        finalSlenderMan.getAttribute(Attribute.MAX_HEALTH).setBaseValue(Config.SLENDERMAN_HEALTH.toInt());
+        finalSlenderMan.setHealth(Config.SLENDERMAN_HEALTH.toInt());
+        finalSlenderMan.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, Integer.MAX_VALUE));
+        
         if (Config.USE_DISGUISE.toBoolean()) {
-            SlenderDisguise skin = gameSlenderMan.getEquippedSkin();
+            final SlenderDisguise skin = gameSlenderMan.getEquippedSkin();
             Bukkit.getScheduler().runTaskLater(SlenderMain.getInstance(), () ->
-                    DisguiseManager.disguise(slenderMan, skin), 10L);
+                    DisguiseManager.disguise(finalSlenderMan, skin), 10L);
         }
 
     }
 
     private void sendTitleToAllPlayers(String title, String subTitle, int fadeIn, int stayIn, int fadeOut) {
-        if (players.isEmpty())
-            return;
-        players.keySet().forEach(player -> player.sendTitle(ColourUtil.colorize(title), ColourUtil.colorize(subTitle), fadeIn, stayIn, fadeOut));
+        if (players.isEmpty()) return;
+        Title adventureTitle = Title.title(
+                ColourUtil.colorizeToComponent(title),
+                ColourUtil.colorizeToComponent(subTitle),
+                Title.Times.times(Ticks.duration(fadeIn), Ticks.duration(stayIn), Ticks.duration(fadeOut))
+        );
+        players.keySet().forEach(player -> player.showTitle(adventureTitle));
     }
 
     private void sendActionBar(String message) {
-        players.keySet().forEach(player -> player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ColourUtil.colorize(message))));
+        if (players.isEmpty()) return;
+        players.keySet().forEach(player -> player.sendActionBar(ColourUtil.colorizeToComponent(message)));
+    }
+
+    public void sendMessage(String message) {
+        if (players.isEmpty()) return;
+        players.keySet().forEach(player -> player.sendMessage(ColourUtil.colorizeToComponent(message)));
+    }
+
+    public void sendMessage(net.kyori.adventure.text.Component component) {
+        if (players.isEmpty()) return;
+        players.keySet().forEach(player -> player.sendMessage(component));
+    }
+
+    public boolean isRunning() {
+        return arenaState == ArenaState.RUNNING;
+    }
+
+    public int getSurvivorsAmount() {
+        return (int) players.entrySet().stream()
+                .filter(entry -> entry.getValue() == Role.SURVIVOR)
+                .count();
+    }
+
+    public List<Player> getSurvivors() {
+        return players.entrySet().stream()
+                .filter(entry -> entry.getValue() == Role.SURVIVOR)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
     }
 
     public void restart() {
-        Bukkit.getWorlds().forEach(world -> world.getEntities().stream().filter(Item.class::isInstance).forEach(Entity::remove));
-
-        SlenderMain.getInstance().getPlayerManager().getPlayers().stream().filter(gamePlayer -> gamePlayer.isInArena() && gamePlayer.getArena().equals(this) && (Boolean) gamePlayer.getSetting(Setting.AUTO_JOIN_MODE)).forEach(gamePlayer -> {
-            SlenderMain.getInstance().getGameManager().leaveGame(gamePlayer.getPlayer(), this);
-            Arena arena = SlenderMain.getInstance().getGameManager().getAvailableArena();
-            if(arena == null) {
-                gamePlayer.getPlayer().sendMessage(Langauge.ARENA_NO_AVAILABLE_ARENAS.toString());
-                return;
-            }
-            SlenderMain.getInstance().getGameManager().joinGame(gamePlayer.getPlayer(), arena);
+        setArenaState(ArenaState.RESTARTING);
+        this.bossBar.removeAll();
+        // Remove entities/items
+        Bukkit.getWorlds().forEach(world -> world.getEntities().stream()
+                .filter(entity -> entity instanceof Item)
+                .forEach(Entity::remove));
+        
+        // Reset players
+        players.keySet().forEach(player -> {
+            SlenderMain.getInstance().getPlayerManager().sendToLobby(player);
         });
 
-        new ArrayList<>(players.keySet()).forEach(player -> SlenderMain.getInstance().getGameManager().leaveGame(player, this));
-
-        setArenaState(ArenaState.RESTARTING);
         players.clear();
-        setCollectedPages(0);
-
-        Bukkit.getWorlds().forEach(world -> world.getEntities().stream().filter(Item.class::isInstance).forEach(Entity::remove));
-        this.bossBar.setTitle(Langauge.ARENA_BOSS_BAR_WAITING_TITLE.toString());
-        this.scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
-        this.scoreboard.registerNewObjective(id, "dummy", id);
-        this.scoreboard.registerNewTeam("survivors");
-        this.scoreboard.registerNewTeam("slenderman");
         this.slenderMan = null;
-        Bukkit.getScheduler().runTaskLater(SlenderMain.getInstance(), () -> setArenaState(ArenaState.WAITING), 100L);
+        this.collectedPages = 0;
+        setArenaState(ArenaState.WAITING);
     }
 
     public void endGame() {
-        this.bossBar.setTitle(Langauge.ARENA_BOSS_BAR_RUNNING_TITLE.toString().replace("%TIME%", String.valueOf(timer)));
-        if (radiusTask != null) {
-            this.radiusTask.cancel();
-            this.radiusTask = null;
-        }
-        if (this.terrorRadius != null) {
-            this.terrorRadius.stop();
-            this.terrorRadius = null;
-        }
-        if (this.ambientSoundManager != null) {
-            this.ambientSoundManager.stop();
-            this.ambientSoundManager = null;
-        }
-        int pagesToWin = Config.PAGES_TO_WIN.toInt();
-        if(getCollectedPages() < pagesToWin) {
-            sendTitleToAllPlayers(Langauge.ARENA_TITLE.toString(), Langauge.ARENA_WIN_SLENDERMAN_SUBTITLE.toString(), 10, 50, 10);
-
-            GamePlayer gamePlayer = SlenderMain.getInstance().getPlayerManager().getPlayer(slenderMan);
-            gamePlayer.setStatistic(Statistic.WINS, gamePlayer.getStatistic(Statistic.WINS)+1);
-
-        } else {
-            sendTitleToAllPlayers(Langauge.ARENA_TITLE.toString(), Langauge.ARENA_WIN_SURVIVORS_SUBTITLE.toString(),10, 50, 10);
-            getPlayers().entrySet().stream().filter(playerRoleEntry -> playerRoleEntry.getValue() == Role.SURVIVOR).forEach(playerRoleEntry -> {
-                GamePlayer gamePlayer = SlenderMain.getInstance().getPlayerManager().getPlayer(playerRoleEntry.getKey());
-                gamePlayer.setStatistic(Statistic.WINS, gamePlayer.getStatistic(Statistic.WINS)+1);
-            });
-        }
-
-        getPlayers().keySet().forEach(player -> {
-            getPlayers().put(player, Role.NONE);
-            player.getInventory().clear();
-            player.getActivePotionEffects().stream().map(PotionEffect::getType).forEach(player::removePotionEffect);
-            player.getInventory().setItem(7, CustomItem.PLAY_AGAIN.toItemStack());
-            player.getInventory().setItem(8, CustomItem.LEAVE.toItemStack());
-        });
-
         setArenaState(ArenaState.ENDING);
-        setTimer(15);
+        setTimer(10);
+        this.bossBar.setTitle(Langauge.ARENA_BOSS_BAR_ENDING_TITLE.toString());
+        sendTitleToAllPlayers(Langauge.ARENA_GAME_OVER_TITLE.toString(), Langauge.ARENA_GAME_OVER_SUBTITLE.toString(), 10, 40, 10);
+        
         SlenderGameEndEvent slenderGameEndEvent = new SlenderGameEndEvent(this);
         Bukkit.getPluginManager().callEvent(slenderGameEndEvent);
     }
 
     public void spawnPage() {
-        ItemStack itemStack = new ItemStack(Material.PAPER);
-
-        Item item = slenderManSpawnLocation.getWorld().dropItem(getPagesLocations().get(Util.getRandomNumber(getPagesLocations().size())), itemStack);
-        item.setCustomName(Langauge.ARENA_COLLECTED_PAGES.toString().replace("%NUMBER%", String.valueOf((collectedPages+1))));
-        item.setCustomNameVisible(true);
-
-        sendMessage(Langauge.ARENA_PAGE_SPAWNED_INFO.toString());
-    }
-
-    public int getSurvivorsAmount() {
-        return (int) players.entrySet().stream().filter(playerRoleEntry -> playerRoleEntry.getValue() == Role.SURVIVOR).count();
-    }
-
-    public void sendMessage(String message) {
-        if (players.isEmpty()) {
-            return;
-        }
-        players.keySet().forEach(player -> player.sendMessage(ColourUtil.colorize(message)));
-    }
-
-    public boolean isRunning() {
-        return getArenaState() == ArenaState.RUNNING || getArenaState() == ArenaState.ENDING;
-    }
-
-    public List<Player> getSurvivors() {
-        return players.entrySet().stream()
-                .filter(playerRoleEntry -> playerRoleEntry.getValue().equals(Role.SURVIVOR))
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
-    }
-
-    public void terrorRadius() {
-        if(getArenaState() == ArenaState.RUNNING) {
-            World world = slenderMan.getWorld();
-            world.getNearbyEntities(slenderMan.getLocation(), Config.TERROR_RADIUS.toInt(), Config.TERROR_RADIUS.toInt(), Config.TERROR_RADIUS.toInt())
-                    .stream().filter(Player.class::isInstance)
-                    .map(Player.class::cast)
-                    .filter(player -> getPlayers().containsKey(player) && getPlayers().get(player) != Role.SLENDER)
-                    .forEach(player -> player.playSound(player.getLocation(), Sound.BLOCK_SNOW_BREAK, 2f, 2f));
-        } else {
-            this.radiusTask.cancel();
-        }
-    }
-
-    @Override
-    public Location getSlenderManSpawnLocation() {
-        return slenderManSpawnLocation;
+        if (pagesLocations.isEmpty()) return;
+        Location loc = pagesLocations.get(Util.getRandomNumber(pagesLocations.size()));
+        // Logic for spawning a literal item or custom entity page would go here
     }
 }

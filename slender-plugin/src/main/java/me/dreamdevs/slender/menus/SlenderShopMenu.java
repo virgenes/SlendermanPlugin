@@ -1,6 +1,5 @@
 package me.dreamdevs.slender.menus;
 
-import me.dreamdevs.slender.SlenderMain;
 import me.dreamdevs.slender.api.Langauge;
 import me.dreamdevs.slender.api.Statistic;
 import me.dreamdevs.slender.api.events.ItemClickEvent;
@@ -10,8 +9,6 @@ import me.dreamdevs.slender.api.utils.ColourUtil;
 import me.dreamdevs.slender.database.data.GamePlayer;
 import me.dreamdevs.slender.disguise.DisguiseManager;
 import me.dreamdevs.slender.disguise.SlenderDisguise;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;

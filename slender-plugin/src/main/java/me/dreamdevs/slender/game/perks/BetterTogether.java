@@ -7,7 +7,6 @@ import me.dreamdevs.slender.api.game.perks.Perk;
 import me.dreamdevs.slender.api.game.perks.PerkInfo;
 import me.dreamdevs.slender.api.utils.ColourUtil;
 import me.dreamdevs.slender.database.data.GamePlayer;
-import me.dreamdevs.slender.game.Arena;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;

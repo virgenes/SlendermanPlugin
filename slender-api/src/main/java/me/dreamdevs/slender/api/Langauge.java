@@ -4,7 +4,7 @@ import lombok.Getter;
 import me.dreamdevs.slender.api.utils.ColourUtil;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import java.io.File;
+
 
 public enum Langauge {
 
@@ -22,7 +22,7 @@ public enum Langauge {
 
 	ARENA_COLLECTED_PAGES("ArenaAnnouncements.Collected-Pages","&6Collected pages: %CURRENT%"),
 
-	ARENA_JOIN_GAME_INFO("ArenaAnnouncements.Join-Game-Info", "&a&l❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚\\n&r\\n                    &f&lStop It Slender           \\n&r\\n\\n    &e&lFind all pages or die by SlenderMan!\n" +
+	ARENA_JOIN_GAME_INFO("ArenaAnnouncements.Join-Game-Info", "&a&l❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚\\n&r\\n                    &f&lSlendermanPlugin           \\n&r\\n\\n    &e&lFind all pages or die by SlenderMan!\n" +
 			"                         \\n   &e&lUse your torches to light up a little!\\n&r\\n&a&l❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚"),
 
 	ARENA_STARTED_INFO("ArenaAnnouncements.Started-Info","&eThe game has begun! Find or kill them all!"),
@@ -33,7 +33,7 @@ public enum Langauge {
 	ARENA_SPECTATOR_MODE("ArenaAnnouncements.Spectator-Mode","&eYou are now spectator!"),
 
 	// Arena titles announcements
-	ARENA_TITLE("ArenaAnnouncements.Arena-Title","&c&lStop It Slender!"),
+	ARENA_TITLE("ArenaAnnouncements.Arena-Title","&c&lSlendermanPlugin!"),
 	ARENA_WAITING_SUBTITLE("ArenaAnnouncements.Waiting-Subtitle","&7Waiting for players..."),
 	ARENA_STARTING_SUBTITLE("ArenaAnnouncements.Starting-Subtitle","&aStarting in %TIME% seconds..."),
 	ARENA_STARTED_SUBTITLE("ArenaAnnouncements.Started-Subtitle","&4Good Luck!"),
@@ -41,10 +41,13 @@ public enum Langauge {
 	ARENA_WIN_SURVIVORS_SUBTITLE("ArenaAnnouncements.Win-Survivors-Subtitle","&aSurvivors won the game!"),
 	ARENA_WIN_SLENDERMAN_SUBTITLE("ArenaAnnouncements.Win-SlenderMan-Subtitle","&cSlenderMan won the game!"),
 
+	ARENA_GAME_OVER_TITLE("ArenaAnnouncements.Game-Over-Title","&c&lGAME OVER"),
+	ARENA_GAME_OVER_SUBTITLE("ArenaAnnouncements.Game-Over-Subtitle","&7Thanks for playing!"),
+
 	ARENA_DEAD_TITLE("ArenaAnnouncements.Dead-Title","&c&lYou died!"),
 	ARENA_DEAD_SUBTITLE("ArenaAnnouncements.Dead-Subtitle","&eYou are now spectator!"),
 
-	ARENA_BOSS_BAR_WAITING_TITLE("ArenaAnnouncements.Boss-Bar.Waiting-Title","&c&lStop It Slender"),
+	ARENA_BOSS_BAR_WAITING_TITLE("ArenaAnnouncements.Boss-Bar.Waiting-Title","&c&lSlendermanPlugin"),
 	ARENA_BOSS_BAR_RUNNING_TITLE("ArenaAnnouncements.Boss-Bar-Running-Title","&cTime left: %TIME% seconds"),
 	ARENA_BOSS_BAR_ENDING_TITLE("ArenaAnnouncements.Boss-Bar.Ending-Title","&cTeleport to lobby in %TIME% seconds"),
 
@@ -70,12 +73,12 @@ public enum Langauge {
 	ARENA_SLENDERMAN_TEAM("ArenaAnnouncements.Objectives.SlenderMan-Team","&cSlenderMan"),
 
 	LOBBY_CLICK_HERE("LobbyAnnouncements.Click-Here", "&eClick here!"),
-	LOBBY_ARENA_STARTING_ANNOUNCEMENT("LobbyAnnouncements.Arena-Starting-Announcement","&a&l❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚\n&r\n                    &f&lStop It Slender           \n&r\n"+
-			"&b&lArena &f&l%ARENA% &b&lis starting in 30 seconds!\n&r\n&a&l❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚"),
+	LOBBY_ARENA_STARTING_ANNOUNCEMENT("LobbyAnnouncements.Arena-Starting-Announcement","&a&l❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚\\n&r\\n                    &f&lSlendermanPlugin           \\n&r\\n"+
+			"&b&lArena &f&l%ARENA% &b&lis starting in 30 seconds!\\n&r\\n&a&l❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚"),
 
 	LEVEL_PLAYER_EXP_REWARD("Level.Player-Exp-Reward","&a+%AMOUNT% Exp"),
-	LEVEL_PLAYER_LEVEL_UP("Level.Player-Level-Up","&a&l❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚\n&r\n                    &f&lStop It Slender           \n&r\n\n                        &3&lLevel Up!"+
-			"\n   &7You are getting better and better!\n     &7Thanks for playing this game!\n      &7Your current level: &b%LEVEL%\n&r\n&a&l❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚"),
+	LEVEL_PLAYER_LEVEL_UP("Level.Player-Level-Up","&a&l❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚\\n&r\\n                    &f&lSlendermanPlugin           \\n&r\\n\\n                        &3&lLevel Up!"+
+			"\n   &7You are getting better and better!\n     &7Thanks for playing this game!\n      &7Your current level: &b%LEVEL%\\n&r\\n&a&l❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚"),
 
 	ITEMS_ARENA_SELECTOR_DISPLAY_NAME("Items.Arena-Selector.DisplayName","&aArena Selector &7(Right-click)"),
 	ITEMS_ARENA_SELECTOR_DISPLAY_LORE("Items.Arena-Selector.DisplayLore","\n&eRight-click to open &aArena Selector&e."),
@@ -147,7 +150,7 @@ public enum Langauge {
 	MENU_MY_PROFILE_SETTINGS_AUTO_JOIN_MODE_ITEM_NAME("Menu.My-Profile.Settings.Auto-Join-Mode-Item-Name","&bAuto Join Mode"),
 	MENU_MY_PROFILE_SETTINGS_AUTO_JOIN_MODE_ITEM_LORE("Menu.My-Profile.Settings.Auto-Join-Mode-Item-Lore","\n&7If this option is on,\n&7you will be teleported to another\n&7arena, after your game ends.\n&7\n&7Status: %STATUS%"),
 	MENU_MY_PROFILE_SETTINGS_SH0W_ARENA_JOIN_MESSAGE_ITEM_NAME("Menu.My-Profile.Settings.Show-Arena-Join-Message-Item-Name","&bShow Arena Join Message"),
-	MENU_MY_PROFILE_SETTINGS_SHOW_ARENA_JOIN_MESSAGE_ITEM_LORE("Menu.My-Profile.Settings.Show-Arena-Join-Message-Item-Lore","\n&7If this option is on,\n&7you will get information about Stop It Slender game\n&7\n&7Status: %STATUS%"),
+	MENU_MY_PROFILE_SETTINGS_SHOW_ARENA_JOIN_MESSAGE_ITEM_LORE("Menu.My-Profile.Settings.Show-Arena-Join-Message-Item-Lore","\n&7If this option is on,\n&7you will get information about SlendermanPlugin game\n&7\n&7Status: %STATUS%"),
 	MENU_MY_PROFILE_SETTINGS_MESSAGES_TYPE_ITEM_NAME("Menu.My-Profile.Settings.Messages-Type-Item-Name","&bMessages Type"),
 	MENU_MY_PROFILE_SETTINGS_MESSAGES_TYPE_ITEM_LORE("Menu.My-Profile.Settings.Messages-Type-Item-Lore","\n&7This option enables you to\n&7choose, which messages you will be getting.\n&7\n&7Type: %TYPE%"),
 
@@ -179,13 +182,13 @@ public enum Langauge {
 
 	MENU_EDITOR_TITLE("Menu.Editor.Title","Map Editor"),
 	MENU_EDITOR_MINIMUM_PLAYERS_ITEM_NAME("Menu.Editor.Minimum-Players-Item-Name","&bMinimum Players: %AMOUNT%"),
-	MENU_EDITOR_MINIMUM_PLAYERS_ITEM_LORE("Menu.Editor.Minimum-Players-Item-Lore","\n&7Left-click to add 1\n&7Right-click to remove 1"),
+	MENU_EDITOR_MINIMUM_PLAYERS_ITEM_LORE("Menu.Editor.Minimum-Players-Item-Lore","\n&7Click izquierdo para subir la cantidad\n&7Click derecho para bajarla"),
 	MENU_EDITOR_MAXIMUM_PLAYERS_ITEM_NAME("Menu.Editor.Maximum-Players-Item-Name","&bMaximum Players: %AMOUNT%"),
-	MENU_EDITOR_MAXIMUM_PLAYERS_ITEM_LORE("Menu.Editor.Maximum-Players-Item-Lore","\n&7Left-click to add 1\n&7Right-click to remove 1"),
+	MENU_EDITOR_MAXIMUM_PLAYERS_ITEM_LORE("Menu.Editor.Maximum-Players-Item-Lore","\n&7Click izquierdo para subir la cantidad\n&7Click derecho para bajarla"),
 	MENU_EDITOR_SET_SLENDERMAN_SPAWN_ITEM_NAME("Menu.Editor.Set-SlenderMan-Spawn-Item-Name","&bSet SlenderMan Spawn"),
 	MENU_EDITOR_SET_SLENDERMAN_SPAWN_ITEM_LORE("Menu.Editor.Set-SlenderMan-Spawn-Item-Lore","\n&7Click to set SlenderMan Spawn location"),
 	MENU_EDITOR_GAME_TIME_ITEM_NAME("Menu.Editor.Game-Time-Item-Name","&bGame Time: %AMOUNT%"),
-	MENU_EDITOR_GAME_TIME_ITEM_LORE("Menu.Editor.Game-Time-Item-Lore","\n&7Left-click to add 1\n&7Right-click to remove 1"),
+	MENU_EDITOR_GAME_TIME_ITEM_LORE("Menu.Editor.Game-Time-Item-Lore","\n&7Click izquierdo para subir la cantidad\n&7Click derecho para bajarla"),
 	MENU_EDITOR_ADD_SURVIVOR_SPAWN_ITEM_NAME("Menu.Editor.Add-Survivor-Spawn-Item-Name","&bAdd Survivors Spawn"),
 	MENU_EDITOR_ADD_SURVIVOR_SPAWN_ITEM_LORE("Menu.Editor.Add-Survivor-Spawn-Item-Lore","\n&7Click to add Survivors Spawn location"),
 	MENU_EDITOR_ADD_PAGES_SPAWN_ITEM_NAME("Menu.Editor.Add-Pages-Spawn-Item-Name","&bAdd Pages Spawn"),

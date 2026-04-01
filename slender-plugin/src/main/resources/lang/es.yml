@@ -7,14 +7,14 @@ ArenaAnnouncements:
   SlenderMan-Left: "&e¡El SlenderMan abandonó la partida!"
   Survivor-Left: "&e%PLAYER% abandonó la partida."
   Collected-Pages: "&6Páginas recogidas: &e%CURRENT%&6/&e8"
-  Join-Game-Info: "&a&l================================================\n&r\n                    &f&lStop It Slender\n&r\n    &e&lEncuentra las 8 páginas o muere a manos del SlenderMan!\n    &e&lUsa tus antorchas para iluminar el camino!\n&r\n&a&l================================================"
+  Join-Game-Info: "&a&l================================================\n&r\n                    &f&lSlendermanPlugin\n&r\n    &e&lEncuentra las 8 páginas o muere a manos del SlenderMan!\n    &e&lUsa tus antorchas para iluminar el camino!\n&r\n&a&l================================================"
   Started-Info: "&e¡La partida ha comenzado! ¡Encuentra o elimina a todos!"
   Stop-Starting: "&cNo hay suficientes jugadores para comenzar..."
   Starting-Info: "&eLa partida comienza en 30 segundos."
   Page-Spawned-Info: "&e¡Una página ha aparecido en algún lugar oscuro!"
   Spectator-Mode: "&eAhora eres espectador."
   Page-Pickup-Title: "&6Página %CURRENT%/8"
-  Arena-Title: "&c&l¡Stop It Slender!"
+  Arena-Title: "&c&l¡SlendermanPlugin!"
   Waiting-Subtitle: "&7Esperando jugadores..."
   Starting-Subtitle: "&aComienza en &e%TIME% &asegundos..."
   Started-Subtitle: "&4¡Buena suerte!"
@@ -23,7 +23,7 @@ ArenaAnnouncements:
   Dead-Title: "&c&l¡Moriste!"
   Dead-Subtitle: "&eAhora eres espectador."
   Boss-Bar:
-    Waiting-Title: "&c&lStop It Slender"
+    Waiting-Title: "&c&lSlendermanPlugin"
     Ending-Title: "&cVolviendo al lobby en &e%TIME%s"
   Boss-Bar-Running-Title: "&cTiempo restante: &e%TIME%s"
   No-Slots: "&c¡Esta partida está llena!"
@@ -48,10 +48,10 @@ ArenaAnnouncements:
     SlenderMan-Team: "&cSlenderMan"
 LobbyAnnouncements:
   Click-Here: "&e¡Haz clic aquí!"
-  Arena-Starting-Announcement: "&a&l================================================\n&r\n                    &f&lStop It Slender\n&r\n&b&lArena &f&l%ARENA% &b&lcomienza en 30 segundos!\n&r\n&a&l================================================"
+  Arena-Starting-Announcement: "&a&l================================================\n&r\n                    &f&lSlendermanPlugin\n&r\n&b&lArena &f&l%ARENA% &b&lcomienza en 30 segundos!\n&r\n&a&l================================================"
 Level:
   Player-Exp-Reward: "&a+%AMOUNT% EXP"
-  Player-Level-Up: "&a&l================================================\n&r\n                    &f&lStop It Slender\n&r\n                        &3&l¡Subiste de nivel!\n   &7¡Cada vez juegas mejor!\n      &7Tu nivel actual: &b%LEVEL%\n&r\n&a&l================================================"
+  Player-Level-Up: "&a&l================================================\n&r\n                    &f&lSlendermanPlugin\n&r\n                        &3&l¡Subiste de nivel!\n   &7¡Cada vez juegas mejor!\n      &7Tu nivel actual: &b%LEVEL%\n&r\n&a&l================================================"
 Items:
   Arena-Selector:
     DisplayName: "&aSelector de Arena &7(Clic derecho)"

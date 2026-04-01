@@ -7,8 +7,10 @@ import me.dreamdevs.slender.api.game.party.PartyRole;
 import me.dreamdevs.slender.api.game.party.PartySettings;
 import me.dreamdevs.slender.database.data.GamePlayer;
 import me.dreamdevs.slender.game.Party;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.TextComponent;
+import me.dreamdevs.slender.api.utils.ColourUtil;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.event.ClickEvent;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -50,10 +52,10 @@ public class PartyManager {
     public void invitePlayer(Player player, Party party) {
         GamePlayer gamePlayer = SlenderMain.getInstance().getPlayerManager().getPlayer(player);
         pendingRequests.put(gamePlayer, party);
-        TextComponent textComponent = new TextComponent(Langauge.PARTY_REQUEST_MESSAGE.toString());
-        textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/party accept"));
-        textComponent.setUnderlined(true);
-        gamePlayer.getPlayer().spigot().sendMessage(textComponent);
+        Component component = ColourUtil.colorizeToComponent(Langauge.PARTY_REQUEST_MESSAGE.toString())
+                .clickEvent(ClickEvent.runCommand("/party accept"))
+                .decorate(TextDecoration.UNDERLINED);
+        gamePlayer.getPlayer().sendMessage(component);
     }
 
     public boolean isInParty(GamePlayer gamePlayer) {

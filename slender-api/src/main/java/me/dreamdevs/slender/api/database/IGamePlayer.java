@@ -7,7 +7,6 @@ import me.dreamdevs.slender.api.game.Role;
 import me.dreamdevs.slender.api.game.perks.Perk;
 import org.bukkit.OfflinePlayer;
 
-import java.util.Map;
 
 public interface IGamePlayer {
 
@@ -36,6 +35,16 @@ public interface IGamePlayer {
 	void setPerk(Role role, Perk perk);
 
 	Perk getPerk(Role role);
+
+	void unlockPerk(String perkName);
+
+	boolean ownsPerk(String perkName);
+
+	java.util.Set<String> getOwnedPerks();
+
+	int getSkillLevel(me.dreamdevs.slender.api.game.Skill skill);
+
+	void setSkillLevel(me.dreamdevs.slender.api.game.Skill skill, int level);
 
 	/**
 	 * Arena methods

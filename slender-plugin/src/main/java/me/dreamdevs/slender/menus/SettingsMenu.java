@@ -72,7 +72,7 @@ public class SettingsMenu extends ItemMenu {
 			super(Langauge.MENU_MY_PROFILE_SETTINGS_MESSAGES_TYPE_ITEM_NAME.toString(),
 					new ItemStack(Material.SLIME_BALL),
 					ColourUtil.colouredLore(Langauge.MENU_MY_PROFILE_SETTINGS_MESSAGES_TYPE_ITEM_LORE.toString()
-							.replace("%STATUS%", (String) gamePlayer.getSetting(Setting.MESSAGE_TYPE)))
+							.replace("%TYPE%", (String) gamePlayer.getSetting(Setting.MESSAGE_TYPE)))
 							.toArray(String[]::new));
 			this.gamePlayer = gamePlayer;
 		}
