@@ -271,3 +271,10 @@ A: The plugin targets 1.19+. Some features (DARKNESS effect, WARDEN disguise) re
 
 MIT License — free to use, modify and distribute.  
 Please credit **virgenes** if you redistribute.
+
+---
+
+## 🏷️ Credits
+
+This plugin is based on the original version by **MrABCDevelopment**:  
+🔗 [https://github.com/MrABCDevelopment/Slender](https://github.com/MrABCDevelopment/Slender)

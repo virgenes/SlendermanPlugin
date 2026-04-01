@@ -1,9 +1,0 @@
-
-F
-java:S1066Ÿ"/Merge this if statement with the enclosing one.(£¬ ™
-h
-java:S3776]"RRefactor this method to reduce its Cognitive Complexity from 52 to the 15 allowed.(¼ñí–
-S
-java:S1854a"=Remove this useless assignment to local variable "itemStack".(­Æº¼
-D
-java:S1481a".Remove this unused "itemStack" local variable.(­Æº¼

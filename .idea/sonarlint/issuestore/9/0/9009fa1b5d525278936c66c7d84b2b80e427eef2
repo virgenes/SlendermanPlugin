@@ -1,8 +1,0 @@
-
-»
-java:S6548"˜A Singleton implementation was detected. Make sure the use of the Singleton pattern is required and the implementation is the right one for the context.(²¸ë½ýÿÿÿÿ8ƒäîÝ¯1
-`
-java:S1124"EReorder the modifiers to comply with the Java Language Specification.(’­¼ìøÿÿÿÿ
-Q
-java:S2696-"6Make the enclosing method "static" or remove this set.(ñõîÙþÿÿÿÿ
-Q	java:S125Q"<This block of commented-out lines of code should be removed.(õ›‰…
