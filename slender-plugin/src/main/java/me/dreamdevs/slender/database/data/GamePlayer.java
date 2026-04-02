@@ -101,8 +101,10 @@ public class GamePlayer implements IGamePlayer {
 
 	@Override
 	public IArena getArena() {
+		Player onlinePlayer = getPlayer();
+		if (onlinePlayer == null) return null;
 		return SlenderMain.getInstance().getGameManager().getArenas().stream()
-				.filter(arena -> arena.getPlayers().containsKey(getPlayer()))
+				.filter(arena -> arena.getPlayers().containsKey(onlinePlayer))
 				.findFirst()
 				.orElse(null);
 	}

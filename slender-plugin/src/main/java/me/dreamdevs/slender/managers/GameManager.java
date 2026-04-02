@@ -131,7 +131,11 @@ public class GameManager {
                 arena.setArenaState(ArenaState.STARTING);
                 arena.sendMessage(Langauge.ARENA_STARTING_INFO.toString());
                 arena.setTimer(30);
-                List<Player> lobbyPlayers = SlenderMain.getInstance().getPlayerManager().getPlayers().stream().filter(lobbyGamePlayer -> !lobbyGamePlayer.isInArena()).map(GamePlayer::getPlayer).collect(Collectors.toList());
+                List<Player> lobbyPlayers = SlenderMain.getInstance().getPlayerManager().getPlayers().stream()
+                        .filter(lobbyGamePlayer -> lobbyGamePlayer.getPlayer() != null)
+                        .filter(lobbyGamePlayer -> !lobbyGamePlayer.isInArena())
+                        .map(GamePlayer::getPlayer)
+                        .collect(Collectors.toList());
                 sendArenaAnnouncement(arena, Langauge.LOBBY_ARENA_STARTING_ANNOUNCEMENT.toString()
                         .replace("%ARENA%", arena.getId()), Langauge.LOBBY_CLICK_HERE.toString(), lobbyPlayers);
             }

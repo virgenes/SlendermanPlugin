@@ -327,6 +327,20 @@ public class Arena extends BukkitRunnable implements IArena {
     public void spawnPage() {
         if (pagesLocations.isEmpty()) return;
         Location loc = pagesLocations.get(Util.getRandomNumber(pagesLocations.size()));
-        // Logic for spawning a literal item or custom entity page would go here
+        if (loc == null || loc.getWorld() == null) return;
+        
+        ItemStack pageItem = new ItemStack(Material.PAPER);
+        ItemMeta meta = pageItem.getItemMeta();
+        if (meta != null) {
+            meta.displayName(ColourUtil.colorizeToComponent(Langauge.ARENA_PAGE_NUMBER.toString().replace("%NUMBER%", String.valueOf(collectedPages + 1))));
+            pageItem.setItemMeta(meta);
+        }
+        
+        Item droppedPage = loc.getWorld().dropItem(loc, pageItem);
+        droppedPage.setGlowing(true);
+        droppedPage.setUnlimitedLifetime(true);
+        
+        // In 1.21, ENCHANTMENT_TABLE particle was renamed to ENCHANT
+        loc.getWorld().spawnParticle(Particle.ENCHANT, loc.clone().add(0, 1, 0), 50, 0.5, 0.5, 0.5, 0.1);
     }
 }
