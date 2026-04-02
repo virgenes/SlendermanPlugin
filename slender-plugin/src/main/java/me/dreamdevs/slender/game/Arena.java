@@ -212,7 +212,7 @@ public class Arena extends BukkitRunnable implements IArena {
             player.teleport(survivorsLocations.get(Util.getRandomNumber(survivorsLocations.size())), PlayerTeleportEvent.TeleportCause.PLUGIN);
             this.scoreboard.getTeam("survivors").addPlayer(player);
             // Total darkness: darkness effect
-            player.addPotionEffect(new PotionEffect(PotionEffectType.DARKNESS, Integer.MAX_VALUE, 4));
+            me.dreamdevs.slender.compat.VersionCompat.applyDarkness(player, Integer.MAX_VALUE, 4);
             player.getInventory().clear();
             player.getInventory().setItem(0, CustomItem.SURVIVOR_WEAPON.toItemStack());
             // Lantern with 5 uses
@@ -241,7 +241,7 @@ public class Arena extends BukkitRunnable implements IArena {
         finalSlenderMan.setVelocity(new org.bukkit.util.Vector(0, 0, 0));
         finalSlenderMan.setFallDistance(0);
         finalSlenderMan.teleport(slenderManSpawnLocation, PlayerTeleportEvent.TeleportCause.PLUGIN);
-        finalSlenderMan.getAttribute(Attribute.MAX_HEALTH).setBaseValue(Config.SLENDERMAN_HEALTH.toInt());
+        finalSlenderMan.getAttribute(me.dreamdevs.slender.utils.AttributeUtils.getMaxHealth()).setBaseValue(Config.SLENDERMAN_HEALTH.toInt());
         finalSlenderMan.setHealth(Config.SLENDERMAN_HEALTH.toInt());
         finalSlenderMan.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, Integer.MAX_VALUE));
         

@@ -9,11 +9,19 @@ import org.bukkit.potion.PotionEffectType;
  */
 public class VersionCompat {
 
-    /**
-     * Applies the darkness effect to a player.
-     * Falls back to blindness on versions that don't have DARKNESS.
-     */
-    public static void applyDarkness(Player player, int durationTicks) {
-        player.addPotionEffect(new PotionEffect(PotionEffectType.DARKNESS, durationTicks, 0, false, false));
+    public static void applyDarkness(Player player, int durationTicks, int amplifier) {
+        PotionEffectType effectType = PotionEffectType.getByName("DARKNESS");
+        if (effectType == null) {
+            effectType = PotionEffectType.BLINDNESS; // Fallback para versiones < 1.19
+        }
+        player.addPotionEffect(new PotionEffect(effectType, durationTicks, amplifier, false, false));
+    }
+
+    public static void removeDarkness(Player player) {
+        PotionEffectType effectType = PotionEffectType.getByName("DARKNESS");
+        if (effectType == null) {
+            effectType = PotionEffectType.BLINDNESS;
+        }
+        player.removePotionEffect(effectType);
     }
 }

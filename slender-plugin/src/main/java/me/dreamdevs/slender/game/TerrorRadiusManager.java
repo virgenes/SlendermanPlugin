@@ -66,7 +66,7 @@ public class TerrorRadiusManager {
                 if (distance <= closeRange) {
                     playCloseSound(player);
                     if (Config.USE_DARKNESS_EFFECT.toBoolean()) {
-                        player.setNoDamageTicks(0);
+                        me.dreamdevs.slender.compat.VersionCompat.applyDarkness(player, 100, 0);
                     }
                 } else if (distance <= distantRange) {
                     playDistantSound(player);

@@ -70,7 +70,7 @@ public class SanityManager {
                 double dist = player.getLocation().distance(slenderLoc);
                 if (dist <= 10.0 && canSeePlayer(player, slender)) {
                     // Panic attack if health > 70% and looking directly
-                    double healthPercent = player.getHealth() / player.getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH).getValue();
+                    double healthPercent = player.getHealth() / player.getAttribute(me.dreamdevs.slender.utils.AttributeUtils.getMaxHealth()).getValue();
                     if (healthPercent > 0.7 && dist <= 5.0) {
                         triggerPanicAttack(player, arena);
                         sanity -= 15.0 * drainMultiplier;

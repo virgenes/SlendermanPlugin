@@ -78,8 +78,9 @@ public class AmbientSoundManager {
                     if (ThreadLocalRandom.current().nextInt(100) < 25) {
                         playHorrorSound(player, pLoc, 0.7f, 0.2f);
                     }
-                    if (ThreadLocalRandom.current().nextInt(100) < 15) {
-                        player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20, 0));
+                    // === DARKNESS TERROR ===
+                    if (ThreadLocalRandom.current().nextInt(100) < 3 && me.dreamdevs.slender.api.Config.USE_DARKNESS_EFFECT.toBoolean()) {
+                        me.dreamdevs.slender.compat.VersionCompat.applyDarkness(player, 80, 0);
                     }
                 } else if (dist <= 20.0) {
                     if (ThreadLocalRandom.current().nextInt(100) < 12) {

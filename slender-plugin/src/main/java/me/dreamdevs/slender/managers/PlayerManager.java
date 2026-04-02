@@ -61,7 +61,7 @@ public class PlayerManager {
         player.setExp(0);
         player.setGlowing(false);
         player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
-        player.getAttribute(Attribute.MAX_HEALTH).setBaseValue(20);
+        player.getAttribute(me.dreamdevs.slender.utils.AttributeUtils.getMaxHealth()).setBaseValue(20);
         player.setHealth(20);
         player.getActivePotionEffects().stream().map(PotionEffect::getType).forEach(player::removePotionEffect);
 

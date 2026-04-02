@@ -186,7 +186,7 @@ public class GameListeners implements Listener {
                 p.getInventory().clear();
                 p.getInventory().setItem(0, CustomItem.SLENDERMAN_WEAPON.toItemStack());
                 p.getInventory().setItem(1, CustomItem.SLENDERMAN_COMPASS.toItemStack());
-                p.getAttribute(Attribute.MAX_HEALTH).setBaseValue(40);
+                p.getAttribute(me.dreamdevs.slender.utils.AttributeUtils.getMaxHealth()).setBaseValue(40);
                 p.setHealth(40);
                 p.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, Integer.MAX_VALUE));
             }, 1L);

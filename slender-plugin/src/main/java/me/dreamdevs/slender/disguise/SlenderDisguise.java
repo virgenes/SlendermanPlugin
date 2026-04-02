@@ -12,23 +12,58 @@ import org.bukkit.entity.EntityType;
 @Getter
 public enum SlenderDisguise {
 
-    ENDERMAN      ("Enderman",       EntityType.ENDERMAN,       Material.ENDER_EYE,             0),
-    WITHER        ("Wither",         EntityType.WITHER,         Material.WITHER_SKELETON_SKULL,  200),
-    PHANTOM       ("Phantom",        EntityType.PHANTOM,        Material.PHANTOM_MEMBRANE,       350),
-    RAVAGER       ("Ravager",        EntityType.RAVAGER,        Material.IRON_CHESTPLATE,        500),
-    ELDER_GUARDIAN("Elder Guardian", EntityType.ELDER_GUARDIAN, Material.PRISMARINE_CRYSTALS,    750),
-    WARDEN        ("Warden",         EntityType.WARDEN,         Material.SCULK_SENSOR,           1000);
+    ENDERMAN      ("Enderman",       "ENDERMAN",       "ENDER_EYE",             0),
+    WITHER        ("Wither",         "WITHER",         "WITHER_SKELETON_SKULL", 200),
+    PHANTOM       ("Phantom",        "PHANTOM",        "PHANTOM_MEMBRANE",      350),
+    RAVAGER       ("Ravager",        "RAVAGER",        "IRON_CHESTPLATE",       500),
+    ELDER_GUARDIAN("Elder Guardian", "ELDER_GUARDIAN", "PRISMARINE_CRYSTALS",   750),
+    WARDEN        ("Warden",         "WARDEN",         "SCULK_SENSOR",          1000);
 
     private final String displayName;
-    private final EntityType entityType;
-    private final Material icon;
+    private final String entityTypeName;
+    private final String iconMaterialName;
     private final int cost;
 
-    SlenderDisguise(String displayName, EntityType entityType, Material icon, int cost) {
+    private EntityType entityTypeCache = null;
+    private Material iconCache = null;
+
+    SlenderDisguise(String displayName, String entityTypeName, String iconMaterialName, int cost) {
         this.displayName = displayName;
-        this.entityType = entityType;
-        this.icon = icon;
+        this.entityTypeName = entityTypeName;
+        this.iconMaterialName = iconMaterialName;
         this.cost = cost;
+    }
+
+    public EntityType getEntityType() {
+        if (entityTypeCache == null) {
+            try {
+                entityTypeCache = EntityType.valueOf(entityTypeName);
+            } catch (Exception | NoSuchFieldError e) {
+                return EntityType.ENDERMAN;
+            }
+        }
+        return entityTypeCache;
+    }
+
+    public Material getIcon() {
+        if (iconCache == null) {
+            try {
+                iconCache = Material.valueOf(iconMaterialName);
+            } catch (Exception | NoSuchFieldError e) {
+                return Material.ENDER_EYE;
+            }
+        }
+        return iconCache;
+    }
+
+    public boolean isAvailableInThisVersion() {
+        try {
+            EntityType.valueOf(entityTypeName);
+            Material.valueOf(iconMaterialName);
+            return true;
+        } catch (Exception | NoSuchFieldError e) {
+            return false;
+        }
     }
 
     /** Returns the disguise for the given name, falling back to ENDERMAN. */

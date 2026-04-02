@@ -209,7 +209,7 @@ public class PlayerInteractListener implements Listener {
             itemStack.setItemMeta(lMeta);
 
             // Remove darkness temporarily (10 seconds of clear vision)
-            player.removePotionEffect(PotionEffectType.DARKNESS);
+            me.dreamdevs.slender.compat.VersionCompat.removeDarkness(player);
             player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 200, 1));
 
             // Light up area with particles
@@ -226,7 +226,7 @@ public class PlayerInteractListener implements Listener {
             Bukkit.getScheduler().runTaskLater(SlenderMain.getInstance(), () -> {
                 if (player.isOnline() && arena.getPlayers().get(player) == Role.SURVIVOR) {
                     player.removePotionEffect(PotionEffectType.NIGHT_VISION);
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.DARKNESS, Integer.MAX_VALUE, 4));
+                    me.dreamdevs.slender.compat.VersionCompat.applyDarkness(player, Integer.MAX_VALUE, 4);
                 }
             }, 200L);
             return;
