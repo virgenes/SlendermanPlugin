@@ -22,7 +22,6 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
 import net.kyori.adventure.util.Ticks;
 import org.bukkit.Bukkit;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -122,7 +121,7 @@ public class GameListeners implements Listener {
             }
 
             if(arena.getSurvivorsAmount() == 0) {
-                arena.endGame();
+                arena.endGame(Role.SLENDER);
             }
 
             event.getEntity().getLocation().getWorld().strikeLightningEffect(event.getEntity().getLocation());
@@ -225,7 +224,7 @@ public class GameListeners implements Listener {
 
         int pagesToWin = Config.PAGES_TO_WIN.toInt();
         if(arena.getCollectedPages() >= pagesToWin) {
-            arena.endGame();
+            arena.endGame(Role.SURVIVOR);
             return;
         }
         arena.spawnPage();

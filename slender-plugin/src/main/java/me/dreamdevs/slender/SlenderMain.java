@@ -92,6 +92,7 @@ public class SlenderMain extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PerksListeners(), this);
         getServer().getPluginManager().registerEvents(new DisguiseListener(), this);
         getServer().getPluginManager().registerEvents(new me.dreamdevs.slender.listeners.PlayerSkillListener(), this);
+        getServer().getPluginManager().registerEvents(new me.dreamdevs.slender.listeners.ChatListener(), this);
 
         // Init disguise system AFTER all listeners are registered
         // (ProtocolLib must be loaded first)

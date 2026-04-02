@@ -33,4 +33,6 @@ public interface IArena {
 
 	void setGameTime(int gameTime);
 
+	void endGame(Role winner);
+
 }

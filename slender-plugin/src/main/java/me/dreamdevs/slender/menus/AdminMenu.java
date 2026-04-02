@@ -57,7 +57,7 @@ public class AdminMenu extends ItemMenu {
 						gamePlayer.getPlayer().sendMessage(Langauge.ADMIN_FORCE_STOP_ARENA_UNSUCCESSFULLY.toString());
 						return;
 					}
-					arena.endGame();
+					arena.endGame(me.dreamdevs.slender.api.game.Role.SLENDER);
 					gamePlayer.getPlayer().sendMessage(Langauge.ADMIN_FORCE_STOP_ARENA_SUCCESSFULLY.toString());
 					break;
 				case RESTART:

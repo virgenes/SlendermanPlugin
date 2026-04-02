@@ -117,7 +117,7 @@ public class Arena extends BukkitRunnable implements IArena {
                 this.bossBar.setTitle(Langauge.ARENA_BOSS_BAR_RUNNING_TITLE.toString().replace("%TIME%", String.valueOf(timer)));
                 sendActionBar(Langauge.ARENA_COLLECTED_PAGES.toString().replace("%CURRENT%", Integer.toString(collectedPages)));
                 if(timer == 0) {
-                    endGame();
+                    endGame(Role.SLENDER);
                     return;
                 }
                 timer--;
@@ -314,11 +314,37 @@ public class Arena extends BukkitRunnable implements IArena {
         setArenaState(ArenaState.WAITING);
     }
 
-    public void endGame() {
+    public void endGame(Role winner) {
         setArenaState(ArenaState.ENDING);
-        setTimer(10);
+        setTimer(Config.ENDING_TIMER.toInt());
         this.bossBar.setTitle(Langauge.ARENA_BOSS_BAR_ENDING_TITLE.toString());
-        sendTitleToAllPlayers(Langauge.ARENA_GAME_OVER_TITLE.toString(), Langauge.ARENA_GAME_OVER_SUBTITLE.toString(), 10, 40, 10);
+        
+        String title;
+        String subtitle;
+        
+        if (winner == Role.SURVIVOR) {
+            title = Config.WIN_SURVIVORS_TITLE.toString();
+            subtitle = Config.WIN_SURVIVORS_SUBTITLE.toString();
+            if (Config.WIN_EFFECTS_SOUNDS.toBoolean()) {
+                players.keySet().forEach(p -> p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1f, 1f));
+            }
+            if (Config.WIN_EFFECTS_PARTICLES.toBoolean()) {
+                players.keySet().forEach(p -> p.getWorld().spawnParticle(Particle.FIREWORK, p.getLocation().add(0, 1, 0), 30, 0.5, 0.5, 0.5, 0.1));
+            }
+        } else {
+            title = Config.WIN_SLENDER_TITLE.toString();
+            subtitle = Config.WIN_SLENDER_SUBTITLE.toString();
+            if (Config.WIN_EFFECTS_SOUNDS.toBoolean()) {
+                players.keySet().forEach(p -> p.playSound(p.getLocation(), Sound.ENTITY_WITHER_DEATH, 1f, 0.5f));
+                players.keySet().forEach(p -> p.playSound(p.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1f, 0.8f));
+            }
+            if (Config.WIN_EFFECTS_PARTICLES.toBoolean()) {
+                players.keySet().forEach(p -> p.getWorld().spawnParticle(Particle.LARGE_SMOKE, p.getLocation().add(0, 1, 0), 50, 0.5, 0.5, 0.5, 0.05));
+                players.keySet().forEach(p -> p.getWorld().spawnParticle(Particle.SQUID_INK, p.getLocation().add(0, 1, 0), 30, 0.5, 0.5, 0.5, 0.02));
+            }
+        }
+
+        sendTitleToAllPlayers(title, subtitle, 10, 60, 20);
         
         SlenderGameEndEvent slenderGameEndEvent = new SlenderGameEndEvent(this);
         Bukkit.getPluginManager().callEvent(slenderGameEndEvent);

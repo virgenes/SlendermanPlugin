@@ -255,7 +255,7 @@ public class GameManager {
         arena.getPlayers().remove(gamePlayer.getPlayer());
         arena.getBossBar().removePlayer(gamePlayer.getPlayer());
         if(arena.getPlayers().size() == 0 && arena.getArenaState() == ArenaState.RUNNING) {
-            arena.endGame();
+            arena.endGame(Role.SLENDER);
         }
         return true;
     }

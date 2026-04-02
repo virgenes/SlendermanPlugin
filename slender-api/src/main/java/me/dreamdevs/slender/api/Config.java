@@ -93,7 +93,19 @@ public enum Config {
     PRICE_ENDLESS_AGONY("Prices.Perks.EndlessAgony", 1300),
     PRICE_DARK_ABYSS("Prices.Perks.DarkAbyss", 1100),
     PRICE_FROM_THE_DARK("Prices.Perks.FromTheDark", 1400),
-    PRICE_PAGES_BELONGINGS("Prices.Perks.PagesBelongings", 1600);
+    PRICE_PAGES_BELONGINGS("Prices.Perks.PagesBelongings", 1600),
+
+    // ── Chat Settings ─────────────────────────────────────────────────────
+    CHAT_ENABLED("Chat.Enabled", true),
+    CHAT_FORMAT("Chat.Format", "&8(&b%RANK%&8) &f%PLAYER% &8[&eLv. %LEVEL%&8] &7= &f%MESSAGE%"),
+
+    // ── Win Visuals ───────────────────────────────────────────────────────
+    WIN_SURVIVORS_TITLE("WinVisuals.Survivors.Title", "&6&lSURVIVORS WON!"),
+    WIN_SURVIVORS_SUBTITLE("WinVisuals.Survivors.Subtitle", "&eThey have collected all the pages."),
+    WIN_SLENDER_TITLE("WinVisuals.Slender.Title", "&4&lSLENDERMAN WON!"),
+    WIN_SLENDER_SUBTITLE("WinVisuals.Slender.Subtitle", "&cNo one escaped the darkness."),
+    WIN_EFFECTS_PARTICLES("WinVisuals.Effects.Particles", true),
+    WIN_EFFECTS_SOUNDS("WinVisuals.Effects.Sounds", true);
 
     // ─────────────────────────────────────────────────────────────────────
 
