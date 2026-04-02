@@ -67,15 +67,17 @@ public class SanityManager {
                 }
 
                 // Drain sanity when looking at SlenderMan within 10 blocks
-                double dist = player.getLocation().distance(slenderLoc);
-                if (dist <= 10.0 && canSeePlayer(player, slender)) {
-                    // Panic attack if health > 70% and looking directly
-                    double healthPercent = player.getHealth() / player.getAttribute(me.dreamdevs.slender.utils.AttributeUtils.getMaxHealth()).getValue();
-                    if (healthPercent > 0.7 && dist <= 5.0) {
-                        triggerPanicAttack(player, arena);
-                        sanity -= 15.0 * drainMultiplier;
-                    } else {
-                        sanity -= 3.0 * drainMultiplier;
+                if (player.getWorld().equals(slenderLoc.getWorld())) {
+                    double dist = player.getLocation().distance(slenderLoc);
+                    if (dist <= 10.0 && canSeePlayer(player, slender)) {
+                        // Panic attack if health > 70% and looking directly
+                        double healthPercent = player.getHealth() / player.getAttribute(me.dreamdevs.slender.utils.AttributeUtils.getMaxHealth()).getValue();
+                        if (healthPercent > 0.7 && dist <= 5.0) {
+                            triggerPanicAttack(player, arena);
+                            sanity -= 15.0 * drainMultiplier;
+                        } else {
+                            sanity -= 3.0 * drainMultiplier;
+                        }
                     }
                 }
 
@@ -188,10 +190,17 @@ public class SanityManager {
     }
 
     private boolean canSeePlayer(Player observer, Player target) {
+        if (!observer.getWorld().equals(target.getWorld())) return false;
         Location from = observer.getEyeLocation();
         Location to = target.getEyeLocation();
+        double distance = from.distance(to);
+        if (distance < 1.0) return true;
+
+        org.bukkit.util.Vector direction = to.clone().subtract(from).toVector();
+        if (direction.lengthSquared() == 0.0) return true;
+
         org.bukkit.util.BlockIterator iterator = new org.bukkit.util.BlockIterator(
-                observer.getWorld(), from.toVector(), to.clone().subtract(from).toVector().normalize(), 0, (int) from.distance(to));
+                observer.getWorld(), from.toVector(), direction.normalize(), 0, (int) distance);
         while (iterator.hasNext()) {
             org.bukkit.block.Block block = iterator.next();
             if (block.getType().isOccluding()) return false;
