@@ -36,6 +36,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
 import java.io.File;
+import java.util.UUID;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -60,6 +61,8 @@ public class Arena extends BukkitRunnable implements IArena {
     private ArenaState arenaState;
     private Map<Player, Role> players;
     private Player slenderMan;
+    private final Map<UUID, Role> persistentRoles = new java.util.concurrent.ConcurrentHashMap<>();
+    private final Map<UUID, Long> disconnectTimes = new java.util.concurrent.ConcurrentHashMap<>();
 
     private BossBar bossBar;
 
@@ -145,6 +148,45 @@ public class Arena extends BukkitRunnable implements IArena {
                     endGame(Role.SLENDER);
                     return;
                 }
+
+                // Check for disconnected players timeout
+                long now = System.currentTimeMillis();
+                for (Map.Entry<UUID, Long> entry : disconnectTimes.entrySet()) {
+                    if (now - entry.getValue() > 30000) { // 30 seconds
+                        UUID uuid = entry.getKey();
+                        Role role = persistentRoles.get(uuid);
+                        String name = Bukkit.getOfflinePlayer(uuid).getName();
+                        
+                        if (role == Role.SLENDER) {
+                            sendMessage("&cSlenderman failed to reconnect in time! Survivors win.");
+                            endGame(Role.SURVIVOR);
+                            return;
+                        } else if (role == Role.SURVIVOR) {
+                            disconnectTimes.remove(uuid);
+                            sendMessage("&e" + name + " failed to reconnect and has been removed from the game.");
+                            
+                            // Check if any survivors are still online or still have time to reconnect
+                            long survivorsLeft = persistentRoles.entrySet().stream()
+                                    .filter(e -> e.getValue() == Role.SURVIVOR)
+                                    .filter(e -> {
+                                        UUID id = e.getKey();
+                                        // If they are online
+                                        if (players.keySet().stream().anyMatch(p -> p.getUniqueId().equals(id))) return true;
+                                        // If they are offline but still have time
+                                        if (disconnectTimes.containsKey(id) && (now - disconnectTimes.get(id) < 30000)) return true;
+                                        return false;
+                                    })
+                                    .count();
+                                    
+                            if (survivorsLeft == 0) {
+                                sendMessage("&cAll survivors have disconnected! Slenderman wins.");
+                                endGame(Role.SLENDER);
+                                return;
+                            }
+                        }
+                    }
+                }
+
                 timer--;
                 break;
             case ENDING:
@@ -216,6 +258,10 @@ public class Arena extends BukkitRunnable implements IArena {
         tempList.remove(slenderMan);
         tempList.forEach(player -> players.put(player, Role.SURVIVOR));
         players.put(slenderMan, Role.SLENDER);
+        
+        persistentRoles.clear();
+        players.forEach((p, r) -> persistentRoles.put(p.getUniqueId(), r));
+        disconnectTimes.clear();
 
         final Player finalSlenderMan = this.slenderMan;
         this.scoreboard.getTeam("slenderman").addPlayer(finalSlenderMan);
@@ -362,9 +408,58 @@ public class Arena extends BukkitRunnable implements IArena {
         });
 
         players.clear();
+        persistentRoles.clear();
+        disconnectTimes.clear();
         this.slenderMan = null;
         this.collectedPages = 0;
         setArenaState(ArenaState.WAITING);
+    }
+
+    public void handleDisconnect(Player player) {
+        if (!players.containsKey(player)) return;
+        Role role = players.get(player);
+        disconnectTimes.put(player.getUniqueId(), System.currentTimeMillis());
+        players.remove(player);
+        
+        sendMessage("&c" + player.getName() + " has disconnected! They have 30 seconds to reconnect.");
+    }
+
+    public void handleReconnect(Player player) {
+        UUID uuid = player.getUniqueId();
+        if (!disconnectTimes.containsKey(uuid)) return;
+        
+        Role role = persistentRoles.get(uuid);
+        players.put(player, role);
+        disconnectTimes.remove(uuid);
+        player.setScoreboard(this.scoreboard);
+        this.bossBar.addPlayer(player);
+
+        if (role == Role.SLENDER) {
+            this.slenderMan = player;
+            player.teleport(slenderManSpawnLocation, PlayerTeleportEvent.TeleportCause.PLUGIN);
+            player.getInventory().clear();
+            player.getInventory().setItem(0, CustomItem.SLENDERMAN_WEAPON.toItemStack());
+            player.getInventory().setItem(1, CustomItem.SLENDERMAN_RADAR.toItemStack());
+            player.getAttribute(me.dreamdevs.slender.utils.AttributeUtils.getMaxHealth()).setBaseValue(Config.SLENDERMAN_HEALTH.toInt());
+            player.setHealth(Config.SLENDERMAN_HEALTH.toInt());
+            player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, Integer.MAX_VALUE));
+            if (Config.USE_DISGUISE.toBoolean()) {
+                GamePlayer gameSlenderMan = SlenderMain.getInstance().getPlayerManager().getPlayer(player);
+                DisguiseManager.disguise(player, gameSlenderMan.getEquippedSkin());
+            }
+        } else {
+            // Restore survivor state
+            player.teleport(survivorsLocations.get(Util.getRandomNumber(survivorsLocations.size())), PlayerTeleportEvent.TeleportCause.PLUGIN);
+            player.getInventory().clear();
+            ItemStack weapon = CustomItem.SURVIVOR_WEAPON.toItemStack();
+            player.getInventory().setItem(0, weapon);
+            if (this.flashlightManager != null) {
+                this.flashlightManager.giveFlashlight(player, 1);
+            }
+            me.dreamdevs.slender.compat.VersionCompat.applyDarkness(player, Integer.MAX_VALUE, 4);
+        }
+        
+        sendMessage("&a" + player.getName() + " has reconnected!");
     }
 
     public void endGame(Role winner) {

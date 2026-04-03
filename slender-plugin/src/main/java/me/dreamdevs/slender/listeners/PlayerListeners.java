@@ -13,6 +13,8 @@ import org.bukkit.GameMode;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import java.util.UUID;
+import java.util.Optional;
 import org.bukkit.event.player.*;
 
 public class PlayerListeners implements Listener {
@@ -30,8 +32,18 @@ public class PlayerListeners implements Listener {
             SlenderMain.getInstance().getPlayerManager().getPlayers().add(gamePlayer);
         }
 
-        SlenderMain.getInstance().getPlayerManager().sendToLobby(event.getPlayer());
-        SlenderMain.getInstance().getPlayerManager().loadLobby(event.getPlayer());
+        // Auto-reconnect check
+        Optional<Arena> reconnectArena = SlenderMain.getInstance().getGameManager().getArenas().stream()
+                .filter(arena -> arena.getArenaState() == me.dreamdevs.slender.api.game.ArenaState.RUNNING)
+                .filter(arena -> arena.getPersistentRoles().containsKey(event.getPlayer().getUniqueId()))
+                .findFirst();
+
+        if (reconnectArena.isPresent()) {
+            reconnectArena.get().handleReconnect(event.getPlayer());
+        } else {
+            SlenderMain.getInstance().getPlayerManager().sendToLobby(event.getPlayer());
+            SlenderMain.getInstance().getPlayerManager().loadLobby(event.getPlayer());
+        }
     }
 
     @EventHandler
@@ -42,14 +54,18 @@ public class PlayerListeners implements Listener {
         if(gamePlayer.isInArena()) {
             Arena arena = (Arena) gamePlayer.getArena();
 
-            if(arena.getPlayers().get(gamePlayer.getPlayer()) == Role.SLENDER) {
-                arena.sendMessage(ColourUtil.colorizeToComponent(Langauge.ARENA_SLENDER_MAN_LEFT.toString()));
-                arena.getPlayers().remove(gamePlayer.getPlayer());
-                if(arena.getArenaState() == ArenaState.RUNNING || arena.getArenaState() == ArenaState.STARTING) {
-                    arena.restart();
-                }
+            if (arena.getArenaState() == ArenaState.RUNNING) {
+                arena.handleDisconnect(event.getPlayer());
             } else {
-                arena.getPlayers().remove(gamePlayer.getPlayer());
+                if(arena.getPlayers().get(gamePlayer.getPlayer()) == Role.SLENDER) {
+                    arena.sendMessage(ColourUtil.colorizeToComponent(Langauge.ARENA_SLENDER_MAN_LEFT.toString()));
+                    arena.getPlayers().remove(gamePlayer.getPlayer());
+                    if(arena.getArenaState() == ArenaState.STARTING) {
+                        arena.restart();
+                    }
+                } else {
+                    arena.getPlayers().remove(gamePlayer.getPlayer());
+                }
             }
         }
 
