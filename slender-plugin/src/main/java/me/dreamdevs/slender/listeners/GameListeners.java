@@ -29,6 +29,14 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -73,6 +81,45 @@ public class GameListeners implements Listener {
 
         if(attackerRole == Role.SURVIVOR && arena.getPlayers().get(entity) == Role.SURVIVOR) {
             event.setCancelled(true);
+        }
+        
+        if (attackerRole == Role.SURVIVOR && arena.getPlayers().get(entity) == Role.SLENDER) {
+            org.bukkit.inventory.ItemStack hand = damager.getInventory().getItemInMainHand();
+            if (hand.getType() == org.bukkit.Material.WOODEN_SWORD && hand.hasItemMeta()) {
+                org.bukkit.inventory.meta.ItemMeta meta = hand.getItemMeta();
+                NamespacedKey hitsKey = new NamespacedKey(SlenderMain.getInstance(), "sword_hits_left");
+                int hitsLeft = meta.getPersistentDataContainer().getOrDefault(hitsKey, PersistentDataType.INTEGER, 3);
+                
+                if (hitsLeft > 0) {
+                    hitsLeft--;
+                    
+                    // Stun Slenderman
+                    entity.addPotionEffect(new PotionEffect(me.dreamdevs.slender.compat.VersionCompat.getPotionType("SLOWNESS", "SLOW"), 80, 255, false, false));
+                    entity.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 80, 1, false, false));
+                    
+                    damager.playSound(damager.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1f, 1f);
+                    entity.getWorld().spawnParticle(Particle.CRIT, entity.getLocation().add(0, 1, 0), 20);
+                    
+                    // Trigger combat music for all arena players
+                    Arena damagerArena = (Arena) SlenderMain.getInstance().getPlayerManager().getPlayer(damager).getArena();
+                    if (damagerArena != null && damagerArena.getMusicManager() != null) {
+                        damagerArena.getMusicManager().triggerCombat();
+                    }
+                    
+                    if (hitsLeft <= 0) {
+                        damager.getInventory().setItemInMainHand(new org.bukkit.inventory.ItemStack(org.bukkit.Material.AIR));
+                        damager.playSound(damager.getLocation(), Sound.ENTITY_ITEM_BREAK, 1f, 1f);
+                        damager.sendMessage(ColourUtil.colorizeToComponent("&cYour sword has broken!"));
+                    } else {
+                        meta.getPersistentDataContainer().set(hitsKey, PersistentDataType.INTEGER, hitsLeft);
+                        List<Component> lore = new ArrayList<>();
+                        lore.add(ColourUtil.colorizeToComponent("&eUses remaining: " + hitsLeft));
+                        meta.lore(lore);
+                        hand.setItemMeta(meta);
+                    }
+                }
+            }
+            event.setCancelled(true); // Always cancel actual damage to Slenderman
         }
 
         if(arena.getSlenderMan().equals(attackerPlayer.getPlayer())) {
@@ -204,6 +251,10 @@ public class GameListeners implements Listener {
         if (arena == null) return;
         if(arena.getPlayers().get(gamePlayer.getPlayer()) != Role.SURVIVOR)
             return;
+            
+        if (event.getItem().getItemStack().getType() != org.bukkit.Material.PAPER) {
+            return;
+        }
 
         event.getItem().remove();
         arena.setCollectedPages(arena.getCollectedPages()+1);
@@ -228,6 +279,15 @@ public class GameListeners implements Listener {
             return;
         }
         arena.spawnPage();
+    }
+    
+    @EventHandler
+    public void onBlockBreak(BlockBreakEvent event) {
+        Player player = event.getPlayer();
+        GamePlayer gamePlayer = SlenderMain.getInstance().getPlayerManager().getPlayer(player);
+        if (gamePlayer != null && gamePlayer.isInArena()) {
+            event.setCancelled(true);
+        }
     }
 
 }

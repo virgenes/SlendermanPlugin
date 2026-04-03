@@ -44,8 +44,7 @@ public enum CustomItem {
     SURVIVOR_WEAPON(Material.WOODEN_SWORD, Langauge.ITEMS_SURVIVOR_SWORD_DISPLAY_NAME.toString(),
             ColourUtil.colouredLore(Langauge.ITEMS_SURVIVOR_SWORD_DISPLAY_LORE.toString())),
 
-    SURVIVOR_LANTERN(Material.LANTERN, "&eSurvivor Lantern",
-            ColourUtil.colouredLore(Arrays.asList("&7Right-click to illuminate", "&7Uses: %USES%/%MAX%"))),
+
 
     SURVIVOR_PERK_ITEM(Material.BLAZE_POWDER, "&6Perk Ability",
             ColourUtil.colouredLore(Arrays.asList("&7Right-click to activate", "&7Your equipped perk"))),

@@ -36,6 +36,15 @@ public class SettingsMenu extends ItemMenu {
 
 		setItem(14, new MessageTypeItem(gamePlayer));
 
+		setItem(15, new SetSettingItem(gamePlayer, Setting.MUSIC_ENABLED,
+				"\u00266\u0026lGame Music",
+				Material.JUKEBOX,
+				ColourUtil.colouredLore(java.util.Arrays.asList(
+						"\u00267Toggle in-game background music.",
+						"\u00267Status: " + ((boolean) gamePlayer.getSetting(Setting.MUSIC_ENABLED) ?
+								"\u00262\u0026lON" : "\u00264\u0026lOFF")
+				)).toArray(String[]::new)));
+
 		setItem(26, new BackToMyProfileItem());
 	}
 

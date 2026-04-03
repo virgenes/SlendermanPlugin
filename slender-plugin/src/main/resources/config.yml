@@ -36,16 +36,36 @@ GameSettings:
   # Delay (ticks, 20 ticks = 1 second) before the arena resets to WAITING.
   Restart-Delay-Ticks: 100
 
-  # ── Torch Settings ──────────────────────────────────────────────────────
-  Torch:
-    # Maximum number of torch uses per game session per survivor.
-    Max-Uses: 3
-
-    # Cooldown in seconds between torch uses.
-    Cooldown-Seconds: 5
-
-    # Duration (ticks) of Night Vision granted by a torch.
-    Night-Vision-Ticks: 100
+  # ── Flashlight Settings ───────────────────────────────────────────────────
+  Flashlight:
+    Item:
+      Material: BLAZE_ROD
+      Name: "&6Linterna de Mano"
+      Broken-Material: STICK
+    Charge:
+      Max-Ticks: 600
+      Drain-Rate: 1
+      Low-Percent: 20
+      Recharge-Item: REDSTONE
+      Recharge-Amount: 100
+    Light-Cone:
+      Horizontal-Angle: 55
+      Vertical-Angle: 22
+      Max-Distance: 12
+      Update-Interval-Ticks: 2
+      Particles-Per-Update: 20
+      Ring-Spacing: 1.5
+    Visual:
+      Darkness-Effect: true
+      Inertia: true
+      Low-Battery-Flicker: true
+    Sounds:
+      On: block.anvil.land
+      On-Pitch: 0.8
+      Off: block.anvil.land
+      Off-Pitch: 1.2
+      Ambient: block.beacon.ambient
+      Ambient-Volume: 0.3
 
   # ── Atmosphere Effects ──────────────────────────────────────────────────
   Atmosphere:

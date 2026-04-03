@@ -26,6 +26,7 @@ public class PlayerListeners implements Listener {
             gamePlayer.setSetting(Setting.AUTO_JOIN_MODE, false);
             gamePlayer.setSetting(Setting.MESSAGE_TYPE, "all");
             gamePlayer.setSetting(Setting.SHOW_ARENA_JOIN_MESSAGE, true);
+            gamePlayer.setSetting(Setting.MUSIC_ENABLED, true);
             SlenderMain.getInstance().getPlayerManager().getPlayers().add(gamePlayer);
         }
 

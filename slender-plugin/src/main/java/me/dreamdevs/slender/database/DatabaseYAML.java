@@ -53,9 +53,10 @@ public class DatabaseYAML implements IDatabase {
 			playerData.set("Statistics.CollectedPages", gamePlayer.getStatistic(Statistic.COLLECTED_PAGES));
 			playerData.set("Statistics.KilledSurvivors", gamePlayer.getStatistic(Statistic.KILLED_SURVIVORS));
 			playerData.set("Statistics.KilledSlenderMen", gamePlayer.getStatistic(Statistic.KILLED_SLENDERMEN));
-			playerData.set("PlayerSettings.AutoArenaJoin", gamePlayer.getSetting(Setting.AUTO_JOIN_MODE));
-			playerData.set("PlayerSettings.ShowJoinArenaMessage", gamePlayer.getSetting(Setting.SHOW_ARENA_JOIN_MESSAGE));
-			playerData.set("PlayerSettings.MessagesType", gamePlayer.getSetting(Setting.MESSAGE_TYPE));
+            playerData.set("PlayerSettings.AutoArenaJoin", gamePlayer.getSetting(Setting.AUTO_JOIN_MODE));
+            playerData.set("PlayerSettings.ShowJoinArenaMessage", gamePlayer.getSetting(Setting.SHOW_ARENA_JOIN_MESSAGE));
+            playerData.set("PlayerSettings.MessagesType", gamePlayer.getSetting(Setting.MESSAGE_TYPE));
+            playerData.set("PlayerSettings.MusicEnabled", gamePlayer.getSetting(Setting.MUSIC_ENABLED));
 			Perk survivorPerk = gamePlayer.getPerk(Role.SURVIVOR);
 			Perk slenderPerk = gamePlayer.getPerk(Role.SLENDER);
 			playerData.set("PlayerPerks.EquippedSurvivorPerk", survivorPerk != null ? survivorPerk.getClass().getAnnotation(PerkInfo.class).name() : "RUNAWAY");
@@ -94,9 +95,10 @@ public class DatabaseYAML implements IDatabase {
 			gamePlayer.setStatistic(Statistic.KILLED_SURVIVORS, configuration.getInt("Statistics.KilledSurvivors",0));
 			gamePlayer.setStatistic(Statistic.KILLED_SLENDERMEN, configuration.getInt("Statistics.KilledSlenderMen",0));
 
-			gamePlayer.setSetting(Setting.AUTO_JOIN_MODE, configuration.getBoolean("PlayerSettings.AutoArenaJoin",false));
-			gamePlayer.setSetting(Setting.SHOW_ARENA_JOIN_MESSAGE, configuration.getBoolean("PlayerSettings.ShowJoinArenaMessage",true));
-			gamePlayer.setSetting(Setting.MESSAGE_TYPE, configuration.getString("PlayerSettings.MessagesType","all"));
+            gamePlayer.setSetting(Setting.AUTO_JOIN_MODE, configuration.getBoolean("PlayerSettings.AutoArenaJoin",false));
+            gamePlayer.setSetting(Setting.SHOW_ARENA_JOIN_MESSAGE, configuration.getBoolean("PlayerSettings.ShowJoinArenaMessage",true));
+            gamePlayer.setSetting(Setting.MESSAGE_TYPE, configuration.getString("PlayerSettings.MessagesType","all"));
+            gamePlayer.setSetting(Setting.MUSIC_ENABLED, configuration.getBoolean("PlayerSettings.MusicEnabled", true));
 
 			gamePlayer.setPerk(Role.SURVIVOR, SlenderMain.getInstance().getPerkManager().getPerk(configuration.getString("PlayerPerks.EquippedSurvivorPerk","")));
 			gamePlayer.setPerk(Role.SLENDER, SlenderMain.getInstance().getPerkManager().getPerk(configuration.getString("PlayerPerks.EquippedSlenderManPerk","")));

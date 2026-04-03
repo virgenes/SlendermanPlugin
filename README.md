@@ -1,6 +1,6 @@
 # 🕯️ SlendermanPlugin
 
-[![Version](https://img.shields.io/badge/version-1.5.0-red.svg)](https://github.com/virgenes/SlendermanPlugin)
+[![Version](https://img.shields.io/badge/version-1.6.0-red.svg)](https://github.com/virgenes/SlendermanPlugin)
 [![Minecraft](https://img.shields.io/badge/Minecraft-1.19--1.21.x-green.svg)](https://papermc.io)
 [![Java](https://img.shields.io/badge/Java-17+-orange.svg)](https://adoptium.net)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -14,7 +14,8 @@
 
 | Category | Features |
 |---|---|
-| 🎮 **Gameplay** | 8-page collection, sanity system, noise mechanics, multiple arenas |
+| 🎮 **Gameplay** | 8-page collection, sanity system, noise mechanics, multiple arenas, **Combat Mechanics** |
+| 🎵 **Audio** | **Independent NBS Engine** (Initial & Combat tracks, per-player toggle) |
 | 🧠 **Sanity** | Visual bar, panic effects, hallucinations, darkness drain |
 | ⚔️ **Perks** | 9 survivor perks + 3 Slenderman perks, equippable in-game |
 | 🎭 **Disguises** | 6 Slenderman skins (Enderman, Wither, Phantom, Ravager, Elder Guardian, Warden) |
@@ -29,17 +30,16 @@
 
 ## 📋 Requirements
 
-- **Server:** Paper or Spigot 1.19 – 1.21.x
+- **Server:** Paper or Spigot 1.16 – 1.21.4
 - **Java:** 17 or higher
 - **Required:** [ProtocolLib](https://www.spigotmc.org/resources/protocollib.1997/) (for disguise system)
-- **Optional:** [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/) (for stats in scoreboards)
-- **Optional:** [ViaVersion](https://www.spigotmc.org/resources/viaversion.19254/) (for multi-version support)
+- **Note:** **No external music library required** (built-in NBS engine).
 
 ---
 
 ## 🚀 Installation
 
-1. Download `SlendermanPlugin-1.5.0.jar`
+1. Download `SlendermanPlugin-1.6.0.jar`
 2. Place it in your server's `plugins/` folder
 3. Install [ProtocolLib](https://www.spigotmc.org/resources/protocollib.1997/)
 4. Start the server — config files are generated automatically
@@ -258,6 +258,18 @@ A: The plugin targets 1.19+. Some features (DARKNESS effect, WARDEN disguise) re
 ---
 
 ## 📜 Changelog
+
+### v1.6.0 (Latest)
+- **🎉 Independent Music Engine**: Removed dependency on `NoteBlockAPI`. Now uses a native, professional NBS engine.
+- **⚔️ Combat System**:
+  - **Stun Sword**: Survivors have a limited 3-charge sword to slow/blind Slenderman.
+  - **Flash Escape**: Survivors get an escape bucket at 100s to teleport Slenderman away.
+- **🛡️ Quality of Life**:
+  - Forced **Adventure Mode** to protect arena blocks.
+  - Smart **Block Break** protection for all players in arena.
+  - Strictly enforced **Material.PAPER** for page collection logic.
+- **🌐 Cross-Version Stability**: Self-contained reflection-based Sound lookup for verified support from 1.16 to 1.21.4+.
+- **⚙️ Music Persistence**: Players can toggle music in `/sis settings` with database-stored preferences.
 
 ### v1.5.0
 - Complete rewrite and bug fixes

@@ -24,4 +24,14 @@ public class VersionCompat {
         }
         player.removePotionEffect(effectType);
     }
+    
+    public static PotionEffectType getPotionType(String... names) {
+        for (String name : names) {
+            PotionEffectType type = org.bukkit.Registry.POTION_EFFECT_TYPE.get(org.bukkit.NamespacedKey.minecraft(name.toLowerCase()));
+            if (type != null) return type;
+            type = PotionEffectType.getByName(name);
+            if (type != null) return type;
+        }
+        return PotionEffectType.BLINDNESS; // Final fallback
+    }
 }

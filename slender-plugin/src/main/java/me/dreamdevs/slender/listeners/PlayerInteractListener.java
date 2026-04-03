@@ -11,6 +11,7 @@ import me.dreamdevs.slender.api.utils.ColourUtil;
 import me.dreamdevs.slender.database.data.GamePlayer;
 import me.dreamdevs.slender.game.Arena;
 import me.dreamdevs.slender.game.CustomItem;
+import me.dreamdevs.slender.game.FlashlightManager;
 import me.dreamdevs.slender.game.perks.*;
 import me.dreamdevs.slender.menus.*;
 import net.kyori.adventure.text.Component;
@@ -42,9 +43,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerInteractListener implements Listener {
 
-    // Lantern uses tracker: player UUID -> remaining uses
-    private static final Map<UUID, Integer> lanternUses = new ConcurrentHashMap<>();
-    private static final int MAX_LANTERN_USES = 5;
 
     // Radar cooldown tracker: player UUID -> last use timestamp
     private static final Map<UUID, Long> radarCooldowns = new ConcurrentHashMap<>();
@@ -185,58 +183,64 @@ public class PlayerInteractListener implements Listener {
         Arena arena = (Arena) gamePlayer.getArena();
         if (arena == null) return;
 
-        // === SURVIVOR LANTERN ===
-        if (itemStack.getType() == Material.LANTERN && plainName.contains("Lantern")) {
+        // === SURVIVOR FLASHLIGHT ===
+        // The Flashlight custom item uses the PersistentDataContainer via the battery key, 
+        // so we check if FlashlightManager should handle it.
+        if (itemStack.getType() != Material.AIR && itemStack.hasItemMeta() &&
+            itemStack.getItemMeta().getPersistentDataContainer().has(FlashlightManager.BATTERY_KEY, org.bukkit.persistence.PersistentDataType.INTEGER)) {
+            
             event.setCancelled(true);
             Role role = arena.getPlayers().get(player);
             if (role != Role.SURVIVOR) return;
 
-            UUID uuid = player.getUniqueId();
-            int uses = lanternUses.getOrDefault(uuid, MAX_LANTERN_USES);
-
-            if (uses <= 0) {
-                player.sendMessage(Component.text("Your lantern has no fuel left!", NamedTextColor.RED));
-                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1f, 0.3f);
+            // Handle Overload Mode (Sneaking + Right Click)
+            if (player.isSneaking() && event.getAction().name().contains("RIGHT")) {
+                // To be implemented or handled inside FlashlightManager
+                arena.getFlashlightManager().toggle(player);
                 return;
             }
 
-            uses--;
-            lanternUses.put(uuid, uses);
+            // Normal Toggle
+            if (event.getAction().name().contains("RIGHT")) {
+                arena.getFlashlightManager().toggle(player);
+            }
+            return;
+        }
+        
+        // === FLASH ESCAPE BUCKET ===
+        if (itemStack.getType() == Material.WATER_BUCKET && itemStack.hasItemMeta() && 
+            itemStack.getItemMeta().getPersistentDataContainer().has(new org.bukkit.NamespacedKey(SlenderMain.getInstance(), "flash_escape"), org.bukkit.persistence.PersistentDataType.BYTE)) {
+            event.setCancelled(true);
+            
+            Role bRole = arena.getPlayers().get(player);
+            if (bRole != Role.SURVIVOR) return;
 
-            // Update item lore
-            ItemMeta lMeta = itemStack.getItemMeta();
-            lMeta.lore(ColourUtil.colouredLoreToComponents(Arrays.asList("&7Right-click to illuminate", "&7Uses: " + uses + "/" + MAX_LANTERN_USES)));
-            itemStack.setItemMeta(lMeta);
-
-            // Remove darkness temporarily (10 seconds of clear vision)
-            me.dreamdevs.slender.compat.VersionCompat.removeDarkness(player);
-            player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 200, 1));
-
-            // Light up area with particles
-            Location loc = player.getLocation();
-            player.getWorld().spawnParticle(Particle.FLAME, loc.clone().add(0, 1.5, 0), 30, 2, 1, 2, 0.01);
-            player.getWorld().spawnParticle(Particle.GLOW_SQUID_INK, loc.clone().add(0, 1.5, 0), 20, 3, 1, 3, 0.02);
-            player.playSound(player.getLocation(), Sound.BLOCK_LANTERN_PLACE, 1f, 1f);
-            player.sendMessage(Component.text()
-                    .append(Component.text("Lantern activated! ", NamedTextColor.YELLOW, TextDecoration.BOLD))
-                    .append(Component.text("(" + uses + " uses remaining)", NamedTextColor.GRAY))
-                    .build());
-
-            // Restore darkness after 10 seconds
-            Bukkit.getScheduler().runTaskLater(SlenderMain.getInstance(), () -> {
-                if (player.isOnline() && arena.getPlayers().get(player) == Role.SURVIVOR) {
-                    player.removePotionEffect(PotionEffectType.NIGHT_VISION);
-                    me.dreamdevs.slender.compat.VersionCompat.applyDarkness(player, Integer.MAX_VALUE, 4);
+            Player arenaSlender = arena.getSlenderMan();
+            if (arenaSlender != null && arenaSlender.isOnline()) {
+                if (player.getWorld().equals(arenaSlender.getWorld()) && player.getLocation().distance(arenaSlender.getLocation()) <= 10.0) {
+                    // Consume Bucket
+                    player.getInventory().remove(itemStack);
+                    
+                    // Teleport and Sound
+                    arenaSlender.teleport(arena.getSlenderManSpawnLocation(), org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.PLUGIN);
+                    player.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f);
+                    arenaSlender.playSound(arenaSlender.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 0.5f);
+                    arenaSlender.addPotionEffect(new org.bukkit.potion.PotionEffect(org.bukkit.potion.PotionEffectType.BLINDNESS, 60, 1));
+                    
+                    player.sendMessage(me.dreamdevs.slender.api.utils.ColourUtil.colorizeToComponent("&bYou banished the Slenderman!"));
+                    arenaSlender.sendMessage(me.dreamdevs.slender.api.utils.ColourUtil.colorizeToComponent("&cYou were banished by a Flash Escape!"));
+                } else {
+                    player.sendMessage(me.dreamdevs.slender.api.utils.ColourUtil.colorizeToComponent("&cSlenderman is not close enough!"));
                 }
-            }, 200L);
+            }
             return;
         }
 
         // === SLENDERMAN RADAR ===
         if (itemStack.getType() == Material.CLOCK && plainName.contains("Radar")) {
             event.setCancelled(true);
-            Role role = arena.getPlayers().get(player);
-            if (role != Role.SLENDER) return;
+            Role rRole = arena.getPlayers().get(player);
+            if (rRole != Role.SLENDER) return;
 
             UUID uuid = player.getUniqueId();
             long now = System.currentTimeMillis();
@@ -286,15 +290,15 @@ public class PlayerInteractListener implements Listener {
         // === PERK ABILITY ITEM ===
         if (lore.stream().anyMatch(c -> PlainTextComponentSerializer.plainText().serialize(c).contains("Your perk ability"))) {
             event.setCancelled(true);
-            Role role = arena.getPlayers().get(player);
-            if (role == null || role == Role.NONE) return;
+            Role pRole = arena.getPlayers().get(player);
+            if (pRole == null || pRole == Role.NONE) return;
 
-            Perk perk = gamePlayer.getPerk(role);
+            Perk perk = gamePlayer.getPerk(pRole);
             if (perk == null) {
                 player.sendMessage(Component.text("No perk equipped!", NamedTextColor.RED));
                 return;
             }
-            activatePerkAbility(player, gamePlayer, perk, role);
+            activatePerkAbility(player, gamePlayer, perk, pRole);
             return;
         }
     }
@@ -395,15 +399,10 @@ public class PlayerInteractListener implements Listener {
         event.setCancelled(true);
     }
 
-    // Clear lantern uses when player joins arena
-    public static void clearLanternUses(Player player) {
-        lanternUses.put(player.getUniqueId(), MAX_LANTERN_USES);
-    }
 
     // Clear all trackers when player leaves arena
     public static void clearPlayerTrackers(Player player) {
         UUID uuid = player.getUniqueId();
-        lanternUses.remove(uuid);
         radarCooldowns.remove(uuid);
         perkCooldowns.remove(uuid);
     }

@@ -75,6 +75,8 @@ public class Arena extends BukkitRunnable implements IArena {
     private SanityManager sanityManager;
     private StealthManager stealthManager;
     private AmbientSoundManager ambientSoundManager;
+    private FlashlightManager flashlightManager;
+    private MusicManager musicManager;
 
     public Arena(String id) {
         this.id = id;
@@ -116,6 +118,29 @@ public class Arena extends BukkitRunnable implements IArena {
             case RUNNING:
                 this.bossBar.setTitle(Langauge.ARENA_BOSS_BAR_RUNNING_TITLE.toString().replace("%TIME%", String.valueOf(timer)));
                 sendActionBar(Langauge.ARENA_COLLECTED_PAGES.toString().replace("%CURRENT%", Integer.toString(collectedPages)));
+                
+                if (timer == 100) { // Distribute Water Bucket flash escape!
+                    org.bukkit.inventory.ItemStack bucket = new org.bukkit.inventory.ItemStack(org.bukkit.Material.WATER_BUCKET);
+                    org.bukkit.inventory.meta.ItemMeta bMeta = bucket.getItemMeta();
+                    if (bMeta != null) {
+                        bMeta.displayName(me.dreamdevs.slender.api.utils.ColourUtil.colorizeToComponent("&bFlash Escape"));
+                        bMeta.getPersistentDataContainer().set(new org.bukkit.NamespacedKey(SlenderMain.getInstance(), "flash_escape"), org.bukkit.persistence.PersistentDataType.BYTE, (byte)1);
+                        java.util.List<net.kyori.adventure.text.Component> bLore = new java.util.ArrayList<>();
+                        bLore.add(me.dreamdevs.slender.api.utils.ColourUtil.colorizeToComponent("&7Right-click near Slenderman"));
+                        bLore.add(me.dreamdevs.slender.api.utils.ColourUtil.colorizeToComponent("&7to instantly banish him."));
+                        bMeta.lore(bLore);
+                        bucket.setItemMeta(bMeta);
+                    }
+                    
+                    for (java.util.Map.Entry<Player, Role> entry : players.entrySet()) {
+                        if (entry.getValue() == Role.SURVIVOR && entry.getKey().isOnline()) {
+                            entry.getKey().getInventory().addItem(bucket);
+                            entry.getKey().playSound(entry.getKey().getLocation(), org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, 1f, 2f);
+                            entry.getKey().sendMessage(me.dreamdevs.slender.api.utils.ColourUtil.colorizeToComponent("&b&lSupply Drop! &7You received a Flash Escape bucket!"));
+                        }
+                    }
+                }
+                
                 if(timer == 0) {
                     endGame(Role.SLENDER);
                     return;
@@ -159,6 +184,13 @@ public class Arena extends BukkitRunnable implements IArena {
                 Bukkit.getPluginManager().registerEvents(this.stealthManager, SlenderMain.getInstance());
             }
             if (this.ambientSoundManager != null) this.ambientSoundManager.start(this);
+            
+            this.flashlightManager = new FlashlightManager(this);
+            this.flashlightManager.start();
+            
+            this.musicManager = new MusicManager(this);
+            this.musicManager.start();
+            
             // Start Tracking perk for players who have it equipped
             me.dreamdevs.slender.game.perks.Tracking tracking = SlenderMain.getInstance().getPerkManager().getPerksByRole(Role.SURVIVOR)
                     .stream().filter(p -> p instanceof me.dreamdevs.slender.game.perks.Tracking)
@@ -187,6 +219,7 @@ public class Arena extends BukkitRunnable implements IArena {
 
         final Player finalSlenderMan = this.slenderMan;
         this.scoreboard.getTeam("slenderman").addPlayer(finalSlenderMan);
+        finalSlenderMan.setGameMode(org.bukkit.GameMode.ADVENTURE);
         finalSlenderMan.getInventory().clear();
         finalSlenderMan.getInventory().setItem(0, CustomItem.SLENDERMAN_WEAPON.toItemStack());
         finalSlenderMan.getInventory().setItem(1, CustomItem.SLENDERMAN_RADAR.toItemStack());
@@ -209,20 +242,31 @@ public class Arena extends BukkitRunnable implements IArena {
         tempList.forEach(player -> {
             player.setVelocity(new org.bukkit.util.Vector(0, 0, 0));
             player.setFallDistance(0);
+            player.setGameMode(org.bukkit.GameMode.ADVENTURE);
             player.teleport(survivorsLocations.get(Util.getRandomNumber(survivorsLocations.size())), PlayerTeleportEvent.TeleportCause.PLUGIN);
             this.scoreboard.getTeam("survivors").addPlayer(player);
             // Total darkness: darkness effect
             me.dreamdevs.slender.compat.VersionCompat.applyDarkness(player, Integer.MAX_VALUE, 4);
             player.getInventory().clear();
-            player.getInventory().setItem(0, CustomItem.SURVIVOR_WEAPON.toItemStack());
-            // Lantern with 5 uses
-            ItemStack lantern = new ItemStack(Material.LANTERN);
-            ItemMeta lMeta = lantern.getItemMeta();
-            lMeta.displayName(ColourUtil.colorizeToComponent("&e&lSurvivor Lantern"));
-            lMeta.lore(ColourUtil.colouredLoreToComponents(Arrays.asList("&7Right-click to illuminate", "&7Uses: 5/5")));
-            lMeta.setUnbreakable(true);
-            lantern.setItemMeta(lMeta);
-            player.getInventory().setItem(1, lantern);
+            
+            ItemStack weapon = CustomItem.SURVIVOR_WEAPON.toItemStack();
+            ItemMeta wMeta = weapon.getItemMeta();
+            if (wMeta != null) {
+                org.bukkit.NamespacedKey hitsKey = new org.bukkit.NamespacedKey(me.dreamdevs.slender.SlenderMain.getInstance(), "sword_hits_left");
+                wMeta.getPersistentDataContainer().set(hitsKey, org.bukkit.persistence.PersistentDataType.INTEGER, 3);
+                List<net.kyori.adventure.text.Component> wLore = wMeta.lore();
+                if (wLore == null) wLore = new ArrayList<>();
+                wLore.add(me.dreamdevs.slender.api.utils.ColourUtil.colorizeToComponent("&eUses remaining: 3"));
+                wMeta.lore(wLore);
+                weapon.setItemMeta(wMeta);
+            }
+            player.getInventory().setItem(0, weapon);
+            
+            if (this.flashlightManager == null) {
+                this.flashlightManager = new FlashlightManager(this);
+            }
+            this.flashlightManager.giveFlashlight(player, 1);
+            
             // Perk ability item (NOT auto-activated, must be clicked)
             GamePlayer gamePlayer = SlenderMain.getInstance().getPlayerManager().getPlayer(player);
             Perk survivorPerk = gamePlayer.getPerk(Role.SURVIVOR);
@@ -303,6 +347,15 @@ public class Arena extends BukkitRunnable implements IArena {
                 .filter(entity -> entity instanceof Item)
                 .forEach(Entity::remove));
         
+        if (this.flashlightManager != null) {
+            this.flashlightManager.stop();
+            this.flashlightManager = null;
+        }
+        if (this.musicManager != null) {
+            this.musicManager.stop();
+            this.musicManager = null;
+        }
+
         // Reset players
         players.keySet().forEach(player -> {
             SlenderMain.getInstance().getPlayerManager().sendToLobby(player);
