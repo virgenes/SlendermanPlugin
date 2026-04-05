@@ -10,6 +10,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
@@ -66,7 +68,24 @@ public class TerrorRadiusManager {
                 if (distance <= closeRange) {
                     playCloseSound(player);
                     if (Config.USE_DARKNESS_EFFECT.toBoolean()) {
-                        me.dreamdevs.slender.compat.VersionCompat.applyDarkness(player, 100, 0);
+                        GamePlayer gpObj = SlenderMain.getInstance().getPlayerManager().getPlayer(player);
+                        boolean flicker = gpObj == null || gpObj.getSetting(me.dreamdevs.slender.api.Setting.DARKNESS_FLICKER) == null || (boolean) gpObj.getSetting(me.dreamdevs.slender.api.Setting.DARKNESS_FLICKER);
+                        
+                        if (flicker) {
+                            PotionEffect active = player.getPotionEffect(PotionEffectType.BLINDNESS);
+                            if (active == null || active.getDuration() < 20) {
+                                me.dreamdevs.slender.compat.VersionCompat.applyDarkness(player, 100, 0);
+                            }
+                        } else {
+                            // Flicker OFF: Darkness and Blindness are disabled
+                            if (distance <= 30) {
+                                player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 0));
+                                player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 40, 1));
+                            }
+                            if (distance <= 15) {
+                                player.addPotionEffect(new PotionEffect(PotionEffectType.NAUSEA, 100, 0));
+                            }
+                        }
                     }
                 } else if (distance <= distantRange) {
                     playDistantSound(player);

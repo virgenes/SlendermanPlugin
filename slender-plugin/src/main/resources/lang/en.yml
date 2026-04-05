@@ -222,3 +222,28 @@ Torch:
 
 Errors:
   No-Page-Locations: "&c[SlenderMan] Error: No page spawn locations configured for arena %ARENA%."
+
+Revival:
+  Downed-Title: "&c&l❤ YOU ARE DOWN! ❤"
+  Downed-Subtitle: "&7Wait for a teammate to revive you..."
+  Downed-ActionBar: "&c&l❤ WOUNDED ❤ &7You need help... (%TIME%s)"
+  Teammate-Downed: "&e%PLAYER% &7has fallen! &eRevive them!"
+  Reviving-ActionBar: "&e&lREVIVING: &f%BAR% &e%PERCENT%%"
+  Being-Revived-ActionBar: "&a&lBEING REVIVED: &f%BAR% &a%PERCENT%%"
+  Cancelled: "&c&l¡REVIVAL CANCELLED! &7Too far away."
+  Success-Title: "&a&l¡REVIVED!"
+  Success-Subtitle: "&7You are badly wounded..."
+  Reviver-Success: "&a&lYou revived &f%PLAYER%&a!"
+  Bleedout-Death: "&c%PLAYER% &7bled out."
+  No-More-Revives: "&cMaximum revivals reached. Next down is permanent."
+  Execution-ActionBar: "&4&lEXECUTING: &f%BAR% &4%PERCENT%%"
+  Execution-Victim-ActionBar: "&4&l☠ BEING EXECUTED ☠ &f%BAR%"
+  Execution-Complete: "&4&l☠ %PLAYER% was executed by Slenderman."
+
+SwordStun:
+  Killer-Title: "&c&l¡YOU HAVE BEEN STUNNED!"
+  Killer-Subtitle: "&7Paralysis for &f%SECONDS% seconds"
+  Survivor-ActionBar: "&a&l¡KILLER STUNNED! &f(%SECONDS% Seconds)"
+  Cooldown: "&c¡Sword is on cooldown! (%TIME%s)"
+  Sword-Broken: "&c&l¡Your sword has broken!"
+  Uses-Left: "&eYour sword has &l%HITS% &euses left."

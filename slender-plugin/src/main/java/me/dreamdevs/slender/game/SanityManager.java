@@ -226,6 +226,20 @@ public class SanityManager {
         setSanity(player, current + amount);
     }
 
+    public void removePlayer(Player player) {
+        UUID uuid = player.getUniqueId();
+        BossBar bar = sanityBars.remove(uuid);
+        if (bar != null) {
+            bar.removeAll();
+        }
+        sanityLevels.remove(uuid);
+        // Clear effects
+        player.removePotionEffect(PotionEffectType.BLINDNESS);
+        player.removePotionEffect(PotionEffectType.NAUSEA);
+        player.removePotionEffect(PotionEffectType.SLOWNESS);
+        player.removePotionEffect(PotionEffectType.WEAKNESS);
+    }
+
     public void stop() {
         if (task != null) {
             task.cancel();

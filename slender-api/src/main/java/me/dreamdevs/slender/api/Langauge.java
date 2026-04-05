@@ -4,8 +4,6 @@ import lombok.Getter;
 import me.dreamdevs.slender.api.utils.ColourUtil;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-
-
 public enum Langauge {
 
 	EMPTY("",""),
@@ -13,23 +11,17 @@ public enum Langauge {
 	// Arena chat announcements
 	ARENA_PLAYER_JOIN("ArenaAnnouncements.Player-Join", "&e%PLAYER% joined to this arena &7(&b%CURRENT%/%MAXIMUM%&7)"),
 	ARENA_PLAYER_QUIT("ArenaAnnouncements.Player-Quit", "&e%PLAYER% left arena &7(&b%CURRENT%/%MAXIMUM%&7)"),
-
 	ARENA_KILLED_BY_SLENDER_MAN("ArenaAnnouncements.Survivor-Killed-By-SlenderMan", "&e%PLAYER% was killed by SlenderMan!"),
 	ARENA_KILLED_BY_SURVIVOR("ArenaAnnouncements.SlenderMan-Killed-By-Survivor", "&eSlenderMan was killed, be careful, he came back!"),
-
 	ARENA_SLENDER_MAN_LEFT("ArenaAnnouncements.SlenderMan-Left", "&eSlenderMan left the game!"),
 	ARENA_SURVIVOR_LEFT("ArenaAnnouncements.Survivor-Left", "&e%PLAYER% left the game!"),
-
 	ARENA_COLLECTED_PAGES("ArenaAnnouncements.Collected-Pages","&6Collected pages: %CURRENT%"),
-
-	ARENA_JOIN_GAME_INFO("ArenaAnnouncements.Join-Game-Info", "&a&l❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚\\n&r\\n                    &f&lSlendermanPlugin           \\n&r\\n\\n    &e&lFind all pages or die by SlenderMan!\n" +
-			"                         \\n   &e&lUse your torches to light up a little!\\n&r\\n&a&l❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚"),
-
+	ARENA_JOIN_GAME_INFO("ArenaAnnouncements.Join-Game-Info", "&a&l❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚\n&r\n                    &f&lSlendermanPlugin           \n&r\n\n    &e&lFind all pages or die by SlenderMan!\n                         \n   &e&lUse your torches to light up a little!\n&r\n&a&l❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚"),
 	ARENA_STARTED_INFO("ArenaAnnouncements.Started-Info","&eThe game has begun! Find or kill them all!"),
 	ARENA_STOPPED_STARTING("ArenaAnnouncements.Stop-Starting", "&cWe need few more people to start the game..."),
-
 	ARENA_STARTING_INFO("ArenaAnnouncements.Starting-Info", "&eStarting in 30 seconds..."),
 	ARENA_PAGE_SPAWNED_INFO("ArenaAnnouncements.Page-Spawned-Info","&eThe page was spawned somewhere in the dark!"),
+	ARENA_PAGE_APPEARED_ACTIONBAR("ArenaAnnouncements.Page-Appeared-ActionBar", "&e&lA NEW PAGE HAS APPEARED..."),
 	ARENA_SPECTATOR_MODE("ArenaAnnouncements.Spectator-Mode","&eYou are now spectator!"),
 
 	// Arena titles announcements
@@ -37,13 +29,10 @@ public enum Langauge {
 	ARENA_WAITING_SUBTITLE("ArenaAnnouncements.Waiting-Subtitle","&7Waiting for players..."),
 	ARENA_STARTING_SUBTITLE("ArenaAnnouncements.Starting-Subtitle","&aStarting in %TIME% seconds..."),
 	ARENA_STARTED_SUBTITLE("ArenaAnnouncements.Started-Subtitle","&4Good Luck!"),
-
 	ARENA_WIN_SURVIVORS_SUBTITLE("ArenaAnnouncements.Win-Survivors-Subtitle","&aSurvivors won the game!"),
 	ARENA_WIN_SLENDERMAN_SUBTITLE("ArenaAnnouncements.Win-SlenderMan-Subtitle","&cSlenderMan won the game!"),
-
 	ARENA_GAME_OVER_TITLE("ArenaAnnouncements.Game-Over-Title","&c&lGAME OVER"),
 	ARENA_GAME_OVER_SUBTITLE("ArenaAnnouncements.Game-Over-Subtitle","&7Thanks for playing!"),
-
 	ARENA_DEAD_TITLE("ArenaAnnouncements.Dead-Title","&c&lYou died!"),
 	ARENA_DEAD_SUBTITLE("ArenaAnnouncements.Dead-Subtitle","&eYou are now spectator!"),
 
@@ -73,12 +62,10 @@ public enum Langauge {
 	ARENA_SLENDERMAN_TEAM("ArenaAnnouncements.Objectives.SlenderMan-Team","&cSlenderMan"),
 
 	LOBBY_CLICK_HERE("LobbyAnnouncements.Click-Here", "&eClick here!"),
-	LOBBY_ARENA_STARTING_ANNOUNCEMENT("LobbyAnnouncements.Arena-Starting-Announcement","&a&l❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚\\n&r\\n                    &f&lSlendermanPlugin           \\n&r\\n"+
-			"&b&lArena &f&l%ARENA% &b&lis starting in 30 seconds!\\n&r\\n&a&l❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚"),
+	LOBBY_ARENA_STARTING_ANNOUNCEMENT("LobbyAnnouncements.Arena-Starting-Announcement","&a&l❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚\n&r\n                    &f&lSlendermanPlugin           \n&r\n\n                    &b&lArena &f&l%ARENA% &b&lis starting in 30 seconds!\n&r\n&a&l❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚"),
 
 	LEVEL_PLAYER_EXP_REWARD("Level.Player-Exp-Reward","&a+%AMOUNT% Exp"),
-	LEVEL_PLAYER_LEVEL_UP("Level.Player-Level-Up","&a&l❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚\\n&r\\n                    &f&lSlendermanPlugin           \\n&r\\n\\n                        &3&lLevel Up!"+
-			"\n   &7You are getting better and better!\n     &7Thanks for playing this game!\n      &7Your current level: &b%LEVEL%\\n&r\\n&a&l❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚"),
+	LEVEL_PLAYER_LEVEL_UP("Level.Player-Level-Up","&a&l❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚\n&r\n                    &f&lSlendermanPlugin           \n&r\n\n                        &3&lLevel Up!\n   &7You are getting better and better!\n     &7Thanks for playing this game!\n      &7Your current level: &b%LEVEL%\n&r\n&a&l❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚❚"),
 
 	ITEMS_ARENA_SELECTOR_DISPLAY_NAME("Items.Arena-Selector.DisplayName","&aArena Selector &7(Right-click)"),
 	ITEMS_ARENA_SELECTOR_DISPLAY_LORE("Items.Arena-Selector.DisplayLore","\n&eRight-click to open &aArena Selector&e."),
@@ -102,6 +89,18 @@ public enum Langauge {
 	ITEMS_SLENDERMAN_COMPASS_DISPLAY_LORE("Items.SlenderMan-Compass.DisplayLore","\n&4Find them all!"),
 	ITEMS_SURVIVOR_SWORD_DISPLAY_NAME("Items.Survivor-Sword.DisplayName","&cSurvivor's Sword"),
 	ITEMS_SURVIVOR_SWORD_DISPLAY_LORE("Items.Survivor-Sword.DisplayLore","\n&7Use this sword to protect\n&7friends and yourself!"),
+	ITEMS_SURVIVOR_MAP_DISPLAY_NAME("Items.Survivor.Map.Display-Name","&bMap"),
+	ITEMS_SURVIVOR_MAP_DISPLAY_LORE("Items.Survivor.Map.Display-Lore","\n&7Click to see map!"),
+
+    // Lobby Voting Items
+    ITEMS_VOTE_MODE_DISPLAY_NAME("Items.Options.Vote-Mode.Display-Name", "&dVote Game Mode"),
+    ITEMS_VOTE_MODE_DISPLAY_LORE("Items.Options.Vote-Mode.Display-Lore", "\n&7Right-Click to vote the mode!"),
+    ITEMS_VOTE_DIFFICULTY_DISPLAY_NAME("Items.Options.Vote-Difficulty.Display-Name", "&cVote Difficulty"),
+    ITEMS_VOTE_DIFFICULTY_DISPLAY_LORE("Items.Options.Vote-Difficulty.Display-Lore", "\n&7Right-Click to vote difficulty!"),
+
+	ITEMS_FORCED_START_NAME("Items.Forced-Start.DisplayName", "&6&lForced Start"),
+	ITEMS_FORCED_START_LORE("Items.Forced-Start.DisplayLore", "\n&eRight-click to start the game\n&eimmediately (Min. players required)"),
+	ARENA_FORCED_START_MSG("ArenaAnnouncements.Forced-Start", "&aGame forced! Starting in 10 seconds..."),
 
 	ADMIN_ONLY_PLAYER("Admin.Only-Player-Command","&cConsole cannot performs this command."),
 	ADMIN_SET_LOBBY_SUCCESSFULLY("Admin.Set-Lobby-Successfully","&aSuccess! You set the lobby!"),
@@ -114,6 +113,7 @@ public enum Langauge {
 	ADMIN_FORCE_STOP_ARENA_SUCCESSFULLY("Admin.Force-Stop-Arena-Successfully","&aSuccessfully forced to stop the game!"),
 	ADMIN_FORCE_STOP_ARENA_UNSUCCESSFULLY("Admin.Force-Stop-Arena-Unsuccessfully","&cCouldn't force to stop the game!"),
 	ADMIN_FORCE_RESTART_ARENA_SUCCESSFULLY("Admin.Force-Restart-Arena-Successfully","&aSuccessfully forced to restart the game!"),
+	ADMIN_RELOAD_SUCCESS("Admin.Reload-Success", "&aConfiguration and language reloaded successfully!"),
 
 	PARTY_CREATED_INFO("Party.Created-Info","&aYou created party!"),
 	PARTY_REMOVED_INFO("Party.Removed-Info","&cThe party was removed!"),
@@ -153,6 +153,10 @@ public enum Langauge {
 	MENU_MY_PROFILE_SETTINGS_SHOW_ARENA_JOIN_MESSAGE_ITEM_LORE("Menu.My-Profile.Settings.Show-Arena-Join-Message-Item-Lore","\n&7If this option is on,\n&7you will get information about SlendermanPlugin game\n&7\n&7Status: %STATUS%"),
 	MENU_MY_PROFILE_SETTINGS_MESSAGES_TYPE_ITEM_NAME("Menu.My-Profile.Settings.Messages-Type-Item-Name","&bMessages Type"),
 	MENU_MY_PROFILE_SETTINGS_MESSAGES_TYPE_ITEM_LORE("Menu.My-Profile.Settings.Messages-Type-Item-Lore","\n&7This option enables you to\n&7choose, which messages you will be getting.\n&7\n&7Type: %TYPE%"),
+	MENU_MY_PROFILE_SETTINGS_DARKNESS_FLICKER_ITEM_NAME("Menu.My-Profile.Settings.Darkness-Flicker-Item-Name","&bDarkness Flicker"),
+	MENU_MY_PROFILE_SETTINGS_DARKNESS_FLICKER_ITEM_LORE("Menu.My-Profile.Settings.Darkness-Flicker-Item-Lore","\n&7If this option is on,\n&7the darkness effect will pulse.\n&7\n&7Status: %STATUS%"),
+	MENU_MY_PROFILE_SETTINGS_FLASHLIGHT_STYLE_ITEM_NAME("Menu.My-Profile.Settings.Flashlight-Style-Item-Name","&bFlashlight Style"),
+	MENU_MY_PROFILE_SETTINGS_FLASHLIGHT_STYLE_ITEM_LORE("Menu.My-Profile.Settings.Flashlight-Style-Item-Lore","\n&7Choose how the flashlight\n&7illuminates the area.\n&7\n&7Style: %STYLE%"),
 
 	MENU_PERKS_TITLE("Menu.Perks.Title","Choose Perk"),
 	MENU_PERKS_OPEN_SURVIVOR_PERKS("Menu.Perks.Survivor-Perks","&aSelect Survivor Perk"),
@@ -182,19 +186,20 @@ public enum Langauge {
 
 	MENU_EDITOR_TITLE("Menu.Editor.Title","Map Editor"),
 	MENU_EDITOR_MINIMUM_PLAYERS_ITEM_NAME("Menu.Editor.Minimum-Players-Item-Name","&bMinimum Players: %AMOUNT%"),
-	MENU_EDITOR_MINIMUM_PLAYERS_ITEM_LORE("Menu.Editor.Minimum-Players-Item-Lore","\n&7Click izquierdo para subir la cantidad\n&7Click derecho para bajarla"),
+	MENU_EDITOR_MINIMUM_PLAYERS_ITEM_LORE("Menu.Editor.Minimum-Players-Item-Lore","\n&7Left-click to increase\n&7Right-click to decrease"),
 	MENU_EDITOR_MAXIMUM_PLAYERS_ITEM_NAME("Menu.Editor.Maximum-Players-Item-Name","&bMaximum Players: %AMOUNT%"),
-	MENU_EDITOR_MAXIMUM_PLAYERS_ITEM_LORE("Menu.Editor.Maximum-Players-Item-Lore","\n&7Click izquierdo para subir la cantidad\n&7Click derecho para bajarla"),
+	MENU_EDITOR_MAXIMUM_PLAYERS_ITEM_LORE("Menu.Editor.Maximum-Players-Item-Lore","\n&7Left-click to increase\n&7Right-click to decrease"),
 	MENU_EDITOR_SET_SLENDERMAN_SPAWN_ITEM_NAME("Menu.Editor.Set-SlenderMan-Spawn-Item-Name","&bSet SlenderMan Spawn"),
 	MENU_EDITOR_SET_SLENDERMAN_SPAWN_ITEM_LORE("Menu.Editor.Set-SlenderMan-Spawn-Item-Lore","\n&7Click to set SlenderMan Spawn location"),
 	MENU_EDITOR_GAME_TIME_ITEM_NAME("Menu.Editor.Game-Time-Item-Name","&bGame Time: %AMOUNT%"),
-	MENU_EDITOR_GAME_TIME_ITEM_LORE("Menu.Editor.Game-Time-Item-Lore","\n&7Click izquierdo para subir la cantidad\n&7Click derecho para bajarla"),
+	MENU_EDITOR_GAME_TIME_ITEM_LORE("Menu.Editor.Game-Time-Item-Lore","\n&7Left-click to increase\n&7Right-click to decrease"),
 	MENU_EDITOR_ADD_SURVIVOR_SPAWN_ITEM_NAME("Menu.Editor.Add-Survivor-Spawn-Item-Name","&bAdd Survivors Spawn"),
 	MENU_EDITOR_ADD_SURVIVOR_SPAWN_ITEM_LORE("Menu.Editor.Add-Survivor-Spawn-Item-Lore","\n&7Click to add Survivors Spawn location"),
 	MENU_EDITOR_ADD_PAGES_SPAWN_ITEM_NAME("Menu.Editor.Add-Pages-Spawn-Item-Name","&bAdd Pages Spawn"),
 	MENU_EDITOR_ADD_PAGES_SPAWN_ITEM_LORE("Menu.Editor.Add-Pages-Spawn-Item-Lore","\n&7Click to add pages spawn location"),
 	MENU_EDITOR_SAVE_SETTINGS_ITEM_NAME("Menu.Editor.Save-Settings-Item-Name","&bSave Settings"),
 	MENU_EDITOR_SAVE_SETTINGS_ITEM_LORE("Menu.Editor.Save-Settings-Item-Lore","\n&7Click to save settings"),
+	MENU_EDITOR_ER_GENERATE_CODE_ITEM_LORE("Menu.Editor.ER-Generate-Code-Item-Lore","\n&7Click to generate a new\n&74-digit code for the keypad.\n\n&3Current Code: &f%CODE%"),
 
 	MENU_ADMIN_MENU_TITLE("Menu.Admin.Title","Admin Menu"),
 	MENU_ADMIN_MENU_FORCE_START_GAME_ITEM("Menu.Admin.Force-Start-Game-Item","&aForce Start"),
@@ -225,9 +230,71 @@ public enum Langauge {
 	TORCH_USED("Torch.Used","&eTorch used. &7Remaining: &6%CURRENT%/%MAX%"),
 
 	// Page pickup title
-	ARENA_PAGE_PICKUP_TITLE("ArenaAnnouncements.Page-Pickup-Title","&6Page %CURRENT%/8");
+	ARENA_PAGE_PICKUP_TITLE("ArenaAnnouncements.Page-Pickup-Title","&6Page %CURRENT%/8"),
 
-	// Torch messages
+    // Page collection progress bar
+    ARENA_COLLECTION_START("ArenaAnnouncements.Collection.Start", "&6&lRECOVERING PAGE..."),
+    ARENA_COLLECTION_TOO_FAR("ArenaAnnouncements.Collection.Too-Far", "&c&lTOO FAR!"),
+    ARENA_COLLECTION_KEEP_LOOKING("ArenaAnnouncements.Collection.Keep-Looking", "&c&lKEEP YOUR EYES ON THE PAGE!"),
+    ARENA_COLLECTION_COMPLETED("ArenaAnnouncements.Collection.Completed", "&a&lPAGE COLLECTED!"),
+    ARENA_COLLECTION_PREFIX("ArenaAnnouncements.Collection.Prefix", "&f&lCOLLECTING PAGE: "),
+    ARENA_COLLECTION_PERK_PREFIX("ArenaAnnouncements.Collection.Perk-Prefix", "&e&lDIVINE HASTE: "),
+
+    // Revival system
+    REVIVAL_DOWNED_TITLE("Revival.Downed-Title", "&c&l❤ YOU ARE DOWN! ❤"),
+    REVIVAL_DOWNED_SUBTITLE("Revival.Downed-Subtitle", "&7Wait for a teammate to revive you..."),
+    REVIVAL_DOWNED_ACTIONBAR("Revival.Downed-ActionBar", "&c&l❤ WOUNDED ❤ &7You need help... (%TIME%s)"),
+    REVIVAL_TEAMMATE_DOWNED("Revival.Teammate-Downed", "&e%PLAYER% &7has fallen! &eRevive them!"),
+    REVIVAL_REVIVING_ACTIONBAR("Revival.Reviving-ActionBar", "&e&lREVIVING: &f%BAR% &e%PERCENT%%"),
+    REVIVAL_BEING_REVIVED_ACTIONBAR("Revival.Being-Revived-ActionBar", "&a&lBEING REVIVED: &f%BAR% &a%PERCENT%%"),
+    REVIVAL_CANCELLED("Revival.Cancelled", "&c&l¡REVIVAL CANCELLED! &7Too far away."),
+    REVIVAL_SUCCESS_TITLE("Revival.Success-Title", "&a&l¡REVIVED!"),
+    REVIVAL_SUCCESS_SUBTITLE("Revival.Success-Subtitle", "&7You are badly wounded..."),
+    REVIVAL_REVIVER_SUCCESS("Revival.Reviver-Success", "&a&lYou revived &f%PLAYER%&a!"),
+    REVIVAL_BLEEDOUT_DEATH("Revival.Bleedout-Death", "&c%PLAYER% &7bled out."),
+    REVIVAL_NO_MORE_REVIVES("Revival.No-More-Revives", "&cMaximum revivals reached. Next down is permanent."),
+    REVIVAL_EXECUTION_ACTIONBAR("Revival.Execution-ActionBar", "&4&lEXECUTING: &f%BAR% &4%PERCENT%%"),
+    REVIVAL_EXECUTION_VICTIM_ACTIONBAR("Revival.Execution-Victim-ActionBar", "&4&l☠ BEING EXECUTED ☠ &f%BAR%"),
+    REVIVAL_EXECUTION_COMPLETE("Revival.Execution-Complete", "&4&l☠ %PLAYER% was executed by Slenderman."),
+
+    // Sword Stun
+    SWORD_STUN_KILLER_TITLE("SwordStun.Killer-Title", "&c&l¡YOU HAVE BEEN STUNNED!"),
+    SWORD_STUN_KILLER_SUBTITLE("SwordStun.Killer-Subtitle", "&7Paralysis for &f%SECONDS% seconds"),
+    SWORD_STUN_SURVIVOR_ACTIONBAR("SwordStun.Survivor-ActionBar", "&a&l¡KILLER STUNNED! &f(%SECONDS% Seconds)"),
+    SWORD_STUN_COOLDOWN("SwordStun.Cooldown", "&c¡Sword is on cooldown! (%TIME%s)"),
+    SWORD_STUN_SWORD_BROKEN("SwordStun.Sword-Broken", "&c&l¡Your sword has broken!"),
+    SWORD_STUN_USES_LEFT("SwordStun.Uses-Left", "&eYour sword has &l%HITS% &euses left."),
+    ARENA_INCOMPLETE_SETUP("ArenaAnnouncements.Incomplete-Setup", "&cThis arena is not fully configured! (Check Slender Spawn or Escape Point)"),
+
+    // Escape Room Mode
+    ER_TOOL_SET_GENERATOR("EscapeRoom.Admin.Generator-Set", "&e&l[Architect] &aGenerator location set successfully!"),
+    ER_TOOL_SET_KEY("EscapeRoom.Admin.Key-Set", "&e&l[Architect] &aKey location added successfully!"),
+    ER_TOOL_SET_ESCAPE("EscapeRoom.Admin.Escape-Point-Set", "&e&l[Architect] &aEscape point set successfully!"),
+    ER_TOOL_SET_SLENDER("EscapeRoom.Admin.Slender-Spawn-Set", "&e&l[Architect] &aSlenderMan spawn set successfully!"),
+    ER_TOOL_SET_SURVIVOR("EscapeRoom.Admin.Survivor-Spawn-Set", "&e&l[Architect] &aSurvivor spawn added successfully!"),
+	ER_ARCHITECT_PREFIX("EscapeRoom.Architect.Prefix", "&e&l[Architect] "),
+	ER_ARCHITECT_GEN_SET("EscapeRoom.Architect.Generator-Set", "&aGenerator position established! &7(Location: %LOCATION%)"),
+	ER_ARCHITECT_KEY_SET("EscapeRoom.Architect.Key-Set", "&bMaster Key position established! &7(Location: %LOCATION%)"),
+	ER_ARCHITECT_ESCAPE_SET("EscapeRoom.Architect.Escape-Set", "&6Escape Point position established! &7(Location: %LOCATION%)"),
+	ER_ARCHITECT_SLENDER_SET("EscapeRoom.Architect.Slender-Set", "&cSlender Spawn position established! &7(Location: %LOCATION%)"),
+	ER_ARCHITECT_SURVIVOR_SET("EscapeRoom.Architect.Survivor-Set", "&dSurvivor Spawn position established! &7(Location: %LOCATION%)"),
+	ER_ARCHITECT_ALREADY_EXISTS("EscapeRoom.Architect.Already-Exists", "&cThis objective already exists here!"),
+    
+    ER_GENERATOR_REPAIR_START("EscapeRoom.Generator.Repair-Start", "&e&l[Generator] &7Starting repair... Stay close!"),
+    ER_GENERATOR_REPAIR_ACTIONBAR("EscapeRoom.Generator.Repair-ActionBar", "&e&lRepairing Generator: &f%PROGRESS%% &a%BAR%"),
+    ER_GENERATOR_REPAIR_SUCCESS("EscapeRoom.Generator.Repair-Success", "&e&l[Event] &aA generator has been repaired! &7(%CURRENT%/%TOTAL%)"),
+    ER_GENERATOR_ALREADY_REPAIRED("EscapeRoom.Generator.Already-Repaired", "&a&l[Generator] &7This generator is already fully repaired!"),
+    ER_GENERATOR_TOO_FAR("EscapeRoom.Generator.Too-Far", "&c&l[Generator] &7Repair cancelled: you moved too far!"),
+    ER_GENERATOR_REPAIRED("EscapeRoom.Generator.Repaired", "&aGenerator repaired! &7(%REPAIRED%/%TOTAL%)"),
+
+    ER_CODE_GENERATED("EscapeRoom.Admin.Code-Generated", "&b&l[EscapeRoom] &aNew escape code generated: &f%CODE%"),
+    ER_KEYPAD_ACCESS_GRANTED("EscapeRoom.Keypad.Access-Granted", "&a&lACCESS GRANTED. &fThe door is opening!"),
+    ER_KEYPAD_INVALID_CODE("EscapeRoom.Keypad.Invalid-Code", "&c&lINVALID CODE. &fTry again."),
+    
+    ER_MENU_GENERATOR_TITLE("EscapeRoom.Menus.Generator.Title", "&eGenerator (%PROGRESS%%)"),
+    ER_MENU_GENERATOR_REPAIR_BUTTON("EscapeRoom.Menus.Generator.Repair-Button", "&a&lStart Repair"),
+    ER_MASTER_KEY_FOUND("EscapeRoom.Items.Master-Key-Found", "&b&l¡MASTER KEY FOUND! &fFind the escape point."),
+    ER_CHEST_OPENED("EscapeRoom.Generator.Chest-Opened", "&7The chest is empty.");
 
 	private static YamlConfiguration configuration;
 	private final @Getter String defaultMessage;
@@ -244,12 +311,10 @@ public enum Langauge {
 
 	@Override
 	public String toString() {
-		if (configuration == null) return ColourUtil.colorize(defaultMessage);
-		Object value = configuration.get(path);
-		if (value instanceof String) {
-			return ColourUtil.colorize((String) value);
+		if (path == null || path.isEmpty()) return "";
+		if (configuration == null || configuration.getString(path) == null) {
+			return ColourUtil.colorize(defaultMessage);
 		}
-		return ColourUtil.colorize(defaultMessage);
+		return ColourUtil.colorize(configuration.getString(path));
 	}
-
 }

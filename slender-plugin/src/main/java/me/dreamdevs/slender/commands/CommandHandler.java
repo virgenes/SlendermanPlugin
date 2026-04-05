@@ -32,6 +32,8 @@ public class CommandHandler implements TabExecutor {
         registerCommand("start", ArenaStartArgument.class);
         registerCommand("join", ArenaJoinArgument.class);
         registerCommand("leave", ArenaLeaveArgument.class);
+        registerCommand("reload", ReloadArgument.class);
+        registerCommand("setup", ArenaSetupArgument.class);
     }
 
     public void register(SlenderMain plugin) {

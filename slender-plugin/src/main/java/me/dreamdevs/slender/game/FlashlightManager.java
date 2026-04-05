@@ -2,19 +2,21 @@ package me.dreamdevs.slender.game;
 
 import me.dreamdevs.slender.SlenderMain;
 import me.dreamdevs.slender.api.Config;
+import me.dreamdevs.slender.api.Setting;
 import me.dreamdevs.slender.api.game.Role;
 import me.dreamdevs.slender.api.utils.ColourUtil;
+import me.dreamdevs.slender.database.data.GamePlayer;
 import me.dreamdevs.slender.compat.VersionCompat;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -24,7 +26,6 @@ import org.bukkit.util.Vector;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 public class FlashlightManager {
 
@@ -38,6 +39,12 @@ public class FlashlightManager {
     
     // Stores pre-calculated particle locations to spawn on sync thread
     private final Map<UUID, List<Location>> currentParticleDraws = new ConcurrentHashMap<>();
+
+    // Track virtual light sources per player (List for path illumination)
+    private final Map<UUID, List<Location>> lastLightLocations = new ConcurrentHashMap<>();
+
+    // Track last known setting to detect changes while active
+    private final Map<UUID, Boolean> lastRealisticSetting = new ConcurrentHashMap<>();
 
     private BukkitTask mainSyncTask;
     private BukkitTask asyncCalculationTask;
@@ -76,7 +83,7 @@ public class FlashlightManager {
         loadConfig();
     }
 
-    private void loadConfig() {
+    public void loadConfig() {
         YamlConfiguration config = Config.getConfiguration();
         try {
             itemMaterial = Material.valueOf(config.getString("Flashlight.Item.Material", "BLAZE_ROD"));
@@ -88,7 +95,7 @@ public class FlashlightManager {
             brokenMaterial = Material.valueOf(config.getString("Flashlight.Item.Broken-Material", "STICK"));
         } catch(Exception e) { brokenMaterial = Material.STICK; }
 
-        maxTicks = config.getInt("Flashlight.Charge.Max-Ticks", 600);
+        maxTicks = config.getInt("Flashlight.Charge.Max-Ticks", 2400);
         drainRate = config.getInt("Flashlight.Charge.Drain-Rate", 1);
         lowPercent = config.getInt("Flashlight.Charge.Low-Percent", 20);
 
@@ -145,30 +152,183 @@ public class FlashlightManager {
                     player.playSound(player.getLocation(), soundAmbient, soundAmbientVol, 1.0f);
                 }
 
+                GamePlayer gp = SlenderMain.getInstance().getPlayerManager().getPlayer(player);
+                if (gp == null || arena == null) continue;
+                
+                boolean flicker = gp.getSetting(Setting.DARKNESS_FLICKER) == null || (boolean) gp.getSetting(Setting.DARKNESS_FLICKER);
+                boolean realistic = gp.getSetting(Setting.FLASHLIGHT_REALISTIC) == null || (boolean) gp.getSetting(Setting.FLASHLIGHT_REALISTIC);
+
+                // Handle setting change while active
+                if (lastRealisticSetting.containsKey(uuid) && lastRealisticSetting.get(uuid) != realistic) {
+                    if (realistic) {
+                        // Switched TO realistic: remove Night Vision
+                        player.removePotionEffect(PotionEffectType.NIGHT_VISION);
+                    } else {
+                        // Switched TO night vision: remove Light blocks
+                        List<Location> last = lastLightLocations.remove(uuid);
+                        if (last != null) {
+                            for (Location loc : last) {
+                                player.sendBlockChange(loc, loc.getBlock().getBlockData());
+                            }
+                        }
+                    }
+                }
+                lastRealisticSetting.put(uuid, realistic);
+
                 if (useDarkness) {
-                    VersionCompat.applyDarkness(player, 35, 0); // Keep Darkness up
+                    PotionEffectType darknessType = PotionEffectType.DARKNESS;
+                    if (flicker) {
+                        PotionEffect activeDarkness = player.getPotionEffect(darknessType != null ? darknessType : PotionEffectType.BLINDNESS);
+                        // Re-apply only if missing or expiring to prevent visual packet flood (flicker)
+                        if (activeDarkness == null || activeDarkness.getDuration() < 10) {
+                            VersionCompat.applyDarkness(player, 35, 0);
+                        }
+                    } else {
+                        // Flicker OFF: Use Atmospheric Fog instead of Darkness/Blindness
+                        if (darknessType != null) player.removePotionEffect(darknessType);
+                        player.removePotionEffect(PotionEffectType.BLINDNESS);
+                        
+                        // Apply Slowness I for FOV narrowing (slight zoom/claustrophobia)
+                        if (!player.hasPotionEffect(PotionEffectType.SLOWNESS)) {
+                            player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 40, 0, false, false));
+                        }
+                        
+                        // Spawn personal fog particles around the player
+                        spawnAtmosphericFog(player);
+                    }
                 }
                 
-                // CRITICAL: Particles do not emit light! We must use Night Vision 
-                // in combination with Darkness so blocks actually become visible.
-                player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 40, 0, false, false, false));
-
-                // Render Particles (Max 20 logic is internally smoothed)
-                drawParticles(player, battery);
+                if (realistic) {
+                    player.removePotionEffect(PotionEffectType.NIGHT_VISION);
+                    // Render Particles and update virtual light
+                    drawParticles(player, battery);
+                    updateVirtualLight(player);
+                } else {
+                    // Night vision style: Infinite duration while holding to prevent "ugly" flickering
+                    if (!player.hasPotionEffect(PotionEffectType.NIGHT_VISION)) {
+                        player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0, false, false));
+                    }
+                    // Minimal particles to indicate it's on
+                    if (Math.random() < 0.1) {
+                         player.getWorld().spawnParticle(Particle.SMOKE, player.getEyeLocation().add(player.getEyeLocation().getDirection()), 1, 0, 0, 0, 0.01);
+                    }
+                }
             }
             
             // Reapply Darkness to those who are off, if useDarkness is true and they are a survivor
             if (useDarkness) {
                 for (Map.Entry<Player, Role> entry : arena.getPlayers().entrySet()) {
-                    if (entry.getValue() == Role.SURVIVOR && entry.getKey().isOnline()) {
-                        if (!activeFlashlights.containsKey(entry.getKey().getUniqueId())) {
-                            VersionCompat.applyDarkness(entry.getKey(), 45, 1);
+                    Player p = entry.getKey();
+                    if (entry.getValue() == Role.SURVIVOR && p.isOnline()) {
+                        if (!activeFlashlights.containsKey(p.getUniqueId())) {
+                            GamePlayer gp = SlenderMain.getInstance().getPlayerManager().getPlayer(p);
+                            if (gp == null) continue;
+                            boolean flicker = gp.getSetting(Setting.DARKNESS_FLICKER) == null || (boolean) gp.getSetting(Setting.DARKNESS_FLICKER);
+                            
+                            if (flicker) {
+                                PotionEffect activeDarkness = p.getPotionEffect(PotionEffectType.DARKNESS != null ? PotionEffectType.DARKNESS : PotionEffectType.BLINDNESS);
+                                if (activeDarkness == null || activeDarkness.getDuration() < 15) {
+                                    VersionCompat.applyDarkness(p, 45, 1);
+                                }
+                            } else {
+                                // Flicker OFF: Use Fog
+                                PotionEffectType darknessType = PotionEffectType.DARKNESS;
+                                if (darknessType != null) p.removePotionEffect(darknessType);
+                                p.removePotionEffect(PotionEffectType.BLINDNESS);
+                                
+                                if (!p.hasPotionEffect(PotionEffectType.SLOWNESS)) {
+                                    p.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 40, 0, false, false));
+                                }
+                                spawnAtmosphericFog(p);
+                            }
                         }
                     }
                 }
             }
 
         }, 0L, 1L);
+    }
+
+    private void updateVirtualLight(Player player) {
+        UUID uuid = player.getUniqueId();
+        Location eye = player.getEyeLocation();
+        Vector dir = eye.getDirection();
+        
+        // Raytrace to find beam length and hit face
+        RayTraceResult result = player.getWorld().rayTraceBlocks(eye, dir, maxDist, FluidCollisionMode.NEVER, true);
+        double endDist = (result != null && result.getHitPosition() != null) ? eye.distance(result.getHitPosition().toLocation(player.getWorld())) : maxDist;
+        
+        List<Location> newLocs = new ArrayList<>();
+        // 1. Path Illumination (Light sources along the beam)
+        for (double d = 1.6; d < endDist - 1.0; d += 3.8) {
+            Location loc = eye.clone().add(dir.clone().multiply(d));
+            if (loc.getBlock().isReplaceable()) {
+                newLocs.add(loc);
+            }
+        }
+        
+        // 2. Impact Point Bloom (More realistic and expanded lighting)
+        Block hitBlock = (result != null) ? result.getHitBlock() : null;
+        BlockFace hitFace = (result != null) ? result.getHitBlockFace() : null;
+        
+        if (hitBlock != null && hitFace != null) {
+            // Place main light in the air block adjacent to the hit face (fixes disappearing objects)
+            Location center = hitBlock.getRelative(hitFace).getLocation().toCenterLocation();
+            if (center.getBlock().isReplaceable()) {
+                newLocs.add(center);
+                
+                // Add 4 more light sources around the impact point for "Bloom/Expanded" effect
+                // Use perpendicular vectors to the hit face to spread out the light
+                Vector hitVec = hitFace.getDirection();
+                Vector planeX = (Math.abs(hitVec.getX()) > 0.5 || Math.abs(hitVec.getZ()) > 0.5) ? new Vector(0, 1, 0) : new Vector(1, 0, 0);
+                Vector planeY = hitVec.crossProduct(planeX).normalize();
+                planeX = hitVec.crossProduct(planeY).normalize();
+                
+                // Smaller offsets (around 1 block) to create a denser, bigger glow
+                double offset = 0.9;
+                Location[] surrounds = {
+                    center.clone().add(planeX.clone().multiply(offset)),
+                    center.clone().add(planeX.clone().multiply(-offset)),
+                    center.clone().add(planeY.clone().multiply(offset)),
+                    center.clone().add(planeY.clone().multiply(-offset))
+                };
+                
+                for (Location loc : surrounds) {
+                    if (loc.getBlock().isReplaceable()) newLocs.add(loc);
+                }
+            }
+        } else {
+            // If no wall, just place a light point in the air at the end
+            Location airEnd = eye.clone().add(dir.clone().multiply(maxDist));
+            if (airEnd.getBlock().isReplaceable()) {
+                newLocs.add(airEnd);
+            }
+        }
+
+        List<Location> lastLocs = lastLightLocations.get(uuid);
+        Location lastEnd = (lastLocs == null || lastLocs.isEmpty()) ? null : lastLocs.get(lastLocs.size() - 1);
+        Location newEnd = newLocs.isEmpty() ? null : newLocs.get(newLocs.size() - 1);
+
+        // Update if significantly moved or first run
+        if (newEnd != null && (lastEnd == null || lastEnd.distanceSquared(newEnd) > 1.4)) {
+            // Remove old lights
+            if (lastLocs != null) {
+                for (Location loc : lastLocs) {
+                    player.sendBlockChange(loc, loc.getBlock().getBlockData());
+                }
+            }
+            
+            // Send new light block changes (Material.LIGHT level 15)
+            try {
+                org.bukkit.block.data.type.Light lightData = (org.bukkit.block.data.type.Light) Bukkit.createBlockData(Material.LIGHT);
+                lightData.setLevel(15);
+                
+                for (Location loc : newLocs) {
+                    player.sendBlockChange(loc, lightData);
+                }
+                lastLightLocations.put(uuid, newLocs);
+            } catch (Exception ignored) {} 
+        }
     }
 
     public void stop() {
@@ -179,7 +339,7 @@ public class FlashlightManager {
         for (UUID uuid : keys) {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
-                toggle(player); // Syncs battery
+                toggle(player); // Syncs battery and removes virtual light
                 if (useDarkness) {
                     VersionCompat.removeDarkness(player);
                 }
@@ -188,6 +348,7 @@ public class FlashlightManager {
         activeFlashlights.clear();
         currentParticleDraws.clear();
         lastDirections.clear();
+        lastLightLocations.clear();
     }
 
     public void giveFlashlight(Player player, int slot) {
@@ -212,15 +373,25 @@ public class FlashlightManager {
         
         if (activeFlashlights.containsKey(uuid)) {
             // TURN OFF
-            int remaining = activeFlashlights.remove(uuid);
+            int battery = activeFlashlights.remove(uuid);
             currentParticleDraws.remove(uuid);
             lastDirections.remove(uuid);
+            
+            // Remove virtual light path
+            List<Location> last = lastLightLocations.remove(uuid);
+            if (last != null) {
+                for (Location loc : last) {
+                    player.sendBlockChange(loc, loc.getBlock().getBlockData());
+                }
+            }
+            lastRealisticSetting.remove(uuid);
+
             player.removePotionEffect(PotionEffectType.NIGHT_VISION);
             player.playSound(player.getLocation(), soundOff, 1f, soundOffPitch);
             
             ItemStack item = player.getInventory().getItemInMainHand();
             if (item.getType() == itemMaterial) {
-                updateItemBattery(item, remaining);
+                updateItemBattery(item, battery);
             }
         } else {
             // TURN ON
@@ -291,12 +462,6 @@ public class FlashlightManager {
         double tanH = Math.tan(Math.toRadians(hAngle / 2.0));
         double tanV = Math.tan(Math.toRadians(vAngle / 2.0));
 
-        // Use thread-safe raytracing pseudo-sync approach if we want to avoid async restrictions
-        // actually Bukkit world.rayTraceBlocks is mostly read-only thread-safe in chunk-loaded areas, but to be 100% compliant,
-        // we shouldn't raytrace fully async. We will just compute the geometric points here, and raytrace them sync, 
-        // OR we can just ignore blocks and just draw rings (which might go through walls).
-        // Since we want performance: compute the offset vectors here.
-        
         for (double d = 2.0; d <= maxDist; d += ringSpacing) {
             double rX = d * tanH;
             double rY = d * tanV;
@@ -319,21 +484,15 @@ public class FlashlightManager {
     }
 
     private void drawParticles(Player player, int battery) {
-        List<Location> locs = currentParticleDraws.get(player.getUniqueId());
-        if (locs == null || locs.isEmpty()) return;
-
+        List<Location> ringLocs = currentParticleDraws.get(player.getUniqueId());
+        
         double percent = (double) battery / maxTicks * 100.0;
-        
-        // Flicker effect
         boolean drawThisTick = true;
-        Particle.DustOptions dust = new Particle.DustOptions(Color.fromRGB(255, 230, 200), 0.5f);
-        
         if (lowBatteryFlicker) {
             if (percent <= lowPercent) {
-                if (Math.random() < 0.3) drawThisTick = false; // Erratic
-                dust = new Particle.DustOptions(Color.fromRGB(200, 100, 50), 0.4f);
+                if (Math.random() < 0.3) drawThisTick = false;
             } else if (percent <= 25) {
-                if (Math.random() < 0.1) drawThisTick = false; // Soft flicker
+                if (Math.random() < 0.1) drawThisTick = false;
             }
         }
 
@@ -341,44 +500,67 @@ public class FlashlightManager {
 
         World world = player.getWorld();
         Location eye = player.getEyeLocation();
+        Vector dir = eye.getDirection();
+
+        // 1. DENSE VOLUMETRIC BEAM (Ray of light)
+        RayTraceResult trace = world.rayTraceBlocks(eye, dir, maxDist, FluidCollisionMode.NEVER, true);
+        double endDist = (trace != null && trace.getHitPosition() != null) ? eye.distance(trace.getHitPosition().toLocation(world)) : maxDist;
         
-        // Glow effect (Entities in Cone)
-        // Check entities around player directly using their bounding box since we're in the sync thread
+        Particle.DustOptions dust = new Particle.DustOptions(Color.fromRGB(255, 230, 200), (float) (0.6 + Math.random() * 0.2));
+        if (percent <= lowPercent) dust = new Particle.DustOptions(Color.fromRGB(200, 100, 50), 0.4f);
+
+        for (double i = 0.5; i < endDist; i += 0.4) {
+            Location pLoc = eye.clone().add(dir.clone().multiply(i));
+            pLoc.add(Math.random()*0.1-0.05, Math.random()*0.1-0.05, Math.random()*0.1-0.05);
+            world.spawnParticle(Particle.DUST, pLoc, 1, 0.0, 0.0, 0.0, 0.0, dust);
+        }
+
+        // 2. CONE RINGS (Peripheral light)
+        if (ringLocs != null && !ringLocs.isEmpty()) {
+            int rendered = 0;
+            for (Location loc : ringLocs) {
+                if (rendered >= 15) break; 
+                RayTraceResult res = world.rayTraceBlocks(eye, loc.toVector().subtract(eye.toVector()).normalize(), eye.distance(loc), FluidCollisionMode.NEVER, true);
+                if (res == null || res.getHitBlock() == null) {
+                    world.spawnParticle(Particle.DUST, loc, 1, 0.05, 0.05, 0.05, 0.0, dust);
+                    rendered++;
+                }
+            }
+        }
+
+        // 3. GLOW ENEMY
         Collection<Entity> near = world.getNearbyEntities(eye, maxDist, maxDist, maxDist, e -> e instanceof LivingEntity && e != player);
         for (Entity e : near) {
-            Vector toEntity = e.getLocation().toVector().subtract(eye.toVector());
+            Vector toEntity = e.getLocation().clone().add(0, 1, 0).toVector().subtract(eye.toVector());
             double dist = toEntity.length();
-            if (dist > maxDist || dist == 0) continue;
+            if (dist > maxDist || dist < 1.0) continue;
             
             toEntity.normalize();
-            double angle = Math.toDegrees(eye.getDirection().angle(toEntity));
-            if (angle <= (hAngle / 2.0) + 5) {
+            double angle = Math.toDegrees(dir.angle(toEntity));
+            if (angle <= (hAngle / 2.0) + 2) {
                 LivingEntity le = (LivingEntity) e;
                 le.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 10, 0, false, false));
             }
         }
+    }
 
-        // Limit particles to avoid rendering too many
-        int rendered = 0;
-        int targetMax = 20;
+    public void spawnAtmosphericFog(Player player) {
+        Location center = player.getLocation().add(0, 1.5, 0);
+        double radius = 13.0; // Distance of the fog wall
+        int points = 5; // Particle clusters per tick
         
-        for (Location loc : locs) {
-            if (rendered >= targetMax) break;
+        for (int i = 0; i < points; i++) {
+            double angle = Math.random() * 2 * Math.PI;
+            double x = Math.cos(angle) * radius;
+            double z = Math.sin(angle) * radius;
+            double y = (Math.random() * 4.0) - 1.5; 
             
-            // Sync rayTrace for block occlusion is safe here
-            RayTraceResult res = world.rayTraceBlocks(eye, loc.toVector().subtract(eye.toVector()).normalize(), eye.distance(loc), FluidCollisionMode.NEVER, true);
-            if (res != null && res.getHitBlock() != null) {
-                continue; // Blocked by wall
+            Location pLoc = center.clone().add(x, y, z);
+            // Spawn personal particles only visible to the player for maximum immersion and performance
+            player.spawnParticle(Particle.LARGE_SMOKE, pLoc, 1, 0.4, 0.4, 0.4, 0.01);
+            if (Math.random() < 0.2) {
+                player.spawnParticle(Particle.SQUID_INK, pLoc, 1, 0.2, 0.2, 0.2, 0.01);
             }
-
-            Particle dustParticle;
-            try {
-                dustParticle = Particle.valueOf("DUST");
-            } catch (IllegalArgumentException ex) {
-                dustParticle = Particle.valueOf("REDSTONE");
-            }
-            world.spawnParticle(dustParticle, loc, 1, 0.1, 0.1, 0.1, 0.0, dust);
-            rendered++;
         }
     }
 }

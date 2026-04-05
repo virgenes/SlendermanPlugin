@@ -14,6 +14,8 @@ import me.dreamdevs.slender.game.CustomItem;
 import me.dreamdevs.slender.game.FlashlightManager;
 import me.dreamdevs.slender.game.perks.*;
 import me.dreamdevs.slender.menus.*;
+import me.dreamdevs.slender.menus.VoteModeMenu;
+import me.dreamdevs.slender.menus.VoteDifficultyMenu;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -37,6 +39,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.Vector;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -54,33 +59,209 @@ public class PlayerInteractListener implements Listener {
 
     @EventHandler
     public void interactEvent(PlayerInteractEvent event) {
-        if (event.getItem() == null) return;
-        if (event.getItem().getItemMeta() == null) return;
         if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 
-        ItemStack itemStack = event.getItem();
-        ItemMeta meta = itemStack.getItemMeta();
-        Component displayName = meta.displayName();
-        List<Component> lore = meta.lore() != null ? meta.lore() : new ArrayList<>();
         Player player = event.getPlayer();
+        ItemStack itemStack = event.getItem();
+        ItemMeta meta = itemStack != null ? itemStack.getItemMeta() : null;
+        Component displayName = meta != null ? meta.displayName() : null;
+        List<Component> lore = meta != null && meta.lore() != null ? meta.lore() : new ArrayList<>();
         GamePlayer gamePlayer = SlenderMain.getInstance().getPlayerManager().getPlayer(player);
 
-        // Plain text for name-based checks if needed
         String plainName = displayName != null ? PlainTextComponentSerializer.plainText().serialize(displayName) : "";
+        
+        final Arena arena = (gamePlayer != null && gamePlayer.getArena() != null) 
+                ? (Arena) gamePlayer.getArena() 
+                : (player.hasMetadata("editing_arena") 
+                    ? SlenderMain.getInstance().getGameManager().getArena(player.getMetadata("editing_arena").get(0).asString()) 
+                    : null);
 
         // === LOBBY ITEMS ===
-        if (Objects.equals(displayName, CustomItem.ARENA_SELECTOR.getDisplayName()) && Objects.equals(lore, CustomItem.ARENA_SELECTOR.getLore())) {
+        if (itemStack != null && Objects.equals(displayName, CustomItem.ARENA_SELECTOR.getDisplayName()) && Objects.equals(lore, CustomItem.ARENA_SELECTOR.getLore())) {
             event.setCancelled(true);
             player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, (float) Math.random());
             new SelectArenaMenu().open(player);
             return;
         }
 
+        if (itemStack != null && Objects.equals(displayName, CustomItem.FORCED_START.getDisplayName()) && Objects.equals(lore, CustomItem.FORCED_START.getLore())) {
+            event.setCancelled(true);
+            if (arena == null) return;
+            if (arena.getPlayers().size() < arena.getMinPlayers()) {
+                player.sendMessage(Langauge.ARENA_STOPPED_STARTING.toString());
+                return;
+            }
+            arena.setTimer(10);
+            player.sendMessage(Langauge.ARENA_FORCED_START_MSG.toString());
+            player.getInventory().remove(itemStack);
+            return;
+        }
+
+        // === PHASE 6: ARCHITECT TOOLS ===
+        if (arena != null && (player.getGameMode() == GameMode.CREATIVE || arena.getArenaState() == ArenaState.WAITING || arena.getArenaState() == ArenaState.STARTING)) {
+            
+            // 1. GENERATOR TOOL
+            if (itemStack != null && itemStack.getType() == Material.DAYLIGHT_DETECTOR && plainName.contains("Place Generator")) {
+                event.setCancelled(true);
+                if (event.getClickedBlock() == null) return;
+                Location loc = event.getClickedBlock().getLocation();
+                if (arena.getGeneratorLocations().contains(loc)) {
+                    player.sendMessage(Langauge.ER_ARCHITECT_PREFIX.toString() + Langauge.ER_ARCHITECT_ALREADY_EXISTS.toString());
+                    return;
+                }
+                arena.getGeneratorLocations().add(loc);
+                SlenderMain.getInstance().getGameManager().saveGame(arena);
+                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 2f);
+                player.sendMessage(Langauge.ER_ARCHITECT_PREFIX.toString() + Langauge.ER_ARCHITECT_GEN_SET.toString().replace("%LOCATION%", loc.getBlockX() + ", " + loc.getBlockY() + ", " + loc.getBlockZ()));
+                return;
+            }
+            
+            // 2. MASTER KEY TOOL
+            if (itemStack != null && itemStack.getType() == Material.TRIPWIRE_HOOK && plainName.contains("Place Master Key")) {
+                event.setCancelled(true);
+                if (event.getClickedBlock() == null) return;
+                Location loc = event.getClickedBlock().getLocation();
+                if (arena.getKeyLocations().contains(loc)) {
+                    player.sendMessage(Langauge.ER_ARCHITECT_PREFIX.toString() + Langauge.ER_ARCHITECT_ALREADY_EXISTS.toString());
+                    return;
+                }
+                arena.getKeyLocations().add(loc);
+                SlenderMain.getInstance().getGameManager().saveGame(arena);
+                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 2f);
+                player.sendMessage(Langauge.ER_ARCHITECT_PREFIX.toString() + Langauge.ER_ARCHITECT_KEY_SET.toString().replace("%LOCATION%", loc.getBlockX() + ", " + loc.getBlockY() + ", " + loc.getBlockZ()));
+                return;
+            }
+            
+            // 3. ESCAPE POINT TOOL
+            if (itemStack != null && itemStack.getType() == Material.IRON_DOOR && plainName.contains("Set Escape Point")) {
+                event.setCancelled(true);
+                if (event.getClickedBlock() == null) return;
+                Location loc = event.getClickedBlock().getLocation();
+                arena.setEscapeLocation(loc);
+                SlenderMain.getInstance().getGameManager().saveGame(arena);
+                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1f);
+                player.sendMessage(Langauge.ER_ARCHITECT_PREFIX.toString() + Langauge.ER_ARCHITECT_ESCAPE_SET.toString().replace("%LOCATION%", loc.getBlockX() + ", " + loc.getBlockY() + ", " + loc.getBlockZ()));
+                return;
+            }
+
+            // 4. SLENDER SPAWN TOOL
+            if (itemStack != null && itemStack.getType() == Material.REDSTONE_BLOCK && plainName.contains("Set Slender Spawn")) {
+                event.setCancelled(true);
+                if (event.getClickedBlock() == null) return;
+                Location loc = event.getClickedBlock().getLocation().clone().add(0.5, 1, 0.5);
+                arena.setSlenderManSpawnLocation(loc);
+                SlenderMain.getInstance().getGameManager().saveGame(arena);
+                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1.5f);
+                player.sendMessage(Langauge.ER_ARCHITECT_PREFIX.toString() + Langauge.ER_ARCHITECT_SLENDER_SET.toString().replace("%LOCATION%", loc.getBlockX() + ", " + loc.getBlockY() + ", " + loc.getBlockZ()));
+                return;
+            }
+            
+            // 5. SURVIVOR SPAWN TOOL
+            if (itemStack != null && itemStack.getType() == Material.BEACON && plainName.contains("Add Survivor Spawn")) {
+                event.setCancelled(true);
+                if (event.getClickedBlock() == null) return;
+                Location loc = event.getClickedBlock().getLocation().clone().add(0.5, 1, 0.5);
+                if (arena.getSurvivorsLocations().contains(loc)) {
+                     player.sendMessage(Langauge.ER_ARCHITECT_PREFIX.toString() + Langauge.ER_ARCHITECT_ALREADY_EXISTS.toString());
+                     return;
+                }
+                arena.getSurvivorsLocations().add(loc);
+                SlenderMain.getInstance().getGameManager().saveGame(arena);
+                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1.8f);
+                player.sendMessage(Langauge.ER_ARCHITECT_PREFIX.toString() + Langauge.ER_ARCHITECT_SURVIVOR_SET.toString().replace("%LOCATION%", loc.getBlockX() + ", " + loc.getBlockY() + ", " + loc.getBlockZ()));
+                return;
+            }
+        }
+
+        // === PHASE 6/7: SLENDERMAN TRAPS ===
+        if (arena != null && arena.getArenaState() == ArenaState.RUNNING) {
+            Role role = arena.getPlayers().get(player);
+            if (role == Role.SLENDER && Objects.equals(displayName, CustomItem.SLENDER_TRAP.getDisplayName())) {
+                event.setCancelled(true);
+                if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock() != null) {
+                    Location trapLoc = event.getClickedBlock().getLocation().add(0, 1, 0);
+                    if (arena.getTrapLocations().size() >= 3) {
+                        player.sendMessage(ColourUtil.colorize("&cYou can only place 3 traps at a time!"));
+                        return;
+                    }
+                    arena.getTrapLocations().add(trapLoc);
+                    itemStack.setAmount(itemStack.getAmount() - 1);
+                    player.sendMessage(ColourUtil.colorize("&c&lTRAP PLACED! &7Awaiting victims..."));
+                    player.playSound(player.getLocation(), Sound.BLOCK_SCAFFOLDING_PLACE, 1f, 0.5f);
+                }
+                return;
+            }
+
+            // === ESCAPE NOTE ===
+            if (role == Role.SURVIVOR && Objects.equals(displayName, CustomItem.ESCAPE_NOTE.getDisplayName())) {
+                event.setCancelled(true);
+                String code = arena.getEscapeCode();
+                player.sendMessage(ColourUtil.colorize("&f&lNOTE CONTENT: &7The code for the exit is &e&l" + (code != null ? code : "????")));
+                player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 1f, 1f);
+                return;
+            }
+        }
+
+        // === PHASE 6: ESCAPE ROOM GAMEPLAY ===
+        if (arena != null && arena.getArenaType() == me.dreamdevs.slender.api.game.ArenaType.ESCAPE_ROOM && arena.getArenaState() == ArenaState.RUNNING) {
+            Role role = arena.getPlayers().get(player);
+            
+            // Interaction with blocks (Generators, Escape Point)
+            if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock() != null) {
+                Location clickedLoc = event.getClickedBlock().getLocation();
+                
+                // 1. Generator Interaction
+                for (Location genLoc : arena.getGeneratorLocations()) {
+                    if (genLoc.equals(clickedLoc)) {
+                        event.setCancelled(true);
+                        if (role == Role.SURVIVOR) {
+                            new me.dreamdevs.slender.menus.GeneratorMenu(arena, genLoc, player).open(player);
+                        } else if (role == Role.SLENDER) {
+                            handleGeneratorSabotage(player, arena, genLoc);
+                        }
+                        return;
+                    }
+                }
+                
+                // 2. Key Pickup Logic (If item is dropped or block represents key)
+                for (Location keyLoc : arena.getKeyLocations()) {
+                    if (keyLoc.equals(clickedLoc)) {
+                        event.setCancelled(true);
+                        if (role == Role.SURVIVOR) {
+                            if (!player.getInventory().contains(CustomItem.ER_MASTER_KEY.toItemStack().getType())) {
+                                player.getInventory().addItem(CustomItem.ER_MASTER_KEY.toItemStack());
+                                player.sendMessage(Langauge.ER_MASTER_KEY_FOUND.toString());
+                                player.playSound(player.getLocation(), Sound.BLOCK_CHEST_OPEN, 1f, 1f);
+                            }
+                        }
+                        return;
+                    }
+                }
+                
+                // 3. Escape Point Interaction
+                if (arena.getEscapeLocation() != null && arena.getEscapeLocation().equals(clickedLoc)) {
+                    event.setCancelled(true);
+                    if (role == Role.SURVIVOR) {
+                        if (player.getInventory().contains(CustomItem.ER_MASTER_KEY.toItemStack().getType())) {
+                            if (arena.getGeneratorsRepaired() >= 3) {
+                                new KeypadMenu(arena).open(player);
+                            } else {
+                                player.sendMessage(ColourUtil.colorize("&cYou need to repair at least 3 generators first!"));
+                            }
+                        } else {
+                            player.sendMessage(ColourUtil.colorize("&cYou need the Master Key to open the escape route!"));
+                        }
+                    }
+                    return;
+                }
+            }
+        }
+
         if (Objects.equals(displayName, CustomItem.LEAVE.getDisplayName()) && Objects.equals(lore, CustomItem.LEAVE.getLore())) {
             event.setCancelled(true);
             if (gamePlayer == null || gamePlayer.getArena() == null) return;
-            Arena arena = (Arena) gamePlayer.getArena();
-            SlenderMain.getInstance().getGameManager().leaveGame(gamePlayer.getPlayer(), arena);
+            Arena arenaObj = (Arena) gamePlayer.getArena();
+            SlenderMain.getInstance().getGameManager().leaveGame(gamePlayer.getPlayer(), arenaObj);
             return;
         }
 
@@ -93,8 +274,7 @@ public class PlayerInteractListener implements Listener {
 
         if (Objects.equals(displayName, CustomItem.PLAY_AGAIN.getDisplayName()) && Objects.equals(lore, CustomItem.PLAY_AGAIN.getLore())) {
             event.setCancelled(true);
-            if (gamePlayer == null || gamePlayer.getArena() == null) return;
-            Arena arena = (Arena) gamePlayer.getArena();
+            if (arena == null) return;
             Arena randomArena = SlenderMain.getInstance().getGameManager().getArenas()
                     .stream().filter(rArena -> (rArena.getArenaState() == ArenaState.WAITING
                             || rArena.getArenaState() == ArenaState.STARTING)
@@ -103,7 +283,8 @@ public class PlayerInteractListener implements Listener {
                 player.sendMessage(ColourUtil.colorizeToComponent(Langauge.ARENA_NO_AVAILABLE_ARENAS.toString()));
                 return;
             }
-            SlenderMain.getInstance().getGameManager().leaveGame(gamePlayer.getPlayer(), arena);
+            if (gamePlayer == null || player == null || randomArena == null) return;
+            SlenderMain.getInstance().getGameManager().leaveGame(player, arena);
             SlenderMain.getInstance().getGameManager().joinGame(player, randomArena);
             return;
         }
@@ -178,9 +359,29 @@ public class PlayerInteractListener implements Listener {
             return;
         }
 
+        if (Objects.equals(displayName, CustomItem.VOTE_MODE.getDisplayName()) && Objects.equals(lore, CustomItem.VOTE_MODE.getLore())) {
+            event.setCancelled(true);
+            if (gamePlayer == null || gamePlayer.getArena() == null) return;
+            Arena arenaStr = (Arena) gamePlayer.getArena();
+            if (arenaStr.getArenaState() != ArenaState.WAITING && arenaStr.getArenaState() != ArenaState.STARTING) return;
+            
+            player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, (float) Math.random());
+            new VoteModeMenu(arenaStr).open(player);
+            return;
+        }
+
+        if (Objects.equals(displayName, CustomItem.VOTE_DIFFICULTY.getDisplayName()) && Objects.equals(lore, CustomItem.VOTE_DIFFICULTY.getLore())) {
+            event.setCancelled(true);
+            if (gamePlayer == null || gamePlayer.getArena() == null) return;
+            Arena arenaStr = (Arena) gamePlayer.getArena();
+            if (arenaStr.getArenaState() != ArenaState.WAITING && arenaStr.getArenaState() != ArenaState.STARTING) return;
+            
+            player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, (float) Math.random());
+            new VoteDifficultyMenu(arenaStr).open(player);
+            return;
+        }
+
         // === GAMEPLAY ITEMS ===
-        if (gamePlayer == null || !gamePlayer.isInArena()) return;
-        Arena arena = (Arena) gamePlayer.getArena();
         if (arena == null) return;
 
         // === SURVIVOR FLASHLIGHT ===
@@ -293,17 +494,25 @@ public class PlayerInteractListener implements Listener {
             Role pRole = arena.getPlayers().get(player);
             if (pRole == null || pRole == Role.NONE) return;
 
+            // Phase 4: HARD Mode Perk Block
+            if (arena.getCurrentDifficulty() == me.dreamdevs.slender.api.game.Difficulty.HARD) {
+                player.sendMessage(me.dreamdevs.slender.api.utils.ColourUtil.colorizeToComponent("&c&lNightmare! &7Perks are disabled in Hard Difficulty."));
+                player.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_SCREAM, 1f, 1f);
+                return;
+            }
+
+            if (gamePlayer == null || arena == null) return;
             Perk perk = gamePlayer.getPerk(pRole);
             if (perk == null) {
                 player.sendMessage(Component.text("No perk equipped!", NamedTextColor.RED));
                 return;
             }
-            activatePerkAbility(player, gamePlayer, perk, pRole);
+            activatePerkAbility(player, gamePlayer, perk, pRole, arena);
             return;
         }
     }
 
-    private void activatePerkAbility(Player player, GamePlayer gamePlayer, Perk perk, Role role) {
+    private void activatePerkAbility(Player player, GamePlayer gamePlayer, Perk perk, Role role, Arena arena) {
         UUID uuid = player.getUniqueId();
         long now = System.currentTimeMillis();
         long lastUse = perkCooldowns.getOrDefault(uuid, 0L);
@@ -366,8 +575,7 @@ public class PlayerInteractListener implements Listener {
                     .filter(e -> e instanceof Player)
                     .map(e -> (Player) e)
                     .forEach(p -> {
-                        Arena a = (Arena) gamePlayer.getArena();
-                        if (a != null && a.getPlayers().get(p) == Role.SURVIVOR) {
+                        if (arena != null && arena.getPlayers().get(p) == Role.SURVIVOR) {
                             p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 100, 1));
                         }
                     });
@@ -399,6 +607,88 @@ public class PlayerInteractListener implements Listener {
         event.setCancelled(true);
     }
 
+    // === PHASE 6: ESCAPE ROOM HANDLERS ===
+
+    private static final Map<UUID, BukkitTask> repairTasks = new HashMap<>();
+
+    public static void startRepair(Player player, Arena arena, Location loc) {
+        if (repairTasks.containsKey(player.getUniqueId())) return;
+        
+        Double progress = arena.getGeneratorProgress().getOrDefault(loc, 0.0);
+        if (progress >= 100.0) {
+            player.sendMessage(Langauge.ER_GENERATOR_ALREADY_REPAIRED.toString());
+            return;
+        }
+
+        BukkitTask task = new BukkitRunnable() {
+            private double currentProgress = progress;
+
+            @Override
+            public void run() {
+                if (!player.isOnline()) {
+                    cancel();
+                    repairTasks.remove(player.getUniqueId());
+                    return;
+                }
+                
+                // If player moves too far (more than 3 blocks)
+                if (player.getLocation().distance(loc) > 4.0) {
+                    player.sendMessage(Langauge.ER_GENERATOR_TOO_FAR.toString());
+                    cancel();
+                    repairTasks.remove(player.getUniqueId());
+                    return;
+                }
+
+                currentProgress += 10.0; // 10% per second
+                arena.getGeneratorProgress().put(loc, currentProgress);
+                
+                // Visuals
+                String bar = "|".repeat((int)currentProgress/5);
+                player.sendActionBar(Langauge.ER_GENERATOR_REPAIR_ACTIONBAR.toString()
+                    .replace("%PROGRESS%", String.valueOf((int)currentProgress))
+                    .replace("%BAR%", bar));
+                player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_USE, 0.5f, 1.5f);
+                loc.getWorld().spawnParticle(Particle.CRIT, loc.clone().add(0.5, 1, 0.5), 5, 0.2, 0.2, 0.2, 0.05);
+
+                if (currentProgress >= 100.0) {
+                    arena.getGeneratorProgress().put(loc, 100.0);
+                    arena.setGeneratorsRepaired(arena.getGeneratorsRepaired() + 1);
+                    
+                    arena.sendMessage(Langauge.ER_GENERATOR_REPAIR_SUCCESS.toString()
+                        .replace("%CURRENT%", String.valueOf(arena.getGeneratorsRepaired()))
+                        .replace("%TOTAL%", String.valueOf(arena.getGeneratorLocations().size())));
+                    
+                    player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
+                    cancel();
+                    repairTasks.remove(player.getUniqueId());
+                }
+            }
+        }.runTaskTimer(me.dreamdevs.slender.SlenderMain.getInstance(), 0L, 20L);
+
+        repairTasks.put(player.getUniqueId(), task);
+        player.sendMessage(Langauge.ER_GENERATOR_REPAIR_START.toString());
+    }
+
+    private void handleGeneratorRepair(Player player, Arena arena, Location loc) {
+        startRepair(player, arena, loc);
+    }
+
+    private void handleGeneratorSabotage(Player player, Arena arena, Location loc) {
+        Double progress = arena.getGeneratorProgress().getOrDefault(loc, 0.0);
+        if (progress <= 0) return;
+
+        double reduction = 20.0; // Sabotage power
+        double newProgress = Math.max(0, progress - reduction);
+        arena.getGeneratorProgress().put(loc, newProgress);
+
+        if (progress >= 100.0 && newProgress < 100.0) {
+            arena.setGeneratorsRepaired(arena.getGeneratorsRepaired() - 1);
+        }
+
+        player.sendMessage(ColourUtil.colorize("&c&lGENERATOR SABOTAGED! &fProgress reduced."));
+        loc.getWorld().playSound(loc, Sound.BLOCK_ANVIL_LAND, 1f, 0.5f);
+        loc.getWorld().spawnParticle(Particle.SMOKE, loc.add(0, 1, 0), 30, 0.5, 0.5, 0.5, 0.05);
+    }
 
     // Clear all trackers when player leaves arena
     public static void clearPlayerTrackers(Player player) {

@@ -7,7 +7,7 @@
     <groupId>me.virgenes.GitHub</groupId>
     <artifactId>SlendermanPlugin</artifactId>
     <packaging>pom</packaging>
-    <version>1.6.0</version>
+    <version>1.7.0</version>
     <modules>
         <module>slender-api</module>
         <module>slender-plugin</module>

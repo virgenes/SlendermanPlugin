@@ -1,5 +1,5 @@
 name: SlendermanPlugin
-version: '1.6.0'
+version: '1.7.0'
 main: me.dreamdevs.slender.SlenderMain
 author: virgenes
 api-version: '1.16'

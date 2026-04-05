@@ -8,6 +8,8 @@ import me.dreamdevs.slender.api.events.SlenderJoinArenaEvent;
 import me.dreamdevs.slender.api.events.SlenderQuitArenaEvent;
 import me.dreamdevs.slender.api.game.ArenaState;
 import me.dreamdevs.slender.api.game.Role;
+import me.dreamdevs.slender.api.game.ArenaType;
+import me.dreamdevs.slender.api.game.GameMode;
 import me.dreamdevs.slender.api.utils.ColourUtil;
 import me.dreamdevs.slender.api.utils.Util;
 import me.dreamdevs.slender.database.data.GamePlayer;
@@ -74,6 +76,10 @@ public class GameManager {
                     gameMember.getPlayer().setScoreboard(arena.getScoreboard());
                     gameMember.getPlayer().getInventory().setItem(8, CustomItem.LEAVE.toItemStack());
                     gameMember.getPlayer().getInventory().setItem(7, CustomItem.FORCED_START.toItemStack());
+                    if (arena.getArenaType() == ArenaType.STANDARD) {
+                        gameMember.getPlayer().getInventory().setItem(0, CustomItem.VOTE_MODE.toItemStack());
+                        gameMember.getPlayer().getInventory().setItem(4, CustomItem.VOTE_DIFFICULTY.toItemStack());
+                    }
                     arena.getPlayers().put(gameMember.getPlayer(), Role.NONE);
                     arena.getBossBar().addPlayer(gameMember.getPlayer());
 
@@ -103,11 +109,20 @@ public class GameManager {
                 return;
             }
 
+            if (!arena.isReady()) {
+                player.sendMessage(Langauge.ARENA_INCOMPLETE_SETUP.toString());
+                return;
+            }
+
             player.teleport(arena.getSlenderManSpawnLocation());
             gamePlayer.clearInventory();
             player.setScoreboard(arena.getScoreboard());
             player.getInventory().setItem(8, CustomItem.LEAVE.toItemStack());
             player.getInventory().setItem(7, CustomItem.FORCED_START.toItemStack());
+            if (arena.getArenaType() == ArenaType.STANDARD) {
+                player.getInventory().setItem(0, CustomItem.VOTE_MODE.toItemStack());
+                player.getInventory().setItem(4, CustomItem.VOTE_DIFFICULTY.toItemStack());
+            }
             arena.getPlayers().put(player, Role.NONE);
             arena.getBossBar().addPlayer(player);
 
@@ -179,6 +194,21 @@ public class GameManager {
         arena.setMinPlayers(configuration.getInt("GameSettings.MinPlayers"));
         arena.setMaxPlayers(configuration.getInt("GameSettings.MaxPlayers"));
         arena.setGameTime(configuration.getInt("GameSettings.Time"));
+        
+        if (configuration.contains("GameSettings.ArenaType")) {
+            try {
+                arena.setArenaType(ArenaType.valueOf(configuration.getString("GameSettings.ArenaType")));
+            } catch (Exception ignored) {}
+        }
+        if (configuration.contains("GameSettings.AllowedModes")) {
+            try {
+                List<GameMode> allowed = configuration.getStringList("GameSettings.AllowedModes")
+                        .stream().map(GameMode::valueOf).collect(Collectors.toList());
+                arena.getAllowedModes().clear();
+                arena.getAllowedModes().addAll(allowed);
+            } catch (Exception ignored) {}
+        }
+        
         arena.setSlenderManSpawnLocation(Util.getStringLocation(configuration.getString("GameSettings.SlenderStartLocation"), true));
         List<Location> locations = new ArrayList<>();
         for(String s : configuration.getStringList("GameSettings.SurvivorsLocations"))
@@ -188,6 +218,24 @@ public class GameManager {
         for(String s : configuration.getStringList("GameSettings.PagesLocations"))
             locations1.add(Util.getStringLocation(s, true));
         arena.setPagesLocations(locations1);
+
+        // Phase 6: Escape Room Locations
+        List<Location> genLocs = new ArrayList<>();
+        for(String s : configuration.getStringList("GameSettings.GeneratorLocations"))
+            genLocs.add(Util.getStringLocation(s, true));
+        arena.setGeneratorLocations(genLocs);
+
+        List<Location> keyLocs = new ArrayList<>();
+        for(String s : configuration.getStringList("GameSettings.KeyLocations"))
+            keyLocs.add(Util.getStringLocation(s, true));
+        arena.setKeyLocations(keyLocs);
+
+        if (configuration.contains("GameSettings.EscapeLocation")) {
+            arena.setEscapeLocation(Util.getStringLocation(configuration.getString("GameSettings.EscapeLocation"), true));
+        }
+        if (configuration.contains("GameSettings.EscapeCode")) {
+            arena.setEscapeCode(configuration.getString("GameSettings.EscapeCode"));
+        }
         arena.startGame();
         arenas.add(arena);
     }
@@ -201,6 +249,9 @@ public class GameManager {
         configuration.set("GameSettings.Time", arena.getGameTime());
         configuration.set("GameSettings.MinPlayers", arena.getMinPlayers());
         configuration.set("GameSettings.MaxPlayers", arena.getMaxPlayers());
+        configuration.set("GameSettings.ArenaType", arena.getArenaType().name());
+        List<String> gameModesStr = arena.getAllowedModes().stream().map(Enum::name).collect(Collectors.toList());
+        configuration.set("GameSettings.AllowedModes", gameModesStr);
         configuration.set("GameSettings.SlenderStartLocation", Util.getLocationString(arena.getSlenderManSpawnLocation(), true));
         List<String> locations = new ArrayList<>();
         for (Location location : arena.getSurvivorsLocations()) {
@@ -208,12 +259,20 @@ public class GameManager {
             locations.add(line);
         }
         configuration.set("GameSettings.SurvivorsLocations", locations);
-        List<String> locations1 = new ArrayList<>();
-        for (Location location : arena.getPagesLocations()) {
-            String line = Util.getLocationString(location, true);
-            locations1.add(line);
-        }
+        List<String> locations1 = arena.getPagesLocations().stream().map(l -> Util.getLocationString(l, true)).collect(Collectors.toList());
         configuration.set("GameSettings.PagesLocations", locations1);
+        
+        // Phase 6: Escape Room Locations
+        List<String> genLocs = arena.getGeneratorLocations().stream().map(l -> Util.getLocationString(l, true)).collect(Collectors.toList());
+        configuration.set("GameSettings.GeneratorLocations", genLocs);
+        List<String> keyLocs = arena.getKeyLocations().stream().map(l -> Util.getLocationString(l, true)).collect(Collectors.toList());
+        configuration.set("GameSettings.KeyLocations", keyLocs);
+        if (arena.getEscapeLocation() != null) {
+            configuration.set("GameSettings.EscapeLocation", Util.getLocationString(arena.getEscapeLocation(), true));
+        }
+        if (arena.getEscapeCode() != null) {
+            configuration.set("GameSettings.EscapeCode", arena.getEscapeCode());
+        }
         try {
             configuration.save(f);
         } catch (IOException ignored) { }

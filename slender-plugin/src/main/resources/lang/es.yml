@@ -212,3 +212,28 @@ Torch:
 
 Errors:
   No-Page-Locations: "&c[SlenderMan] Error: No hay ubicaciones de páginas configuradas para la arena %ARENA%."
+
+Revival:
+  Downed-Title: "&c&l❤ ¡ESTÁS CAÍDO! ❤"
+  Downed-Subtitle: "&7Espera a que un compañero te reanime..."
+  Downed-ActionBar: "&c&l❤ HERIDO ❤ &7Necesitas ayuda... (%TIME%s)"
+  Teammate-Downed: "&e%PLAYER% &7ha caído! &e¡Reanímalo!"
+  Reviving-ActionBar: "&e&lREANIMANDO: &f%BAR% &e%PERCENT%%"
+  Being-Revived-ActionBar: "&a&lSIENDO REANIMADO: &f%BAR% &a%PERCENT%%"
+  Cancelled: "&c&l¡REANIMACIÓN CANCELADA! &7Demasiado lejos."
+  Success-Title: "&a&l¡REANIMADO!"
+  Success-Subtitle: "&7Estás malherido..."
+  Reviver-Success: "&a&l¡Reanimaste a &f%PLAYER%&a!"
+  Bleedout-Death: "&c%PLAYER% &7se desangró."
+  No-More-Revives: "&cMáximo de reanimaciones alcanzado. La próxima caída será permanente."
+  Execution-ActionBar: "&4&lEJECUTANDO: &f%BAR% &4%PERCENT%%"
+  Execution-Victim-ActionBar: "&4&l☠ SIENDO EJECUTADO ☠ &f%BAR%"
+  Execution-Complete: "&4&l☠ %PLAYER% fue ejecutado por el Slenderman."
+
+SwordStun:
+  Killer-Title: "&c&l¡HAS SIDO NOQUEADO!"
+  Killer-Subtitle: "&7Parálisis por &f%SECONDS% segundos"
+  Survivor-ActionBar: "&a&l¡ASESINO NOQUEADO! &f(%SECONDS% Segundos)"
+  Cooldown: "&c¡La espada está en enfriamiento! (%TIME%s)"
+  Sword-Broken: "&c&l¡Tu espada se ha roto!"
+  Uses-Left: "&eTu espada tiene &l%HITS% &eusos restantes."

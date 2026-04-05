@@ -5,7 +5,7 @@
     <parent>
         <artifactId>SlendermanPlugin</artifactId>
         <groupId>me.virgenes.GitHub</groupId>
-        <version>1.6.0</version>
+        <version>1.7.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -13,7 +13,7 @@
 
     <!-- Information used in plugin.yml -->
     <name>SlendermanPlugin</name>
-    <version>1.6.0</version>
+    <version>1.7.0</version>
 
     <properties>
         <maven.compiler.release>17</maven.compiler.release>
@@ -38,7 +38,7 @@
         <dependency>
             <groupId>me.virgenes.GitHub</groupId>
             <artifactId>slender-api</artifactId>
-            <version>1.6.0</version>
+            <version>1.7.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -55,6 +55,7 @@
     </dependencies>
 
     <build>
+        <finalName>SlendermanPlugin-1.7.0</finalName>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>

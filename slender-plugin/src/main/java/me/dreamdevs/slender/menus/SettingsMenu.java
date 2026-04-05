@@ -18,11 +18,16 @@ public class SettingsMenu extends ItemMenu {
 	private static final String[] MESSAGE_TYPES = {"all", "arena", "lobby"};
 
 	public SettingsMenu(GamePlayer gamePlayer) {
-		super(Langauge.MENU_MY_PROFILE_SETTINGS_TITLE.toString(), Size.THREE_LINE);
+		super(Langauge.MENU_MY_PROFILE_SETTINGS_TITLE.toString(), Size.FIVE_LINE);
 
-		setItem(12, new SetSettingItem(gamePlayer, Setting.AUTO_JOIN_MODE,
+        // Decoration: Glass panes for a premium look
+        for (int i = 0; i < 45; i++) {
+            setItem(i, new MenuItem(" ", new ItemStack(Material.GRAY_STAINED_GLASS_PANE)));
+        }
+
+		setItem(11, new SetSettingItem(gamePlayer, Setting.AUTO_JOIN_MODE,
 				Langauge.MENU_MY_PROFILE_SETTINGS_AUTO_JOIN_MODE_ITEM_NAME.toString(),
-				Material.APPLE,
+				Material.COMPASS,
 				ColourUtil.colouredLore(Langauge.MENU_MY_PROFILE_SETTINGS_AUTO_JOIN_MODE_ITEM_LORE.toString()
 						.replace("%STATUS%", ((boolean)gamePlayer.getSetting(Setting.AUTO_JOIN_MODE)) ?
 											Langauge.MENU_STATUS_ON.toString() : Langauge.MENU_STATUS_OFF.toString())).toArray(String[]::new)));
@@ -34,18 +39,32 @@ public class SettingsMenu extends ItemMenu {
 						.replace("%STATUS%", ((boolean)gamePlayer.getSetting(Setting.SHOW_ARENA_JOIN_MESSAGE)) ?
 								Langauge.MENU_STATUS_ON.toString() : Langauge.MENU_STATUS_OFF.toString())).toArray(String[]::new)));
 
-		setItem(14, new MessageTypeItem(gamePlayer));
+		setItem(15, new MessageTypeItem(gamePlayer));
 
-		setItem(15, new SetSettingItem(gamePlayer, Setting.MUSIC_ENABLED,
-				"\u00266\u0026lGame Music",
+		setItem(29, new SetSettingItem(gamePlayer, Setting.MUSIC_ENABLED,
+				"&6&lGame Music",
 				Material.JUKEBOX,
 				ColourUtil.colouredLore(java.util.Arrays.asList(
-						"\u00267Toggle in-game background music.",
-						"\u00267Status: " + ((boolean) gamePlayer.getSetting(Setting.MUSIC_ENABLED) ?
-								"\u00262\u0026lON" : "\u00264\u0026lOFF")
+						"&7Toggle in-game background music.",
+						"&7Status: " + ((boolean) gamePlayer.getSetting(Setting.MUSIC_ENABLED) ?
+								"&2&lON" : "&4&lOFF")
 				)).toArray(String[]::new)));
 
-		setItem(26, new BackToMyProfileItem());
+		setItem(31, new SetSettingItem(gamePlayer, Setting.DARKNESS_FLICKER,
+				Langauge.MENU_MY_PROFILE_SETTINGS_DARKNESS_FLICKER_ITEM_NAME.toString(),
+				Material.ENDER_EYE,
+				ColourUtil.colouredLore(Langauge.MENU_MY_PROFILE_SETTINGS_DARKNESS_FLICKER_ITEM_LORE.toString()
+						.replace("%STATUS%", ((boolean)gamePlayer.getSetting(Setting.DARKNESS_FLICKER)) ?
+								Langauge.MENU_STATUS_ON.toString() : Langauge.MENU_STATUS_OFF.toString())).toArray(String[]::new)));
+
+		setItem(33, new SetSettingItem(gamePlayer, Setting.FLASHLIGHT_REALISTIC,
+				Langauge.MENU_MY_PROFILE_SETTINGS_FLASHLIGHT_STYLE_ITEM_NAME.toString(),
+				Material.BEACON,
+				ColourUtil.colouredLore(Langauge.MENU_MY_PROFILE_SETTINGS_FLASHLIGHT_STYLE_ITEM_LORE.toString()
+						.replace("%STYLE%", ((boolean)gamePlayer.getSetting(Setting.FLASHLIGHT_REALISTIC)) ?
+								"Realistic" : "Night Vision")).toArray(String[]::new)));
+
+		setItem(40, new BackToMyProfileItem());
 	}
 
 	private static class SetSettingItem extends MenuItem {

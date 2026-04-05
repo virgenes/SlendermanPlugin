@@ -57,6 +57,8 @@ public class DatabaseYAML implements IDatabase {
             playerData.set("PlayerSettings.ShowJoinArenaMessage", gamePlayer.getSetting(Setting.SHOW_ARENA_JOIN_MESSAGE));
             playerData.set("PlayerSettings.MessagesType", gamePlayer.getSetting(Setting.MESSAGE_TYPE));
             playerData.set("PlayerSettings.MusicEnabled", gamePlayer.getSetting(Setting.MUSIC_ENABLED));
+            playerData.set("PlayerSettings.DarknessFlicker", gamePlayer.getSetting(Setting.DARKNESS_FLICKER));
+            playerData.set("PlayerSettings.FlashlightRealistic", gamePlayer.getSetting(Setting.FLASHLIGHT_REALISTIC));
 			Perk survivorPerk = gamePlayer.getPerk(Role.SURVIVOR);
 			Perk slenderPerk = gamePlayer.getPerk(Role.SLENDER);
 			playerData.set("PlayerPerks.EquippedSurvivorPerk", survivorPerk != null ? survivorPerk.getClass().getAnnotation(PerkInfo.class).name() : "RUNAWAY");
@@ -99,6 +101,8 @@ public class DatabaseYAML implements IDatabase {
             gamePlayer.setSetting(Setting.SHOW_ARENA_JOIN_MESSAGE, configuration.getBoolean("PlayerSettings.ShowJoinArenaMessage",true));
             gamePlayer.setSetting(Setting.MESSAGE_TYPE, configuration.getString("PlayerSettings.MessagesType","all"));
             gamePlayer.setSetting(Setting.MUSIC_ENABLED, configuration.getBoolean("PlayerSettings.MusicEnabled", true));
+            gamePlayer.setSetting(Setting.DARKNESS_FLICKER, configuration.getBoolean("PlayerSettings.DarknessFlicker", true));
+            gamePlayer.setSetting(Setting.FLASHLIGHT_REALISTIC, configuration.getBoolean("PlayerSettings.FlashlightRealistic", true));
 
 			gamePlayer.setPerk(Role.SURVIVOR, SlenderMain.getInstance().getPerkManager().getPerk(configuration.getString("PlayerPerks.EquippedSurvivorPerk","")));
 			gamePlayer.setPerk(Role.SLENDER, SlenderMain.getInstance().getPerkManager().getPerk(configuration.getString("PlayerPerks.EquippedSlenderManPerk","")));

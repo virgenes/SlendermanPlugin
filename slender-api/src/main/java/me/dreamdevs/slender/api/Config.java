@@ -105,7 +105,17 @@ public enum Config {
     WIN_SLENDER_TITLE("WinVisuals.Slender.Title", "&4&lSLENDERMAN WON!"),
     WIN_SLENDER_SUBTITLE("WinVisuals.Slender.Subtitle", "&cNo one escaped the darkness."),
     WIN_EFFECTS_PARTICLES("WinVisuals.Effects.Particles", true),
-    WIN_EFFECTS_SOUNDS("WinVisuals.Effects.Sounds", true);
+    WIN_EFFECTS_SOUNDS("WinVisuals.Effects.Sounds", true),
+
+    // ── Revival System ────────────────────────────────────────────────────
+    REVIVAL_ENABLED("GameSettings.Revival.Enabled", true),
+    REVIVAL_BLEEDOUT_SECONDS("GameSettings.Revival.Bleedout-Seconds", 30),
+    REVIVAL_DURATION_SECONDS("GameSettings.Revival.Revival-Duration-Seconds", 10),
+    REVIVAL_EXECUTION_SECONDS("GameSettings.Revival.Execution-Duration-Seconds", 5),
+    REVIVAL_MAX_PER_GAME("GameSettings.Revival.Max-Revivals-Per-Player", 1),
+    REVIVAL_RECOVERY_SECONDS("GameSettings.Revival.Recovery-Duration-Seconds", 8),
+    REVIVAL_RECOVERY_HEALTH("GameSettings.Revival.Recovery-Start-Health", 8),
+    REVIVAL_REVIVER_MAX_DISTANCE("GameSettings.Revival.Reviver-Max-Distance", 3);
 
     // ─────────────────────────────────────────────────────────────────────
 
@@ -116,6 +126,10 @@ public enum Config {
     Config(String path, Object defaultValue) {
         this.path = path;
         this.defaultValue = defaultValue;
+    }
+
+    public static void setConfiguration(YamlConfiguration conf) {
+        configuration = conf;
     }
 
     public static void setConfiguration(File file) {

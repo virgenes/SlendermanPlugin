@@ -81,7 +81,19 @@ public class GamePlayer implements IGamePlayer {
 
 	@Override
 	public Object getSetting(Setting setting) {
-		return settings.get(setting);
+		Object value = settings.get(setting);
+		if (value == null) {
+			if (setting == Setting.DARKNESS_FLICKER || setting == Setting.FLASHLIGHT_REALISTIC || setting == Setting.MUSIC_ENABLED || setting == Setting.SHOW_ARENA_JOIN_MESSAGE) {
+				return true;
+			}
+			if (setting == Setting.MESSAGE_TYPE) {
+				return "all";
+			}
+			if (setting == Setting.AUTO_JOIN_MODE) {
+				return false;
+			}
+		}
+		return value;
 	}
 
 	@Override

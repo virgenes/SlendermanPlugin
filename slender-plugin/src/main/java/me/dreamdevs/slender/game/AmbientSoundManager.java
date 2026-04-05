@@ -2,6 +2,7 @@ package me.dreamdevs.slender.game;
 
 import me.dreamdevs.slender.SlenderMain;
 import me.dreamdevs.slender.api.game.Role;
+import me.dreamdevs.slender.api.game.Difficulty;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -53,6 +54,16 @@ public class AmbientSoundManager {
             if (slender == null || !slender.isOnline()) return;
             Location slenderLoc = slender.getLocation();
 
+            // Phase 4: HARD Mode Slenderman Debuff
+            if (arena.getCurrentDifficulty() == Difficulty.HARD) {
+                // Slenderman will reveal his position occasionally with Glowing and slowed down slightly
+                if (ThreadLocalRandom.current().nextInt(100) < 15) { // 15% chance every 3 seconds
+                    slender.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 60, 0)); // visible through walls for 3s
+                    slender.sendMessage(me.dreamdevs.slender.api.utils.ColourUtil.colorizeToComponent("&eThe darkness recedes slightly... Your aura is revealed!"));
+                    slender.playSound(slenderLoc, Sound.BLOCK_BEACON_DEACTIVATE, 1f, 1f);
+                }
+            }
+
             for (Map.Entry<Player, Role> entry : arena.getPlayers().entrySet()) {
                 Player player = entry.getKey();
                 Role role = entry.getValue();
@@ -72,7 +83,7 @@ public class AmbientSoundManager {
                         playHorrorSound(player, pLoc, 1.0f, 0.1f);
                     }
                     if (ThreadLocalRandom.current().nextInt(100) < 30) {
-                        applyGlitchEffect(player);
+                        applyGlitchEffect(player, arena, slender);
                     }
                 } else if (dist <= 10.0) {
                     if (ThreadLocalRandom.current().nextInt(100) < 25) {
@@ -80,7 +91,20 @@ public class AmbientSoundManager {
                     }
                     // === DARKNESS TERROR ===
                     if (ThreadLocalRandom.current().nextInt(100) < 3 && me.dreamdevs.slender.api.Config.USE_DARKNESS_EFFECT.toBoolean()) {
-                        me.dreamdevs.slender.compat.VersionCompat.applyDarkness(player, 80, 0);
+                        me.dreamdevs.slender.database.data.GamePlayer gpObj = SlenderMain.getInstance().getPlayerManager().getPlayer(player);
+                        boolean flicker = gpObj == null || gpObj.getSetting(me.dreamdevs.slender.api.Setting.DARKNESS_FLICKER) == null || (boolean) gpObj.getSetting(me.dreamdevs.slender.api.Setting.DARKNESS_FLICKER);
+                        
+                        if (flicker) {
+                            org.bukkit.potion.PotionEffect active = player.getPotionEffect(PotionEffectType.DARKNESS != null ? PotionEffectType.DARKNESS : PotionEffectType.BLINDNESS);
+                            if (active == null || active.getDuration() < 20) {
+                                me.dreamdevs.slender.compat.VersionCompat.applyDarkness(player, 80, 0);
+                            }
+                        } else {
+                            // Flicker OFF: Darkness and Blindness are disabled
+                            org.bukkit.potion.PotionEffectType dType = PotionEffectType.DARKNESS;
+                            if (dType != null) player.removePotionEffect(dType);
+                            player.removePotionEffect(PotionEffectType.BLINDNESS);
+                        }
                     }
                 } else if (dist <= 20.0) {
                     if (ThreadLocalRandom.current().nextInt(100) < 12) {
@@ -104,7 +128,7 @@ public class AmbientSoundManager {
                         playHorrorSound(player, pLoc, 0.8f, 0.1f);
                     }
                     if (ThreadLocalRandom.current().nextInt(100) < 20) {
-                        applyGlitchEffect(player);
+                        applyGlitchEffect(player, arena, slender);
                     }
                     if (ThreadLocalRandom.current().nextInt(100) < 40) {
                         playHeartbeat(player, pLoc);
@@ -128,6 +152,24 @@ public class AmbientSoundManager {
                             ThreadLocalRandom.current().nextDouble(-5, 5), 0,
                             ThreadLocalRandom.current().nextDouble(-5, 5)));
                     player.playSound(pLoc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 2f, 0.5f);
+                } // End of lightning strike
+                if (arena.getCurrentDifficulty() == Difficulty.INTERMEDIATE || arena.getCurrentDifficulty() == Difficulty.HARD) {
+                    // Constant paranoia: 15% chance to hear footsteps nearby
+                    if (ThreadLocalRandom.current().nextInt(100) < 15) {
+                        Location soundLoc = pLoc.clone().add(ThreadLocalRandom.current().nextDouble(-3, 3), 0, ThreadLocalRandom.current().nextDouble(-3, 3));
+                        player.playSound(soundLoc, Sound.BLOCK_WOOD_STEP, 0.8f, 0.5f);
+                    }
+                    // 10% chance to hear a fake heartbeat
+                    if (ThreadLocalRandom.current().nextInt(100) < 10) {
+                        playHeartbeat(player, pLoc);
+                    }
+                    // 5% chance of fake explosion hallucination
+                    if (ThreadLocalRandom.current().nextInt(100) < 5) {
+                        Location explosionLoc = pLoc.clone().add(ThreadLocalRandom.current().nextDouble(-5, 5), 0, ThreadLocalRandom.current().nextDouble(-5, 5));
+                        player.playSound(explosionLoc, Sound.ENTITY_GENERIC_EXPLODE, 2.0f, 0.5f);
+                        player.spawnParticle(Particle.EXPLOSION_EMITTER, explosionLoc, 1);
+                        player.addPotionEffect(new PotionEffect(PotionEffectType.NAUSEA, 40, 1));
+                    }
                 }
             }
         }, 0L, 60L);
@@ -145,11 +187,21 @@ public class AmbientSoundManager {
                 player.playSound(loc, beat, 0.4f, 0.15f), 6L);
     }
 
-    private void applyGlitchEffect(Player player) {
-        // Flash blindness
-        player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 10, 0));
-        // Nausea warp
-        player.addPotionEffect(new PotionEffect(PotionEffectType.NAUSEA, 30, 0));
+    private void applyGlitchEffect(Player player, Arena arena, Player slender) {
+        if (slender != null && player.getLocation().distance(slender.getLocation()) < 15) {
+            player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 0));
+        } else {
+            player.removePotionEffect(PotionEffectType.BLINDNESS);
+        }
+        if (slender != null && player.getLocation().distance(slender.getLocation()) < 8) {
+            player.addPotionEffect(new PotionEffect(PotionEffectType.NAUSEA, 100, 0));
+        }
+        
+        // Intermediate/Hard exclusive: Random Explosions
+        if (arena.getCurrentDifficulty() != Difficulty.EASY && ThreadLocalRandom.current().nextInt(100) < 2) {
+            player.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 0.8f, 0.5f);
+        }
+        
         // Screen shake via camera (rapid teleport back)
         Location original = player.getLocation().clone();
         player.teleport(original.add(0.05, 0, 0));

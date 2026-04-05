@@ -27,9 +27,14 @@ public class VersionCompat {
     
     public static PotionEffectType getPotionType(String... names) {
         for (String name : names) {
-            PotionEffectType type = org.bukkit.Registry.POTION_EFFECT_TYPE.get(org.bukkit.NamespacedKey.minecraft(name.toLowerCase()));
-            if (type != null) return type;
-            type = PotionEffectType.getByName(name);
+            try {
+                // Try modern registry first
+                PotionEffectType type = org.bukkit.Registry.POTION_EFFECT_TYPE.get(org.bukkit.NamespacedKey.minecraft(name.toLowerCase()));
+                if (type != null) return type;
+            } catch (Exception ignored) {}
+            
+            // Fallback for older names or manual lookups
+            PotionEffectType type = PotionEffectType.getByName(name.toUpperCase());
             if (type != null) return type;
         }
         return PotionEffectType.BLINDNESS; // Final fallback

@@ -1,12 +1,12 @@
 # 🕯️ SlendermanPlugin
 
-[![Version](https://img.shields.io/badge/version-1.6.0-red.svg)](https://github.com/virgenes/SlendermanPlugin)
+[![Version](https://img.shields.io/badge/version-1.7.0-red.svg)](https://github.com/virgenes/SlendermanPlugin)
 [![Minecraft](https://img.shields.io/badge/Minecraft-1.19--1.21.x-green.svg)](https://papermc.io)
 [![Java](https://img.shields.io/badge/Java-17+-orange.svg)](https://adoptium.net)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 > A professional, feature-rich Slender Man horror minigame for Paper/Spigot servers.  
-> Collect 8 pages before the Slenderman catches you — if you dare.
+> Featuring multiple game modes, a custom music engine, and high-performance anti-cheat.
 
 ---
 
@@ -14,17 +14,13 @@
 
 | Category | Features |
 |---|---|
-| 🎮 **Gameplay** | 8-page collection, sanity system, noise mechanics, multiple arenas, **Combat Mechanics** |
+| 🎮 **Game Modes** | **Classic** (Pages), **Escape Room** (Objectives), **Infection** (Alpha Slender) |
+| 🛡️ **Anti-Cheat** | **Combat-Logout System** (Disconnected survivors after hit are penalized) |
 | 🎵 **Audio** | **Independent NBS Engine** (Initial & Combat tracks, per-player toggle) |
+| 🌐 **Localization** | **Advanced System**: Dynamic `lang/` folder, automatic extraction |
 | 🧠 **Sanity** | Visual bar, panic effects, hallucinations, darkness drain |
-| ⚔️ **Perks** | 9 survivor perks + 3 Slenderman perks, equippable in-game |
-| 🎭 **Disguises** | 6 Slenderman skins (Enderman, Wither, Phantom, Ravager, Elder Guardian, Warden) |
-| 📊 **Progression** | Complete Evolution system: XP, Levels, Skills, and Achievements |
-| 💰 **Economy** | Built-in coin system, balance commands, shop |
-| 🌍 **Multi-arena** | Unlimited simultaneous arenas with independent config |
+| 🎭 **Disguises** | 6 Slenderman skins (Enderman, Wither, Phantom, Ravager, etc.) |
 | 🔌 **Integrations** | PlaceholderAPI, ProtocolLib, ViaVersion compatible |
-| 🌐 **Languages** | English, Spanish, French, German, Portuguese, Chinese |
-| 🛠️ **Admin tools** | Game logs, hot-reload, wizard setup, force-start |
 
 ---
 
@@ -32,266 +28,71 @@
 
 - **Server:** Paper or Spigot 1.16 – 1.21.4
 - **Java:** 17 or higher
-- **Required:** [ProtocolLib](https://www.spigotmc.org/resources/protocollib.1997/) (for disguise system)
-- **Note:** **No external music library required** (built-in NBS engine).
+- **Required:** [ProtocolLib](https://www.spigotmc.org/resources/protocollib.1997/) (for disguise & anti-cheat)
 
 ---
 
 ## 🚀 Installation
 
-1. Download `SlendermanPlugin-1.6.0.jar`
+1. Download `SlendermanPlugin-1.7.0.jar`
 2. Place it in your server's `plugins/` folder
 3. Install [ProtocolLib](https://www.spigotmc.org/resources/protocollib.1997/)
-4. Start the server — config files are generated automatically
+4. Start the server — config and `lang/` are generated automatically
 5. Set the lobby: `/sis setlobby`
 6. Create your first arena: `/sis createarena <id>`
-7. Configure it: `/sis editarena <id>`
+7. Configure it: `/sis editarena <id>` (Select your preferred **Game Mode**)
 8. Save and play: `/sis admin save <id>`
 
 ---
 
-## 🎮 Commands & Permissions
+## 🏗️ Game Modes
 
-### Player Commands
-| Command | Alias | Permission | Description |
-|---|---|---|---|
-| `/sis join <arena>` | — | `SlendermanPlugin.player` | Join an arena |
-| `/sis leave` | — | `SlendermanPlugin.player` | Leave current arena |
-| `/sis balance [player]` | `/sis bal` | `slender.economy.balance` | View coin balance |
-| `/sis baltop` | `/sis balancetop` | `slender.economy.balancetop` | Top 10 richest |
-| `/sis pay <player> <amount>` | — | `slender.economy.pay` | Send coins |
-| `/sis money` | `/sis eco` | `slender.economy.help` | Economy help |
+### 📖 Classic Mode
+The traditional experience. Survivors must find and collect 8 scattered pages while keeping their sanity high and avoiding the Slenderman.
 
-### Admin Commands
-| Command | Alias | Permission | Description |
-|---|---|---|---|
-| `/sis setlobby` | — | `SlendermanPlugin.admin` | Set lobby location |
-| `/sis createarena <id>` | — | `SlendermanPlugin.admin` | Create a new arena |
-| `/sis editarena <id>` | — | `SlendermanPlugin.admin` | Open arena editor |
-| `/sis deletearena <id>` | — | `SlendermanPlugin.admin` | Delete an arena |
-| `/sis admin <id>` | — | `SlendermanPlugin.admin` | Admin menu for arena |
-| `/sis start <arena>` | — | `SlendermanPlugin.admin` | Force-start an arena |
-| `/sis money give <player> <amount>` | — | `slender.economy.give` | Give coins |
-| `/sis money take <player> <amount>` | — | `slender.economy.take` | Take coins |
-| `/sis money set <player> <amount>` | — | `slender.economy.set` | Set balance |
-| `/sis money reload` | `/sis money rl` | `slender.economy.reload` | Reload config |
+### 🔌 Escape Room Mode
+A strategic team-based mode:
+- **Repair Generators**: Find and fix 5 generators to power the exit.
+- **Find Master Keys**: Scavenge for hidden keys to unlock the final gate.
+- **Keypad Security**: Enter the numeric code to open the iron door.
+
+### 🧟 Infection Mode
+A rapid-fire survival mode where the infection spreads:
+- **First Slender**: One player starts as the Alpha Slender.
+- **Assimilation**: Killed survivors become **Proxies** and join the hunt.
+- **Last Hope**: If only one survivor remains, they receive temporary Speed, Resistance, and Glowing buffs to make a final stand.
 
 ---
 
-## ⚙️ Configuration
-
-The main config is at `plugins/SlendermanPlugin/config.yml`.  
-Key sections:
-
-```yaml
-General:
-  Language: en          # en, es, fr, de, pt, zh
-  Update-Checker: true
-
-GameSettings:
-  Pages-To-Win: 8
-  SlenderMan-Health: 40
-  Starting-Countdown: 30
-  Torch:
-    Max-Uses: 3
-    Cooldown-Seconds: 5
-  TerrorRadius:
-    Enabled: true
-    Music-Radius: 7
-    Nausea-Radius: 3
-  Disguise:
-    Enabled: true
-    Default-Skin: ENDERMAN  # ENDERMAN, WITHER, PHANTOM, RAVAGER, ELDER_GUARDIAN, WARDEN
-```
-
-Full config with 80+ parameters is auto-generated on first run.
+## 🛡️ Combat-Logout Anti-Cheat
+Version 1.7.0 introduces a robust anti-cheat to ensure fairness:
+- **Combat Tracking**: Players are in "combat" for 10s after being hit by SlenderMan.
+- **Instant Loss Detection**: If the last survivor combat-logs, SlenderMan wins **immediately**.
+- **Cheater Relegation**: Disconnecting in combat marks you as a cheater; upon return, you are forced into **Spectator mode** with no items or survivor effects.
 
 ---
 
-## 🧠 Systems
-
-### Sanity System
-Survivors have 0–100 sanity. It drains when:
-- Looking at the Slenderman (within 15 blocks)
-- Standing in darkness
-- Near the Slenderman (within 7 blocks)
-
-**Effects by level:**
-| Sanity | Effects |
-|---|---|
-| 75–100 | Normal |
-| 50–74 | Occasional ambient sounds |
-| 25–49 | Nausea, slowness, blindness pulses |
-| 0–24 | **PANIC** — severe effects, vulnerability |
-
-### Evolution System (Leveling)
-Players earn EXP by playing games, collecting pages, killing survivors, or killing Slenderman. 
-As they level up, they unlock new levels with specific coin rewards configured in `levels.yml`.
-
-### Skills System
-Players can use their earned coins to upgrade permanent passive skills up to Level 5:
-| Skill | Effect |
-|---|---|
-| **Walk Speed** | Increases base movement speed by +5% per level |
-| **Stamina** | Increases sprint duration |
-| **Resistance** | Reduces damage taken by monsters by -5% per level |
-| **Coin Booster** | Increases coins earned per match |
-
-### Achievements
-Players have a dedicated tracker to unlock lifetime achievements based on total stats:
-- **Scholar I-III**: Collect 8, 40, and 200 total pages
-- **Hunter I-III**: Kill 5, 25, and 100 survivors as Slenderman
-- **Survivor I-III**: Win 1, 10, and 50 matches as Survivor
-
-### Survivor Perks
-| Perk | Effect |
-|---|---|
-| Runaway | Speed II for 5s (20s cooldown) |
-| Better Together | Regeneration for you + nearby ally (25s) |
-| Archaeologist | Compass → nearest page + Night Vision (30s) |
-| Iron Will | Resistance I for 8s (30s) |
-| Shadow Step | Invisibility for 4s (35s) |
-| Last Stand | Speed III + Strength I for 5s (45s) |
-| Resilience | Passive 40% less sanity drain + restore 25 sanity (45s) |
-| Tracker | Compass → nearest page for 10s (25s) |
-| Spirit | Passive: on death, slows Slenderman 5s |
-
-### Slenderman Perks
-| Perk | Effect |
-|---|---|
-| Blood Hunt | Speed II + Slowness I on all survivors (40s) |
-| Terrify | Nausea + Darkness on nearby survivors (30s) |
-| Aura Sense | Passive: survivors glow 3s when picking a page |
-
----
-
-## 📊 PlaceholderAPI
-
-If PlaceholderAPI is installed, these placeholders are available:
-
-| Placeholder | Description |
-|---|---|
-| `%slender_level%` | Player level |
-| `%slender_rank%` | Player rank name |
-| `%slender_coins%` | Coin balance |
-| `%slender_wins%` | Total wins |
-| `%slender_pages%` | Total pages collected |
-| `%slender_deaths%` | Total deaths |
-| `%slender_games%` | Total games played |
-| `%slender_sanity%` | Current sanity (in-game) |
-| `%slender_arena%` | Current arena ID |
-| `%slender_role%` | Current role |
-
----
-
-## 🗂️ File Structure
-
-```
-plugins/SlendermanPlugin/
-├── config.yml          # Main configuration
-├── langauge.yml        # Legacy language file (auto-migrated)
-├── levels.yml          # XP/level configuration
-├── lang/               # Language files
-│   ├── en.yml
-│   ├── es.yml
-│   ├── fr.yml
-│   ├── de.yml
-│   ├── pt.yml
-│   └── zh.yml
-├── arenas/             # Arena configuration files
-│   └── <arena-id>.yml
-├── users/              # Player data files
-│   └── <uuid>.yml
-└── logs/               # Game logs
-    └── YYYY-MM-DD.log
-```
-
----
-
-## 🔧 API
-
-SlendermanPlugin fires custom events that other plugins can listen to:
-
-```java
-// Player gains EXP
-@EventHandler
-public void onExpGain(SlenderPlayerExpGainEvent event) {
-    GamePlayer player = event.getGamePlayer();
-    int exp = event.getExp();
-}
-
-// Player levels up
-@EventHandler
-public void onLevelUp(SlenderPlayerLevelUpEvent event) {
-    int newLevel = event.getNewLevel();
-}
-
-// Game starts
-@EventHandler
-public void onGameStart(SlenderGameStartEvent event) {
-    IArena arena = event.getArena();
-}
-
-// Game ends
-@EventHandler
-public void onGameEnd(SlenderGameEndEvent event) {
-    IArena arena = event.getArena();
-}
-```
-
----
-
-## ❓ FAQ
-
-**Q: The Slenderman disguise doesn't work.**  
-A: Make sure ProtocolLib is installed. Check console for `[Disguise] ProtocolLib disguise ready.`
-
-**Q: Players get kicked with protocol errors.**  
-A: This was a ViaVersion compatibility issue, fixed in 1.5.0 by using ProtocolLib for packet injection.
-
-**Q: How do I create an arena?**  
-A: Use `/sis createarena <id>`, then `/sis editarena <id>` to set spawns and pages, then `/sis admin save <id>`.
-
-**Q: Can I use this on 1.16?**  
-A: The plugin targets 1.19+. Some features (DARKNESS effect, WARDEN disguise) require 1.19+. The plugin adapts automatically on older versions.
+## 🌍 Localization
+Dynamic language loading system:
+- **Automatic Extraction**: Languages (`en.yml`, `es.yml`, etc.) extract to `plugins/SlendermanPlugin/lang/`.
+- **Full UI Translation**: Every menu, item, and message is localized.
 
 ---
 
 ## 📜 Changelog
 
-### v1.6.0 (Latest)
-- **🎉 Independent Music Engine**: Removed dependency on `NoteBlockAPI`. Now uses a native, professional NBS engine.
-- **⚔️ Combat System**:
-  - **Stun Sword**: Survivors have a limited 3-charge sword to slow/blind Slenderman.
-  - **Flash Escape**: Survivors get an escape bucket at 100s to teleport Slenderman away.
-- **🛡️ Quality of Life**:
-  - Forced **Adventure Mode** to protect arena blocks.
-  - Smart **Block Break** protection for all players in arena.
-  - Strictly enforced **Material.PAPER** for page collection logic.
-- **🌐 Cross-Version Stability**: Self-contained reflection-based Sound lookup for verified support from 1.16 to 1.21.4+.
-- **⚙️ Music Persistence**: Players can toggle music in `/sis settings` with database-stored preferences.
-
-### v1.5.0
-- Complete rewrite and bug fixes
-- Internal disguise system (no LibsDisguises required)
-- Sanity system with visual bar
-- 9 survivor perks + 3 Slenderman perks
-- 6 Slenderman skins in shop
-- Economy system with balance commands
-- PlaceholderAPI integration
-- 6-language support
-- Game logging system
-- Lantern with battery system
-- In-game scoreboard with sanity/pages/time
-- Custom chat format with rank badges
-- ViaVersion compatibility via ProtocolLib
+### v1.7.0 (Latest)
+- **⚡ Combat-Logout Anti-Cheat**: Resolved match-end hang bugs and enforced spectator restoration rules.
+- **🧟 Infection Mode**: Fully implemented role transitions and survivor buffs.
+- **🔓 Escape Room Mode**: Added generators, keypads, and master keys.
+- **🌐 Professional Localization**: New dynamic `lang/` directory loading.
+- **🚪 Iron Door & Interaction Fixes**: Synchronized door behavior and empty-hand interaction.
+- **🎭 Disguise System Overhaul**: Real-time virtual packet injection via ProtocolLib.
 
 ---
 
 ## 📄 License
-
-MIT License — free to use, modify and distribute.  
-Please credit **virgenes** if you redistribute.
+MIT License. Please credit **virgenes** if you redistribute.
 
 ---
 

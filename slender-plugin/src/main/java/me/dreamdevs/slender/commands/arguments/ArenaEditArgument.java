@@ -5,6 +5,8 @@ import me.dreamdevs.slender.api.Langauge;
 import me.dreamdevs.slender.api.commands.ArgumentCommand;
 import me.dreamdevs.slender.game.Arena;
 import me.dreamdevs.slender.menus.EditorMenu;
+import me.dreamdevs.slender.menus.EscapeRoomEditorMenu;
+import me.dreamdevs.slender.api.game.ArenaType;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -30,7 +32,12 @@ public class ArenaEditArgument implements ArgumentCommand {
             player.sendMessage(Langauge.ARENA_NO_ARENA.toString());
             return true;
         }
-        new EditorMenu(arena).open(player);
+        if (arena.getArenaType() == ArenaType.ESCAPE_ROOM) {
+            new EscapeRoomEditorMenu(arena).open(player);
+        } else {
+            new EditorMenu(arena).open(player);
+        }
+        player.setMetadata("editing_arena", new org.bukkit.metadata.FixedMetadataValue(SlenderMain.getInstance(), arena.getId()));
         return true;
     }
 

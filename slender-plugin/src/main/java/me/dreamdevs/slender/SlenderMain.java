@@ -130,7 +130,19 @@ public class SlenderMain extends JavaPlugin {
         this.database.disconnect();
     }
 
-    private void loadConfig() {
+    public void reloadPlugin() {
+        loadConfig();
+        loadLang();
+        if (gameManager != null) {
+            gameManager.getArenas().forEach(arena -> {
+                if (arena.getFlashlightManager() != null) {
+                    arena.getFlashlightManager().loadConfig();
+                }
+            });
+        }
+    }
+
+    public void loadConfig() {
         File config = new File(getDataFolder(), "config.yml");
 
         // Use bundled config.yml as template if file doesn't exist
@@ -154,7 +166,7 @@ public class SlenderMain extends JavaPlugin {
                 .filter(setting -> conf.getString(setting.getPath()) == null)
                 .forEach(setting -> conf.set(setting.getPath(), setting.getDefaultValue()));
 
-        Config.setConfiguration(config);
+        Config.setConfiguration(conf);
         try {
             conf.save(config);
         } catch (IOException e) {
@@ -162,20 +174,54 @@ public class SlenderMain extends JavaPlugin {
         }
     }
 
-    private void loadLang() {
-        File config = new File(getDataFolder(), "langauge.yml");
-        Util.createFile(config);
+    public void loadLang() {
+        String lang = Config.LANGUAGE.toString().toLowerCase();
+        if (lang.isEmpty()) lang = "en";
+        
+        File langDir = new File(getDataFolder(), "lang");
+        if (!langDir.exists()) langDir.mkdirs();
 
-        YamlConfiguration conf = YamlConfiguration.loadConfiguration(config);
-        Stream.of(Langauge.values())
-                .filter(setting -> conf.getString(setting.getPath()) == null)
-                .forEach(setting -> conf.set(setting.getPath(), setting.getDefaultMessage()));
+        // Extract bundled languages if they don't exist
+        String[] bundledLangs = {"de", "en", "es", "fr", "pt", "zh"};
+        for (String l : bundledLangs) {
+            File lFile = new File(langDir, l + ".yml");
+            if (!lFile.exists()) {
+                try (InputStream in = getResource("lang/" + l + ".yml")) {
+                    if (in != null) {
+                        Files.copy(in, lFile.toPath());
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        File langFile = new File(langDir, lang + ".yml");
+        if (!langFile.exists()) {
+            getLogger().warning("Language file " + lang + ".yml not found! Falling back to English.");
+            langFile = new File(langDir, "en.yml");
+        }
+        
+        getLogger().info("Loading language: " + lang);
+        
+        YamlConfiguration conf = YamlConfiguration.loadConfiguration(langFile);
+        
+        // Fill missing keys from enum defaults
+        boolean changed = false;
+        for (Langauge val : Langauge.values()) {
+            if (conf.getString(val.getPath()) == null) {
+                conf.set(val.getPath(), val.getDefaultMessage());
+                changed = true;
+            }
+        }
 
         Langauge.setConfiguration(conf);
-        try {
-            conf.save(config);
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (changed) {
+            try {
+                conf.save(langFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
